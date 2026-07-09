@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>ももいろ ひきざんランド</title>
+  <style>
+    :root {
+      --bg1: #fff4fb;
+      --bg2: #ffe3f3;
+      --pink: #ff6fb3;
+      --pink2: #ff9ccc;
+      --deep: #8a3f65;
+      --text: #553047;
+      --cream: #fffaf2;
+      --yellow: #ffd86b;
+      --mint: #9ce8d1;
+      --line: rgba(138, 63, 101, 0.18);
+      --shadow: 0 12px 28px rgba(181, 72, 130, 0.18);
+      --card: rgba(255,255,255,0.76);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, #fff 0 8%, transparent 9%),
+        radial-gradient(circle at 85% 12%, #fff 0 6%, transparent 7%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+      filter: blur(2px);
+      z-index: -1;
+    }
+    body::before { left: -80px; bottom: 10%; }
+    body::after { right: -90px; top: 24%; }
+
+    .app {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mascot {
+      width: 62px;
+      height: 62px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #fff, #ffd1e9);
+      border: 3px solid rgba(255, 111, 179, 0.36);
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      transform: rotate(-4deg);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 4.6vw, 44px);
+      line-height: 1.05;
+      color: #7b3157;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin-top: 5px;
+      font-size: clamp(13px, 2.1vw, 17px);
+      color: #80536e;
+    }
+
+    .pill {
+      border: 2px solid rgba(255, 111, 179, 0.3);
+      background: rgba(255,255,255,0.72);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(181, 72, 130, 0.12);
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .mode-card, .panel {
+      background: var(--card);
+      border: 2px solid rgba(255, 111, 179, 0.22);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+      backdrop-filter: blur(8px);
+    }
+
+    .mode-card {
+      min-height: 184px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .mode-card:active { transform: scale(0.985); }
+
+    .mode-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -42px -56px auto;
+      width: 142px;
+      height: 142px;
+      border-radius: 50%;
+      background: rgba(255, 156, 204, 0.25);
+    }
+
+    .mode-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-emoji {
+      font-size: 42px;
+      filter: drop-shadow(0 8px 8px rgba(138, 63, 101, 0.14));
+    }
+
+    .mode-card h2 {
+      margin: 0 0 7px;
+      font-size: clamp(21px, 3.5vw, 30px);
+      color: #743250;
+    }
+
+    .mode-card p {
+      margin: 0;
+      line-height: 1.55;
+      color: #6a4960;
+      font-weight: 650;
+      font-size: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tiny-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #fff7cf;
+      color: #7b5a13;
+      font-weight: 850;
+      font-size: 13px;
+      border: 1px solid rgba(123, 90, 19, 0.12);
+    }
+
+    .game-shell {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left, .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font: inherit;
+      border: none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: #fff;
+      border: 2px solid rgba(255, 111, 179, 0.25);
+      color: #743250;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(181, 72, 130, 0.12);
+      min-height: 48px;
+    }
+
+    .btn.primary {
+      background: linear-gradient(180deg, #ff86c4, #ff5fac);
+      color: #fff;
+      border-color: rgba(255,255,255,0.5);
+      text-shadow: 0 1px rgba(112, 24, 70, 0.2);
+    }
+
+    .btn.soft {
+      background: #fff7fd;
+    }
+
+    .btn:active { transform: translateY(1px) scale(0.99); }
+    .btn.hidden { display: none; }
+
+    .bottom-action {
+      display: flex;
+      justify-content: center;
+      padding: 2px 0 0;
+    }
+
+    .bottom-action .btn {
+      min-width: min(320px, 100%);
+      font-size: clamp(18px, 3vw, 24px);
+      padding: 14px 22px;
+    }
+
+    .panel {
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .question {
+      display: grid;
+      gap: 8px;
+      text-align: center;
+      padding: 8px 4px 12px;
+    }
+
+    .mode-name {
+      color: #9c5174;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      font-size: 14px;
+    }
+
+    .big-question {
+      font-size: clamp(25px, 5vw, 46px);
+      font-weight: 950;
+      line-height: 1.2;
+      color: #66314d;
+    }
+
+    .hint {
+      min-height: 31px;
+      font-size: clamp(16px, 2.7vw, 22px);
+      font-weight: 850;
+      color: #80536e;
+      line-height: 1.5;
+    }
+
+    .equation {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      margin: 2px auto 0;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: #fff7cf;
+      color: #7b4d1d;
+      font-weight: 950;
+      font-size: clamp(16px, 2.6vw, 23px);
+      border: 2px solid rgba(255, 216, 107, 0.7);
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: 0.2s ease;
+    }
+    .equation.show { opacity: 1; transform: translateY(0); }
+
+    .workspace {
+      min-height: 275px;
+      display: grid;
+      place-items: center;
+      padding: 16px 4px;
+      border-radius: 26px;
+      background:
+        linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.66)),
+        repeating-linear-gradient(45deg, transparent 0 16px, rgba(255, 156, 204, 0.09) 16px 32px);
+      border: 2px dashed rgba(255, 111, 179, 0.28);
+    }
+
+    .blocks {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .block {
+      width: clamp(48px, 8.2vw, 72px);
+      height: clamp(48px, 8.2vw, 72px);
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: clamp(25px, 4.4vw, 36px);
+      background: linear-gradient(145deg, #fff, #ffd2e9 54%, #ff9ccc);
+      border: 3px solid rgba(255,255,255,0.86);
+      box-shadow: 0 9px 16px rgba(138, 63, 101, 0.18), inset 0 -5px 0 rgba(138, 63, 101, 0.08);
+      position: relative;
+      user-select: none;
+      transition: transform 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+    }
+
+    .block::before {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.84);
+      top: 10px;
+      left: 13px;
+    }
+
+    .block.clickable { cursor: pointer; }
+    .block.clickable:active { transform: scale(0.94) rotate(-2deg); }
+    .block.taken {
+      opacity: 0.23;
+      transform: translateY(10px) scale(0.82) rotate(8deg);
+      filter: grayscale(0.4);
+    }
+
+    .block.fixed {
+      background: linear-gradient(145deg, #fff, #ffe6a4 54%, #ffd86b);
+    }
+
+    .block.empty {
+      background: rgba(255,255,255,0.45);
+      border: 3px dashed rgba(138, 63, 101, 0.25);
+      box-shadow: none;
+      color: rgba(138, 63, 101, 0.35);
+    }
+    .block.empty::before { display: none; }
+    .block.filled-new {
+      animation: pop 0.25s ease-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.72); }
+      70% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .ten-frame-wrap {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .ten-frame {
+      display: grid;
+      grid-template-columns: repeat(5, clamp(48px, 8.2vw, 72px));
+      gap: 10px;
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.62);
+      border: 3px solid rgba(255, 156, 204, 0.36);
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,0.38);
+    }
+
+    .extra-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      min-height: clamp(52px, 8.5vw, 76px);
+    }
+
+    .split-wrap {
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+      width: min(820px, 100%);
+    }
+
+    .split-total {
+      width: min(620px, 100%);
+      border-radius: 28px;
+      padding: 12px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(255, 218, 238, 0.82));
+      border: 3px solid rgba(255, 111, 179, 0.32);
+      box-shadow: 0 10px 18px rgba(181, 72, 130, 0.12);
+      text-align: center;
+    }
+
+    .split-total-title {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      font-weight: 950;
+      color: #7b3157;
+      font-size: clamp(18px, 3vw, 25px);
+      margin-bottom: 8px;
+    }
+
+    .split-total-number {
+      font-size: clamp(38px, 7vw, 64px);
+      color: #ff5fac;
+      line-height: 0.9;
+      text-shadow: 0 3px 0 rgba(255,255,255,0.9);
+    }
+
+    .split-total .blocks { gap: 7px; }
+    .split-total .block {
+      width: clamp(34px, 5.8vw, 48px);
+      height: clamp(34px, 5.8vw, 48px);
+      border-radius: 13px;
+      font-size: clamp(18px, 3vw, 25px);
+    }
+
+    .split-arrow {
+      font-weight: 950;
+      color: #a24b78;
+      font-size: clamp(18px, 3vw, 25px);
+    }
+
+    .split-board {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: stretch;
+      gap: 12px;
+      width: min(760px, 100%);
+    }
+
+    .basket {
+      min-height: 182px;
+      border-radius: 24px;
+      padding: 12px;
+      background: rgba(255,255,255,0.63);
+      border: 3px solid rgba(255, 156, 204, 0.32);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .basket-title {
+      font-weight: 950;
+      color: #7b3157;
+      background: #fff7fd;
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 111, 179, 0.22);
+    }
+
+    .basket .blocks { gap: 7px; }
+    .basket .block {
+      width: clamp(38px, 6.7vw, 56px);
+      height: clamp(38px, 6.7vw, 56px);
+      border-radius: 15px;
+      font-size: clamp(20px, 3.5vw, 29px);
+    }
+
+    .plus-sign {
+      align-self: center;
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 950;
+      color: #a24b78;
+    }
+
+    .answer-area {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .answer-btn {
+      min-height: 74px;
+      border-radius: 24px;
+      background: #fff;
+      border: 3px solid rgba(255, 111, 179, 0.28);
+      color: #733250;
+      font-size: clamp(26px, 4.2vw, 42px);
+      font-weight: 950;
+      box-shadow: 0 8px 16px rgba(181, 72, 130, 0.13);
+      transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
+    }
+
+    .answer-btn:active { transform: scale(0.97); }
+    .answer-btn.correct {
+      background: #e7fff7;
+      border-color: #75d7bb;
+    }
+    .answer-btn.wrong {
+      background: #fff0f5;
+      border-color: #ff9bbb;
+      animation: shake 0.22s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      35% { transform: translateX(-5px); }
+      70% { transform: translateX(5px); }
+    }
+
+    .feedback {
+      min-height: 56px;
+      padding: 12px 14px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.72);
+      border: 2px solid rgba(255, 111, 179, 0.22);
+      color: #6d3b55;
+      font-size: clamp(16px, 2.7vw, 21px);
+      font-weight: 850;
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      color: #b17600;
+      font-size: 20px;
+    }
+
+    .small-note {
+      margin: 12px 4px 0;
+      color: #79546b;
+      line-height: 1.65;
+      font-weight: 650;
+      font-size: 14px;
+    }
+
+    .celebrate {
+      position: fixed;
+      pointer-events: none;
+      inset: 0;
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -20px;
+      animation: fall 900ms ease-in forwards;
+      font-size: 22px;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(105vh) rotate(260deg); opacity: 0.2; }
+    }
+
+    @media (max-width: 720px) {
+      header { align-items: flex-start; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .answers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split-board { grid-template-columns: 1fr; }
+      .plus-sign { line-height: 0.8; }
+      .topbar { justify-content: center; }
+      .topbar-left, .topbar-right { justify-content: center; }
+      .pill { font-size: 14px; }
+      .workspace { min-height: 245px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-wrap">
+        <div class="mascot" aria-hidden="true">🌸</div>
+        <div>
+          <h1>ももいろ<br class="mobile-break">ひきざんランド</h1>
+          <div class="subtitle">ブロックをうごかして、ひきざんの「見える」を育てよう</div>
+        </div>
+      </div>
+      <div class="pill"><span aria-hidden="true">💗</span> <span id="totalStars">0</span> できた</div>
+    </header>
+
+    <main>
+      <section id="menuScreen" class="screen active" aria-label="メニュー">
+        <div class="panel">
+          <div class="question">
+            <div class="mode-name">きょうはどれであそぶ？</div>
+            <div class="big-question">ゆっくり、見て、さわって、わかる</div>
+            <div class="hint">こたえを急がなくて大丈夫。ブロックが教えてくれるよ。</div>
+          </div>
+        </div>
+
+        <div class="menu-grid">
+          <button class="mode-card" data-mode="take" aria-label="へる おへや">
+            <div class="mode-top">
+              <div>
+                <span class="tiny-label">はじめに</span>
+                <h2>へる おへや</h2>
+              </div>
+              <div class="mode-emoji" aria-hidden="true">🍓</div>
+            </div>
+            <p>「8こから3こ取ると？」を、ブロックを消しながら見ていくよ。</p>
+          </button>
+
+          <button class="mode-card" data-mode="split" aria-label="わかれる おへや">
+            <div class="mode-top">
+              <div>
+                <span class="tiny-label">大事</span>
+                <h2>わかれる おへや</h2>
+              </div>
+              <div class="mode-emoji" aria-hidden="true">🎀</div>
+            </div>
+            <p>「7は4といくつ？」みたいに、数の中身を見つけるよ。</p>
+          </button>
+
+          <button class="mode-card" data-mode="ten" aria-label="10のまとまり">
+            <div class="mode-top">
+              <div>
+                <span class="tiny-label">おすすめ</span>
+                <h2>10の まとまり</h2>
+              </div>
+              <div class="mode-emoji" aria-hidden="true">🏠</div>
+            </div>
+            <p>10このおへやをうめて、「あといくつで10？」を覚えるよ。</p>
+          </button>
+
+          <button class="mode-card" data-mode="bridge" aria-label="10をまたぐ">
+            <div class="mode-top">
+              <div>
+                <span class="tiny-label">なれてきたら</span>
+                <h2>10を またぐ</h2>
+              </div>
+              <div class="mode-emoji" aria-hidden="true">🌈</div>
+            </div>
+            <p>13−7みたいな計算を、まず10にしてから考えるよ。</p>
+          </button>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen" aria-label="ゲーム画面">
+        <div class="game-shell">
+          <div class="topbar">
+            <div class="topbar-left">
+              <button id="backBtn" class="btn soft">← メニュー</button>
+            </div>
+            <div class="topbar-right">
+              <div class="pill" id="roundInfo">1もんめ</div>
+              <div class="pill stars" aria-label="できた数">💗 <span id="modeStars">0</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="question">
+              <div class="mode-name" id="modeName">へる おへや</div>
+              <div class="big-question" id="questionText">8こから3こ とってみよう</div>
+              <div class="hint" id="hintText">ブロックを3こタップしてね</div>
+              <div class="equation" id="equationText" aria-live="polite"></div>
+            </div>
+
+            <div class="workspace" id="workspace" aria-live="polite"></div>
+
+            <div class="answer-area" id="answerArea">
+              <div class="answers" id="answers"></div>
+              <div class="feedback" id="feedback">まずはブロックで見てみよう。</div>
+            </div>
+          </div>
+
+          <div class="bottom-action">
+            <button id="newBtn" class="btn primary hidden">つぎの もんだい</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="celebrate" id="celebrate" aria-hidden="true"></div>
+
+  <script>
+    const state = {
+      mode: null,
+      round: 0,
+      modeStars: 0,
+      totalStars: Number(localStorage.getItem('subtractionLandStars') || 0),
+      problem: null,
+      taken: new Set(),
+      tenFilledExtra: 0,
+      locked: false,
+    };
+
+    const modeLabels = {
+      take: 'へる おへや',
+      split: 'わかれる おへや',
+      ten: '10の まとまり',
+      bridge: '10を またぐ'
+    };
+
+    const emojiSets = [
+      ['🌸','🍓','🎀','💗','🧁'],
+      ['🐰','🌷','🍒','💞','⭐'],
+      ['🧸','🍬','🌼','💝','🍓']
+    ];
+    let currentEmojis = emojiSets[0];
+
+    const $ = (id) => document.getElementById(id);
+    const menuScreen = $('menuScreen');
+    const gameScreen = $('gameScreen');
+    const workspace = $('workspace');
+    const questionText = $('questionText');
+    const hintText = $('hintText');
+    const equationText = $('equationText');
+    const answers = $('answers');
+    const feedback = $('feedback');
+    const modeName = $('modeName');
+    const roundInfo = $('roundInfo');
+    const modeStars = $('modeStars');
+    const totalStars = $('totalStars');
+    const newBtn = $('newBtn');
+
+    totalStars.textContent = state.totalStars;
+
+    document.querySelectorAll('.mode-card').forEach(btn => {
+      btn.addEventListener('click', () => startMode(btn.dataset.mode));
+    });
+
+    $('backBtn').addEventListener('click', showMenu);
+    newBtn.addEventListener('click', nextProblem);
+
+    function showMenu() {
+      gameScreen.classList.remove('active');
+      menuScreen.classList.add('active');
+    }
+
+    function startMode(mode) {
+      state.mode = mode;
+      state.round = 0;
+      state.modeStars = 0;
+      currentEmojis = emojiSets[Math.floor(Math.random() * emojiSets.length)];
+      menuScreen.classList.remove('active');
+      gameScreen.classList.add('active');
+      modeName.textContent = modeLabels[mode];
+      modeStars.textContent = state.modeStars;
+      nextProblem();
+    }
+
+    function nextProblem() {
+      if (!state.mode) return;
+      state.round += 1;
+      state.taken = new Set();
+      state.tenFilledExtra = 0;
+      state.locked = false;
+      newBtn.classList.add('hidden');
+      answers.innerHTML = '';
+      feedback.textContent = 'まずはブロックで見てみよう。';
+      equationText.classList.remove('show');
+      equationText.textContent = '';
+      roundInfo.textContent = `${state.round}もんめ`;
+      state.problem = makeProblem(state.mode);
+      renderProblem();
+    }
+
+    function makeProblem(mode) {
+      if (mode === 'take') {
+        const total = rand(4, 10);
+        const sub = rand(1, Math.min(5, total - 1));
+        return { mode, total, sub, answer: total - sub };
+      }
+      if (mode === 'split') {
+        const total = rand(5, 10);
+        const left = rand(1, total - 1);
+        return { mode, total, left, answer: total - left };
+      }
+      if (mode === 'ten') {
+        const filled = rand(3, 9);
+        return { mode, filled, answer: 10 - filled };
+      }
+      if (mode === 'bridge') {
+        const total = rand(11, 18);
+        const ones = total - 10;
+        const maxExtra = Math.min(7, 10 - ones);
+        const afterTen = rand(1, Math.max(1, maxExtra));
+        const sub = ones + afterTen;
+        return { mode, total, ones, sub, answer: total - sub };
+      }
+    }
+
+    function renderProblem() {
+      const p = state.problem;
+      workspace.innerHTML = '';
+      answers.innerHTML = '';
+      if (p.mode === 'take') {
+        questionText.textContent = `${p.total}こから ${p.sub}こ とってみよう`;
+        hintText.textContent = `ブロックを ${p.sub}こ タップしてね`;
+        renderBlocks(p.total, { clickable: true, onClick: onTakeBlock });
+      }
+
+      if (p.mode === 'split') {
+        questionText.textContent = `ぜんぶで ${p.total}こ。${p.left}こと、いくつに わかれる？`;
+        hintText.textContent = `上の「ぜんぶで${p.total}こ」を見て、右のはこに入る数をえらんでね`;
+        renderSplitBoard(false);
+        showAnswers(p.answer, onAnswer);
+        equationText.textContent = `${p.total} = ${p.left} + ?`;
+        equationText.classList.add('show');
+      }
+
+      if (p.mode === 'ten') {
+        questionText.textContent = `${p.filled}こあるよ。あといくつで10？`;
+        hintText.textContent = `あいているおへやをタップして、10こにしよう`;
+        renderTenFrame(p.filled, 10 - p.filled, true);
+        feedback.textContent = `あいているところが「あといくつ」のヒントだよ。`;
+      }
+
+      if (p.mode === 'bridge') {
+        questionText.textContent = `${p.total}こから ${p.sub}こ とってみよう`;
+        hintText.textContent = `まず ${p.ones}こ とると10になるよ。そのあと、のこりをとろう`;
+        renderBridgeBlocks();
+      }
+    }
+
+    function renderBlocks(count, opts = {}) {
+      const wrap = document.createElement('div');
+      wrap.className = 'blocks';
+      for (let i = 0; i < count; i++) {
+        const b = makeBlock(i, currentEmojis[i % currentEmojis.length]);
+        if (opts.clickable) b.classList.add('clickable');
+        if (state.taken.has(i)) b.classList.add('taken');
+        if (opts.onClick) b.addEventListener('click', () => opts.onClick(i));
+        wrap.appendChild(b);
+      }
+      workspace.appendChild(wrap);
+    }
+
+    function makeBlock(index, emoji, extraClass = '') {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = `block ${extraClass}`.trim();
+      b.dataset.index = index;
+      b.setAttribute('aria-label', `${index + 1}こめ`);
+      b.textContent = emoji;
+      return b;
+    }
+
+    function onTakeBlock(index) {
+      const p = state.problem;
+      if (state.locked || state.taken.has(index)) return;
+      if (state.taken.size >= p.sub) return;
+      state.taken.add(index);
+      workspace.innerHTML = '';
+      renderBlocks(p.total, { clickable: true, onClick: onTakeBlock });
+      const leftToTake = p.sub - state.taken.size;
+      if (leftToTake > 0) {
+        hintText.textContent = `あと ${leftToTake}こ とってね`;
+        feedback.textContent = `${state.taken.size}こ とれたよ。ゆっくりで大丈夫。`;
+      } else {
+        hintText.textContent = `のこったブロックはいくつかな？`;
+        feedback.textContent = `${p.sub}こ とれたね。のこりを見てみよう。`;
+        equationText.textContent = `${p.total} - ${p.sub} = ?`;
+        equationText.classList.add('show');
+        showAnswers(p.answer, onAnswer);
+      }
+    }
+
+    function renderSplitBoard(reveal) {
+      const p = state.problem;
+      workspace.innerHTML = '';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'split-wrap';
+
+      const totalBox = document.createElement('div');
+      totalBox.className = 'split-total';
+      totalBox.innerHTML = `<div class="split-total-title">ぜんぶで <span class="split-total-number">${p.total}</span> こ</div>`;
+      const totalBlocks = document.createElement('div');
+      totalBlocks.className = 'blocks';
+      for (let i = 0; i < p.total; i++) {
+        totalBlocks.appendChild(makeBlock(i, currentEmojis[i % currentEmojis.length], 'fixed'));
+      }
+      totalBox.appendChild(totalBlocks);
+
+      const arrow = document.createElement('div');
+      arrow.className = 'split-arrow';
+      arrow.textContent = `${p.total}こを、ふたつにわけるよ`;
+
+      const board = document.createElement('div');
+      board.className = 'split-board';
+
+      const left = document.createElement('div');
+      left.className = 'basket';
+      left.innerHTML = `<div class="basket-title">${p.left}こ</div>`;
+      const leftBlocks = document.createElement('div');
+      leftBlocks.className = 'blocks';
+      for (let i = 0; i < p.left; i++) leftBlocks.appendChild(makeBlock(i, currentEmojis[i % currentEmojis.length], 'fixed'));
+      left.appendChild(leftBlocks);
+
+      const plus = document.createElement('div');
+      plus.className = 'plus-sign';
+      plus.textContent = '+';
+
+      const right = document.createElement('div');
+      right.className = 'basket';
+      right.innerHTML = `<div class="basket-title">？こ</div>`;
+      const rightBlocks = document.createElement('div');
+      rightBlocks.className = 'blocks';
+      const rightCount = p.answer;
+      for (let i = 0; i < rightCount; i++) {
+        const cls = reveal ? 'filled-new' : 'empty';
+        rightBlocks.appendChild(makeBlock(i, reveal ? currentEmojis[(i + p.left) % currentEmojis.length] : '？', cls));
+      }
+      right.appendChild(rightBlocks);
+
+      board.append(left, plus, right);
+      wrap.append(totalBox, arrow, board);
+      workspace.appendChild(wrap);
+    }
+
+    function renderTenFrame(filled, emptyCount, tappable) {
+      workspace.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'ten-frame-wrap';
+      const frame = document.createElement('div');
+      frame.className = 'ten-frame';
+
+      for (let i = 0; i < 10; i++) {
+        if (i < filled || (i >= filled && i < filled + state.tenFilledExtra)) {
+          const b = makeBlock(i, currentEmojis[i % currentEmojis.length], i >= filled ? 'filled-new' : '');
+          frame.appendChild(b);
+        } else {
+          const b = makeBlock(i, '＋', 'empty');
+          if (tappable) {
+            b.classList.add('clickable');
+            b.addEventListener('click', onTenEmpty);
+          }
+          frame.appendChild(b);
+        }
+      }
+      wrap.appendChild(frame);
+      workspace.appendChild(wrap);
+    }
+
+    function onTenEmpty() {
+      const p = state.problem;
+      if (state.locked) return;
+      if (state.tenFilledExtra >= p.answer) return;
+      state.tenFilledExtra += 1;
+      renderTenFrame(p.filled, p.answer, true);
+      const left = p.answer - state.tenFilledExtra;
+      if (left > 0) {
+        hintText.textContent = `あと ${left}こ うめたら10だよ`;
+        feedback.textContent = `${state.tenFilledExtra}こ ふえたね。空いているところを見てみよう。`;
+      } else {
+        hintText.textContent = `${p.filled}に ${p.answer}をたすと10だね`;
+        equationText.textContent = `10 - ${p.filled} = ${p.answer}`;
+        equationText.classList.add('show');
+        feedback.textContent = `できた。あいていたおへやは ${p.answer}こ だったね。`;
+        completeProblem();
+      }
+    }
+
+    function renderBridgeBlocks() {
+      const p = state.problem;
+      workspace.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'ten-frame-wrap';
+      const extra = document.createElement('div');
+      extra.className = 'extra-row';
+      for (let i = 0; i < p.ones; i++) {
+        const idx = 10 + i;
+        const b = makeBlock(idx, currentEmojis[idx % currentEmojis.length]);
+        b.classList.add('clickable');
+        if (state.taken.has(idx)) b.classList.add('taken');
+        b.addEventListener('click', () => onBridgeBlock(idx));
+        extra.appendChild(b);
+      }
+
+      const frame = document.createElement('div');
+      frame.className = 'ten-frame';
+      for (let i = 0; i < 10; i++) {
+        const b = makeBlock(i, currentEmojis[i % currentEmojis.length]);
+        b.classList.add('clickable');
+        if (state.taken.has(i)) b.classList.add('taken');
+        b.addEventListener('click', () => onBridgeBlock(i));
+        frame.appendChild(b);
+      }
+      wrap.append(extra, frame);
+      workspace.appendChild(wrap);
+    }
+
+    function onBridgeBlock(index) {
+      const p = state.problem;
+      if (state.locked || state.taken.has(index) || state.taken.size >= p.sub) return;
+      state.taken.add(index);
+      renderBridgeBlocks();
+      const takenExtra = [...state.taken].filter(i => i >= 10).length;
+      const leftToTake = p.sub - state.taken.size;
+      if (leftToTake === 0) {
+        hintText.textContent = `のこったブロックはいくつかな？`;
+        feedback.textContent = `${p.sub}こ とれたよ。10のまとまりがどうなったか見てみよう。`;
+        equationText.textContent = `${p.total} - ${p.sub} = ?`;
+        equationText.classList.add('show');
+        showAnswers(p.answer, onAnswer);
+      } else if (takenExtra < p.ones) {
+        hintText.textContent = `まず上の ${p.ones}こをとると、ぴったり10になるよ。あと ${leftToTake}こ。`;
+        feedback.textContent = `いま ${state.taken.size}こ とったよ。`;
+      } else {
+        hintText.textContent = `10になったね。あと ${leftToTake}こ とろう。`;
+        feedback.textContent = `ここから10の中から取っていくよ。`;
+      }
+    }
+
+    function showAnswers(correct, handler) {
+      answers.innerHTML = '';
+      const opts = makeOptions(correct);
+      opts.forEach(num => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'answer-btn';
+        b.textContent = num;
+        b.setAttribute('aria-label', `${num}`);
+        b.addEventListener('click', () => handler(num, b));
+        answers.appendChild(b);
+      });
+    }
+
+    function onAnswer(num, button) {
+      if (state.locked) return;
+      const p = state.problem;
+      if (num === p.answer) {
+        button.classList.add('correct');
+        if (p.mode === 'split') {
+          renderSplitBoard(true);
+          equationText.textContent = `${p.total} = ${p.left} + ${p.answer}`;
+        }
+        if (p.mode === 'take') equationText.textContent = `${p.total} - ${p.sub} = ${p.answer}`;
+        if (p.mode === 'bridge') equationText.textContent = `${p.total} - ${p.sub} = ${p.answer}`;
+        equationText.classList.add('show');
+        feedback.textContent = praiseText(p);
+        completeProblem();
+      } else {
+        button.classList.add('wrong');
+        feedback.textContent = gentleHint(p, num);
+        setTimeout(() => button.classList.remove('wrong'), 420);
+      }
+    }
+
+    function completeProblem() {
+      if (state.locked) return;
+      state.locked = true;
+      state.modeStars += 1;
+      state.totalStars += 1;
+      localStorage.setItem('subtractionLandStars', String(state.totalStars));
+      modeStars.textContent = state.modeStars;
+      totalStars.textContent = state.totalStars;
+      sparkle();
+      newBtn.classList.remove('hidden');
+    }
+
+    function praiseText(p) {
+      if (p.mode === 'take') return `そうそう。${p.total}こから${p.sub}こ取ると、${p.answer}こ残るね。`;
+      if (p.mode === 'split') return `いいね。${p.total}は、${p.left}と${p.answer}に分かれるね。`;
+      if (p.mode === 'bridge') return `できたね。まず10に近づけてから考えられたよ。`;
+      return 'できたね。';
+    }
+
+    function gentleHint(p, num) {
+      if (p.mode === 'take') return `惜しいね。取ったブロックはうすくなっているよ。濃いブロックをもう一度数えてみよう。`;
+      if (p.mode === 'split') return `もう少し見てみよう。上にぜんぶで${p.total}こあるね。左の${p.left}こを見て、右に入る分をもう一度考えてみよう。`;
+      if (p.mode === 'bridge') return `惜しいね。うすくなっていないブロックが、残っている数だよ。`;
+      return `もう一度見てみよう。`;
+    }
+
+    function makeOptions(correct) {
+      const set = new Set([correct]);
+      const candidates = [correct - 2, correct - 1, correct + 1, correct + 2, correct + 3, 0, 10]
+        .filter(n => n >= 0 && n <= 18 && n !== correct);
+      shuffle(candidates).forEach(n => { if (set.size < 4) set.add(n); });
+      while (set.size < 4) set.add(rand(0, 18));
+      return shuffle([...set]);
+    }
+
+    function sparkle() {
+      const box = $('celebrate');
+      box.innerHTML = '';
+      const pieces = ['🌸','💗','✨','🍓','🎀'];
+      for (let i = 0; i < 18; i++) {
+        const s = document.createElement('div');
+        s.className = 'confetti';
+        s.textContent = pieces[i % pieces.length];
+        s.style.left = `${rand(4, 96)}vw`;
+        s.style.animationDelay = `${Math.random() * 150}ms`;
+        s.style.fontSize = `${rand(18, 30)}px`;
+        box.appendChild(s);
+      }
+      setTimeout(() => box.innerHTML = '', 1300);
+    }
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+  </script>
+</body>
+</html>
