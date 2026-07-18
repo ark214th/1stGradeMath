@@ -8,15 +8,16 @@
   <style>
     *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:#653a52}
     body{background:radial-gradient(circle at 12% 8%,#fff 0 4%,transparent 4.5%),linear-gradient(145deg,#d5f4ed,#ffe6f1 55%,#fff4c9);padding:max(22px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom))}
-    main{width:min(850px,100%);margin:auto}header{text-align:center;margin:12px 0 24px}h1{font-size:clamp(30px,7vw,54px);margin:0 0 8px;color:#8d4067;text-shadow:0 3px white}header p{font-weight:800;margin:0;color:#80576b}
-    .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.game{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:rgba(255,255,255,.9);border:5px solid white;border-radius:32px;padding:18px;box-shadow:0 14px 30px rgba(105,57,82,.15);transition:.15s}.game:active{transform:scale(.985)}.game.featured{background:linear-gradient(160deg,#fff,#fff0f6)}
-    .art{height:180px;border-radius:24px;display:grid;place-items:center;font-size:82px;background:linear-gradient(#c7f0e7 0 48%,#ffd6e7 48%);position:relative;overflow:hidden}.art.old{background:linear-gradient(145deg,#fff6fb,#ffdff0)}.new{position:absolute;top:10px;right:10px;border-radius:999px;background:#ff65a6;color:#fff;padding:6px 10px;font-size:13px;font-weight:900}
-    h2{font-size:clamp(23px,4vw,31px);margin:15px 0 5px;color:#8e3d67}.game p{font-weight:750;line-height:1.55;margin:0 0 14px}.play{margin-top:auto;text-align:center;border-radius:999px;background:#ff6eaa;color:white;padding:13px;font-size:19px;font-weight:900;box-shadow:0 6px 0 #c94c7e}.old .play{background:#ae6fc4;box-shadow:0 6px 0 #7c4b91}
-    @media(max-width:650px){.games{grid-template-columns:1fr}.art{height:150px}}
+    main{width:min(1120px,100%);margin:auto}header{text-align:center;margin:12px 0 24px}h1{font-size:clamp(30px,7vw,54px);margin:0 0 8px;color:#8d4067;text-shadow:0 3px white}header p{font-weight:800;margin:0;color:#80576b}
+    .games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.game{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:rgba(255,255,255,.9);border:5px solid white;border-radius:32px;padding:18px;box-shadow:0 14px 30px rgba(105,57,82,.15);transition:.15s}.game:active{transform:scale(.985)}.game.featured{background:linear-gradient(160deg,#fff,#fff0f6)}
+    .art{height:180px;border-radius:24px;display:grid;place-items:center;font-size:76px;background:linear-gradient(#c7f0e7 0 48%,#ffd6e7 48%);position:relative;overflow:hidden}.art.addition{background:linear-gradient(145deg,#d4f4ec,#f0dcff 55%,#fff1ad)}.art.old{background:linear-gradient(145deg,#fff6fb,#ffdff0)}.new{position:absolute;top:10px;right:10px;border-radius:999px;background:#ff65a6;color:#fff;padding:6px 10px;font-size:13px;font-weight:900}
+    h2{font-size:clamp(22px,3.2vw,29px);margin:15px 0 5px;color:#8e3d67}.game p{font-weight:750;line-height:1.55;margin:0 0 14px}.play{margin-top:auto;text-align:center;border-radius:999px;background:#ff6eaa;color:white;padding:13px;font-size:19px;font-weight:900;box-shadow:0 6px 0 #c94c7e}.addition-card .play{background:#9a69cf;box-shadow:0 6px 0 #71499b}.old .play{background:#ae6fc4;box-shadow:0 6px 0 #7c4b91}
+    @media(max-width:900px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.games{grid-template-columns:1fr}.art{height:150px}}
   </style>
 </head>
 <body><main><header><h1>1年生の さんすうゲーム</h1><p>見て、さわって、ゆっくり分かろう</p></header><div class="games">
     <a class="game featured" href="momo_sweets/index.html"><div class="art"><span>🐰🍓</span><span class="new">おすすめ</span></div><h2>ももちゃんのスイーツショップ</h2><p>数字といちごの数を結びつけよう。まずは1〜3から始まります。</p><div class="play">あそぶ</div></a>
+    <a class="game addition-card" href="momo_addition_party/index.html"><div class="art addition">🐰＋🐱</div><h2>ももいろ たしざんパーティー</h2><p>あとから来るおともだちと合流して、合計10までの足し算を体験しよう。</p><div class="play">あそぶ</div></a>
     <a class="game old" href="2026_0709_hikizan_land.html"><div class="art old">🌸➖</div><h2>ももいろ ひきざんランド</h2><p>ブロックを動かして、数が減る様子や10のまとまりを見てみよう。</p><div class="play">あそぶ</div></a>
   </div></main></body>
 </html>
