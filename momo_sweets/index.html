@@ -99,7 +99,6 @@
     .check-btn{min-width:230px;margin-top:8px;background:linear-gradient(#79d9bd,#4fc5a3);box-shadow:0 7px 0 #2d9e82;border-color:white}
     .check-btn:active{box-shadow:0 3px 0 #2d9e82}
     .stage-line{display:inline-block;margin:0 0 12px;padding:7px 13px;border-radius:999px;background:#fff2b8;font-size:14px;font-weight:900;color:#805b24}
-    .subtraction-btn{display:block;width:min(360px,100%);margin:12px auto 0;text-decoration:none;background:linear-gradient(#bd83d0,#9d62b7);box-shadow:0 7px 0 #724486}
     .success-overlay{position:absolute;inset:0;background:rgba(255,250,238,.93);display:none;place-items:center;text-align:center;padding:20px;z-index:6}
     .success-overlay.show{display:grid;animation:fade .25s ease}
     .success-word{font-size:clamp(32px,7vw,58px);font-weight:950;color:#e94f94;text-shadow:0 4px white}
@@ -149,7 +148,6 @@
         </div>
         <div id="stageLine" class="stage-line">ステップ1：かずを つくろう</div><br>
         <button id="playBtn" class="round-btn primary">おみせを ひらく</button>
-        <a id="subtractionBtn" class="round-btn primary subtraction-btn hidden" href="../2026_0709_hikizan_land.html">つぎは ひきざんランドへ</a>
         <div class="button-row"><button id="galleryBtn" class="round-btn">ケーキずかん</button><button id="settingsBtn" class="round-btn icon-btn" aria-label="おとなの設定">⚙️</button></div>
         <p id="saveLine" class="save-line"></p>
       </div>
@@ -218,10 +216,9 @@
   function persist(){localStorage.setItem(KEY,JSON.stringify(save));updateSaveLine()}
   function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo(0,0)}
   function updateSaveLine(){
-    const labels={1:'数字と おなじ数を つくる れんしゅう',2:'いちごを見て 数字を えらぶ れんしゅう',3:'ひきざんランドが ひらいたよ！'};
+    const labels={1:'数字と おなじ数を つくる れんしゅう',2:'いちごを見て 数字を えらぶ れんしゅう',3:'ふたつを まぜて あそぼう'};
     $('stageLine').textContent=`ステップ${save.stage}：${labels[save.stage]}`;
     $('saveLine').textContent=save.total?`${save.total}かい できたよ`:'はじめての おきゃくさんが まってるよ';
-    $('subtractionBtn').classList.toggle('hidden',save.stage<3);
   }
   function maxNumber(){
     if(save.level!=='auto')return Number(save.level);
@@ -293,10 +290,10 @@
   function prepareComplete(){
     justUnlocked='';
     if(sessionStage===1&&save.packMastery>=5){save.stage=2;justUnlocked='read'}
-    else if(sessionStage===2&&save.readMastery>=5){save.stage=3;justUnlocked='subtract'}
+    else if(sessionStage===2&&save.readMastery>=5){save.stage=3;justUnlocked='mix'}
     persist();selectedTopper='🎀';$('chosenTopper').textContent=selectedTopper;document.querySelectorAll('.topper-btn').forEach((b,i)=>b.classList.toggle('selected',i===0));
     $('completeTitle').textContent=justUnlocked?'あたらしい あそびが ひらいた！':'ケーキが できたよ！';
-    $('completeCopy').textContent=justUnlocked==='read'?'つぎは、いちごを見て 数字をあてよう':justUnlocked==='subtract'?'数字といちごが分かったね。ひきざんランドへ進めるよ！':'さいごの かざりを えらんでね';
+    $('completeCopy').textContent=justUnlocked==='read'?'つぎは、いちごを見て 数字をあてよう':justUnlocked==='mix'?'どちらもできたね。こんどは、ふたつをまぜて遊ぼう！':'さいごの かざりを えらんでね';
     show('completeScreen');confetti(28);
   }
   function next(){if(round>=5)prepareComplete();else newOrder()}
