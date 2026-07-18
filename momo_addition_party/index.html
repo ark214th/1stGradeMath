@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#a77be8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ももいろ たしざんパーティー</title>
+  <style>
+    :root{--ink:#563c68;--purple:#9b6bd1;--pink:#ff76ae;--yellow:#ffe37b;--mint:#9ce3cf;--cream:#fffaf0;--card:rgba(255,255,255,.91);--shadow:0 14px 30px rgba(79,47,104,.18)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;overflow-x:hidden;overscroll-behavior:none}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:var(--ink);background:#efe4ff;user-select:none;-webkit-user-select:none}
+    button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}.hidden{display:none!important}
+    .app{min-height:100dvh;position:relative;overflow:hidden;background:
+      radial-gradient(circle at 10% 10%,rgba(255,255,255,.75) 0 5%,transparent 5.5%),
+      radial-gradient(circle at 90% 16%,rgba(255,255,255,.7) 0 6%,transparent 6.5%),
+      linear-gradient(180deg,#c7efe7 0 31%,#f2e8ff 31% 68%,#ffe8f1 68%)}
+    .garland{position:absolute;top:22px;left:-2%;width:104%;height:90px;border-top:5px solid rgba(114,73,137,.28);border-radius:50%;pointer-events:none}
+    .garland:after{content:"◆  ●  ◆  ●  ◆  ●  ◆  ●  ◆";position:absolute;top:-3px;left:8%;right:8%;word-spacing:clamp(10px,4vw,46px);color:#ff76ae;font-size:25px;text-shadow:45px 8px #8bdcc6,90px 0 #ffe270}
+    .screen{display:none;min-height:100dvh;position:relative;z-index:1;padding:max(14px,env(safe-area-inset-top)) 13px max(18px,env(safe-area-inset-bottom))}
+    .screen.active{display:flex;animation:fade .28s ease-out}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .pill-btn{min-height:51px;padding:10px 18px;border-radius:999px;background:white;border:3px solid rgba(157,103,207,.25);font-weight:900;box-shadow:0 7px 0 rgba(90,57,112,.13)}
+    .pill-btn:active{transform:translateY(3px);box-shadow:0 4px 0 rgba(90,57,112,.13)}
+    .primary{background:linear-gradient(#b082e5,#9361cb);border-color:white;color:white;box-shadow:0 7px 0 #71469c;font-size:clamp(19px,3.5vw,26px);padding:14px 27px}.primary:active{box-shadow:0 3px 0 #71469c}
+    .icon-btn{width:51px;padding:0;display:grid;place-items:center;font-size:23px}
+
+    /* title */
+    #titleScreen{align-items:center;justify-content:center}
+    .title-card{width:min(740px,96vw);background:rgba(255,252,246,.94);border:6px solid white;border-radius:38px;text-align:center;padding:25px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .title-card:before{content:"";position:absolute;height:28px;left:0;right:0;top:0;background:repeating-linear-gradient(90deg,#ff82b5 0 55px,#fff0b0 55px 110px,#9de2d0 110px 165px,#c29ae8 165px 220px)}
+    .logo-small{margin-top:14px;font-weight:900;color:#8d5bb1;letter-spacing:.12em;font-size:clamp(14px,2.6vw,19px)}
+    h1{font-size:clamp(34px,7.8vw,62px);line-height:1.12;margin:7px 0;color:#754b9c;text-shadow:0 4px white}
+    .title-copy{font-size:clamp(16px,3vw,21px);font-weight:850;margin:5px 0 13px}
+    .stage-line{display:inline-block;padding:7px 14px;border-radius:999px;background:#fff1ad;color:#795a21;font-size:14px;font-weight:900;margin-bottom:12px}
+    .title-scene{height:175px;margin:0 auto 15px;position:relative;display:flex;align-items:flex-end;justify-content:center;gap:12px}
+    .party-table{width:260px;height:82px;border-radius:50% 50% 18px 18px;background:linear-gradient(#fff,#ffd4e5);border:5px solid white;box-shadow:0 9px 0 #ca91aa;position:absolute;bottom:3px;left:50%;transform:translateX(-50%)}
+    .party-table:after{content:"🎂";font-size:65px;position:absolute;left:50%;top:-52px;transform:translateX(-50%)}
+    .hero-friend{width:107px;height:112px;position:relative;z-index:2;filter:drop-shadow(0 7px 5px rgba(70,40,90,.16))}.hero-friend.left{margin-right:145px}.hero-friend.right{margin-left:-135px}
+    .hero-ear{position:absolute;width:35px;height:62px;top:0;border-radius:50%;background:#fff;border:3px solid #e6c8db}.hero-ear.l{left:14px;transform:rotate(-10deg)}.hero-ear.r{right:14px;transform:rotate(10deg)}
+    .hero-face{position:absolute;left:4px;right:4px;height:87px;bottom:0;border-radius:48%;background:#fff;border:3px solid #e6c8db}.hero-face:before{content:"●　●";position:absolute;top:34px;left:20px;font-size:15px;color:#594057}.hero-face:after{content:"◡";position:absolute;top:48px;left:42px;font-size:22px;color:#714d65}.hero-friend.right .hero-ear,.hero-friend.right .hero-face{background:#ffe0ab;border-color:#d8ad75}.hero-friend.right .hero-ear{height:48px;width:43px;top:11px}
+    .button-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}.save-line{font-size:14px;font-weight:800;color:#806d8b;margin:13px 0 0}
+
+    /* game */
+    #gameScreen{flex-direction:column;gap:9px;width:min(1040px,100%);margin:auto}
+    .hud{display:flex;align-items:center;justify-content:space-between;gap:8px}.progress{display:flex;gap:7px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 5px 15px rgba(80,50,100,.12)}.progress i{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#e8ddec;border:2px solid white;font-style:normal;font-size:17px}.progress i.done{background:#ff84b6;animation:pop .35s ease}
+    .game-grid{flex:1;display:grid;grid-template-columns:minmax(200px,.65fr) minmax(390px,1.35fr);gap:11px;min-height:0}
+    .story-card,.venue{background:var(--card);border:4px solid white;border-radius:30px;box-shadow:var(--shadow)}
+    .story-card{padding:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.story-title{font-weight:950;color:#875aaa;font-size:clamp(17px,2.5vw,22px)}
+    .story-equation{display:flex;align-items:center;justify-content:center;gap:7px;margin:9px 0}.story-num{width:58px;height:58px;border-radius:18px;background:#fff1ad;display:grid;place-items:center;font-size:40px;font-weight:950;color:#8a5b28;border:3px solid white;box-shadow:0 5px 0 #e1c87d}.plus{font-size:34px;font-weight:950;color:#a065c5}
+    .story-copy{min-height:57px;display:grid;place-items:center;background:#f4ecff;border-radius:20px;padding:9px;width:100%;font-weight:900;line-height:1.45}.equation-reveal{opacity:0;transform:translateY(-4px);transition:.2s;margin-top:8px;padding:8px 13px;border-radius:999px;background:#fff3b8;font-size:23px;font-weight:950}.equation-reveal.show{opacity:1;transform:none}
+    .venue{padding:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}.venue-title{font-weight:950;font-size:clamp(17px,2.8vw,23px);margin-bottom:6px;text-align:center}
+    .party-area{display:grid;grid-template-columns:1fr minmax(120px,.48fr);align-items:center;gap:9px;width:100%}
+    .dance-floor{display:grid;grid-template-columns:repeat(5,minmax(43px,70px));gap:6px;padding:10px;border-radius:25px;background:linear-gradient(135deg,#f8dfff,#fff3b7);border:5px solid white;box-shadow:inset 0 0 0 4px rgba(160,100,190,.12),0 7px 0 #c59bd2}
+    .seat{aspect-ratio:1;border-radius:17px;background:rgba(255,255,255,.68);border:3px dashed rgba(116,73,135,.22);display:grid;place-items:center;min-width:0;position:relative}.seat.locked{display:none}.seat.filled{border-style:solid;border-color:white;cursor:pointer}.seat.counted{background:#fff3a6;box-shadow:0 0 0 4px #ffbf57;transform:scale(.94)}
+    .mini-friend{width:76%;height:76%;border-radius:50%;background:#fff;border:3px solid #ead0df;position:relative;box-shadow:0 5px 0 rgba(90,55,85,.12);animation:pop .28s cubic-bezier(.2,1.6,.5,1)}.mini-friend:before{content:"";position:absolute;left:18%;right:18%;height:28%;top:-20%;background:linear-gradient(90deg,#fff 0 38%,transparent 39% 61%,#fff 62%);border-radius:50%}.mini-friend:after{content:"●  ●";position:absolute;left:17%;top:33%;font-size:clamp(7px,1.5vw,13px);white-space:nowrap;color:#5b4254}.mini-friend.arrival{background:#ffe0a8;border-color:#d9ad79}.mini-friend.arrival:before{background:linear-gradient(90deg,#ffd28a 0 40%,transparent 41% 59%,#ffd28a 60%);height:23%;top:-13%}
+    .bus{min-height:160px;border-radius:25px;background:linear-gradient(#ff92b9,#ff6fa3);border:5px solid white;box-shadow:0 8px 0 #c9517b;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px;position:relative}.bus:after{content:"●　　　　●";position:absolute;bottom:-15px;left:12%;right:12%;color:#645262;font-size:24px}.bus-title{font-weight:950;color:white;text-shadow:0 2px rgba(100,40,70,.18);margin-bottom:7px}.bus-friends{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;min-height:45px}.bus-dot{width:32px;height:32px;border-radius:50%;background:#ffe1a7;border:3px solid white;display:grid;place-items:center;font-size:17px}.bring-btn{margin-top:20px;min-width:230px;min-height:60px;border-radius:22px;background:linear-gradient(#ff92b9,#ff659e);color:white;border:4px solid white;font-weight:950;font-size:clamp(17px,3vw,22px);box-shadow:0 7px 0 #c44975}.bring-btn:active{transform:translateY(4px);box-shadow:0 3px 0 #c44975}.bring-btn.done{background:#a99eb0;box-shadow:0 5px 0 #817486}
+    .count-readout{min-height:42px;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:900}.count-bubble{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:white;border:3px solid #d9b8e9;color:#8956ad;font-size:28px}.gentle{min-height:27px;text-align:center;font-size:15px;font-weight:850;color:#765b82;margin-top:4px}
+    .answers{display:grid;grid-template-columns:repeat(5,minmax(45px,63px));gap:7px;justify-content:center;margin:7px 0}.answer-btn{aspect-ratio:1;border-radius:17px;background:white;border:3px solid #e1c8ef;font-size:clamp(24px,4vw,34px);font-weight:950;box-shadow:0 5px 0 #dacbe1}.answer-btn.selected{background:#fff0a0;border-color:#ffbe55;transform:translateY(3px);box-shadow:0 2px 0 #deb970}.answer-btn.wrong{animation:shake .34s ease;background:#ffe5ee;border-color:#ff79a6}
+    .check-btn{min-width:230px;min-height:58px;border-radius:22px;background:linear-gradient(#79d8bc,#4ec3a1);border:4px solid white;color:white;font-size:21px;font-weight:950;box-shadow:0 7px 0 #2d9b80}.check-btn:active{transform:translateY(4px);box-shadow:0 3px 0 #2d9b80}
+    .success-overlay{position:absolute;inset:0;display:none;place-items:center;text-align:center;background:rgba(255,251,239,.94);padding:20px;z-index:7}.success-overlay.show{display:grid;animation:fade .24s ease}.success-word{font-size:clamp(34px,7vw,58px);font-weight:950;color:#975ac4;text-shadow:0 4px white}.success-detail{font-size:clamp(18px,3.5vw,27px);font-weight:900;margin:6px 0 18px}
+
+    /* modal */
+    #completeScreen,#galleryScreen,#settingsScreen{align-items:center;justify-content:center}.modal{width:min(720px,96vw);max-height:calc(100dvh - 28px);overflow:auto;background:rgba(255,252,246,.97);border:5px solid white;border-radius:36px;padding:22px;text-align:center;box-shadow:var(--shadow)}.modal h2{font-size:clamp(29px,6vw,47px);margin:4px 0 7px;color:#754b9c}.modal p{font-weight:800;line-height:1.55}
+    .finished-party{height:160px;margin:4px auto 8px;position:relative;border-radius:28px;background:linear-gradient(#c8eee7 0 47%,#f7dcff 47%);overflow:hidden;border:4px solid white}.finished-party:after{content:"🐰  🐱  🐻";position:absolute;left:0;right:0;bottom:19px;font-size:54px}.theme-icon{position:absolute;z-index:2;left:50%;top:10px;transform:translateX(-50%);font-size:55px}.theme-choices{display:flex;justify-content:center;gap:10px;margin:10px 0 17px}.theme-btn{width:82px;height:72px;border-radius:22px;background:white;border:4px solid #e5cef0;font-size:40px;box-shadow:0 6px 0 #ded1e4}.theme-btn.selected{background:#fff1a2;border-color:#ffbf55;transform:translateY(3px);box-shadow:0 3px 0 #dfbd7c}
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:13px 0;min-height:110px}.gallery-item{background:#f5ebff;border:3px solid white;border-radius:21px;padding:9px;font-size:42px;box-shadow:0 5px 12px rgba(90,55,110,.1)}.gallery-item small{display:block;font-size:12px;font-weight:850;color:#816a8d}.empty-gallery{grid-column:1/-1;padding:28px 8px;font-weight:800;color:#8b768f}
+    .setting-group{text-align:left;background:#f5ecff;border-radius:22px;padding:14px;margin:12px 0}.setting-group h3{margin:0 0 9px}.setting-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.setting-btn{min-height:51px;border-radius:17px;background:white;border:3px solid #e2d3e9;font-weight:900}.setting-btn.selected{background:#fff0a2;border-color:#ffbd52}.toggle-row{display:flex;justify-content:space-between;align-items:center;font-weight:900}.toggle{width:68px;height:40px;border-radius:999px;background:#d4cbd8;padding:4px}.toggle span{display:block;width:32px;height:32px;border-radius:50%;background:white;transition:.2s}.toggle.on{background:#9d6fd1}.toggle.on span{transform:translateX(28px)}
+    .confetti{position:fixed;z-index:30;pointer-events:none;top:-30px;animation:fall 1.2s ease-in forwards;font-size:24px}@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.3}}@keyframes pop{0%{transform:scale(.45)}75%{transform:scale(1.12)}100%{transform:scale(1)}}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+    @media(max-width:720px){.screen{padding-left:8px;padding-right:8px}.game-grid{grid-template-columns:1fr;grid-template-rows:auto 1fr}.story-card{min-height:0;padding:8px;display:grid;grid-template-columns:1fr 1.2fr;gap:7px}.story-title{display:none}.story-equation{margin:0}.story-num{width:48px;height:48px;font-size:33px}.story-copy{min-height:55px}.equation-reveal{grid-column:1/-1;margin:0;padding:5px;font-size:19px}.venue{padding:8px}.party-area{grid-template-columns:1fr 106px}.dance-floor{grid-template-columns:repeat(5,minmax(38px,57px));gap:4px;padding:7px}.seat{border-radius:13px}.bus{min-height:128px;padding:5px}.bus-dot{width:27px;height:27px;font-size:14px}.bring-btn{margin-top:16px;min-height:54px}.answers{margin:5px 0}.count-readout{margin-top:5px}.gentle{margin-top:2px}.title-card{padding:22px 14px}.title-scene{height:145px}.hero-friend{transform:scale(.82);transform-origin:bottom}.hero-friend.left{margin-right:130px}}
+    @media(max-height:720px) and (orientation:landscape){.game-grid{grid-template-columns:210px 1fr;grid-template-rows:1fr}.story-card{display:flex}.party-area{max-width:650px}.dance-floor{grid-template-columns:repeat(5,53px)}.bring-btn{margin-top:13px;min-height:49px}.answers{margin:3px}.check-btn{min-height:50px}.venue-title,.gentle{margin:1px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+  </style>
+</head>
+<body>
+<div class="app"><div class="garland"></div>
+  <section id="titleScreen" class="screen active"><div class="title-card">
+    <div class="logo-small">みんなで あわせよう</div><h1>ももいろ<br>たしざんパーティー</h1>
+    <p class="title-copy">あとから来た おともだちと、いっしょに あそぼう</p><div id="stageLine" class="stage-line"></div>
+    <div class="title-scene"><div class="party-table"></div><div class="hero-friend left"><i class="hero-ear l"></i><i class="hero-ear r"></i><div class="hero-face"></div></div><div class="hero-friend right"><i class="hero-ear l"></i><i class="hero-ear r"></i><div class="hero-face"></div></div></div>
+    <button id="playBtn" class="pill-btn primary">パーティーを はじめる</button>
+    <div class="button-row"><button id="galleryBtn" class="pill-btn">パーティーずかん</button><button id="settingsBtn" class="pill-btn icon-btn" aria-label="おとなの設定">⚙️</button></div><p id="saveLine" class="save-line"></p>
+  </div></section>
+
+  <section id="gameScreen" class="screen"><div class="hud"><button id="homeBtn" class="pill-btn icon-btn" aria-label="もどる">⌂</button><div id="progress" class="progress"></div><button id="soundBtn" class="pill-btn icon-btn" aria-label="音の切り替え">🔊</button></div>
+    <div class="game-grid"><div class="story-card"><div class="story-title">きょうの おはなし</div><div class="story-equation"><span id="firstNumber" class="story-num">3</span><span class="plus">＋</span><span id="secondNumber" class="story-num">2</span></div><div id="storyCopy" class="story-copy"></div><div id="equationReveal" class="equation-reveal"></div></div>
+      <div class="venue"><div id="venueTitle" class="venue-title">パーティー会場</div><div class="party-area"><div id="danceFloor" class="dance-floor"></div><div class="bus"><div class="bus-title">あとから くるよ</div><div id="busFriends" class="bus-friends"></div></div></div>
+        <button id="bringBtn" class="bring-btn">おともだちを よぶ</button><div id="countReadout" class="count-readout"><span id="countLabel">かぞえた数</span><span id="countBubble" class="count-bubble">0</span></div><div id="gentle" class="gentle"></div><div id="answers" class="answers"></div><button id="checkBtn" class="check-btn">これで OK！</button>
+        <div id="successOverlay" class="success-overlay"><div><div class="success-word">できた！</div><div id="successDetail" class="success-detail"></div><button id="nextBtn" class="pill-btn primary">つぎの おともだち</button></div></div>
+      </div></div>
+  </section>
+
+  <section id="completeScreen" class="screen"><div class="modal"><h2 id="completeTitle">パーティーが できたよ！</h2><p id="completeCopy">さいごのテーマを えらんでね</p><div class="finished-party"><div id="chosenTheme" class="theme-icon">🎀</div></div><div class="theme-choices"><button class="theme-btn selected" data-theme="🎀">🎀</button><button class="theme-btn" data-theme="🌈">🌈</button><button class="theme-btn" data-theme="🦄">🦄</button></div><button id="savePartyBtn" class="pill-btn primary">ずかんに しまう</button></div></section>
+  <section id="galleryScreen" class="screen"><div class="modal"><h2>パーティーずかん</h2><p id="galleryCount"></p><div id="galleryGrid" class="gallery-grid"></div><button id="galleryBackBtn" class="pill-btn primary">もどる</button></div></section>
+  <section id="settingsScreen" class="screen"><div class="modal"><h2>おとなの設定</h2><p>お子さんの様子に合わせて変更できます。</p>
+    <div class="setting-group"><h3>出てくる合計</h3><div class="setting-buttons"><button class="setting-btn limit-btn" data-limit="auto">おまかせ</button><button class="setting-btn limit-btn" data-limit="5">5まで</button><button class="setting-btn limit-btn" data-limit="10">10まで</button></div></div>
+    <div class="setting-group"><h3>学び方</h3><div class="setting-buttons"><button class="setting-btn step-btn" data-step="auto">おまかせ</button><button class="setting-btn step-btn" data-step="1">全部を数える</button><button class="setting-btn step-btn" data-step="2">5のまとまり</button><button class="setting-btn step-btn" data-step="3">続きから数える</button></div></div>
+    <div class="setting-group toggle-row"><span>数を読み上げる</span><button id="voiceToggle" class="toggle"><span></span></button></div><p style="font-size:14px;color:#7c6a84">「おまかせ」は、初回で正解できた回数に合わせて少しずつ進みます。記録はこの端末だけに保存されます。</p><button id="settingsBackBtn" class="pill-btn primary">もどる</button>
+  </div></section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const KEY='momoAdditionPartyV1';
+  const defaults={total:0,parties:[],stage:1,mastery1:0,mastery2:0,mastery3:0,limit:'auto',step:'auto',sound:true,voice:true};
+  let save=load(),problem=null,arrived=0,counted=new Set(),selected=null,round=0,locked=false,firstTry=true,sessionStage=1,theme='🎀',justUnlocked='';
+  const $=id=>document.getElementById(id),screens=[...document.querySelectorAll('.screen')];
+  function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return {...defaults}}}
+  function persist(){localStorage.setItem(KEY,JSON.stringify(save));updateTitle()}
+  function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo(0,0)}
+  function effectiveStage(){return save.step==='auto'?save.stage:Number(save.step)}
+  function limit(){if(save.limit!=='auto')return Number(save.limit);return sessionStage===1?5:10}
+  function updateTitle(){const labels={1:'あわせて、ぜんぶを数えよう',2:'5のまとまりで見てみよう',3:'つづきから数えてみよう',4:'いろいろな足し算であそぼう'};$('stageLine').textContent=`ステップ${save.stage}：${labels[save.stage]}`;$('saveLine').textContent=save.total?`${save.total}もん できたよ`:'はじめての パーティーが まってるよ'}
+  function makeProblem(){
+    let stage=sessionStage===4?(round%2?3:2):sessionStage,max=limit(),a,b;
+    if(stage===1){max=Math.min(max,5);a=rand(1,Math.min(3,max-1));b=rand(1,Math.min(3,max-a))}
+    else if(stage===2){a=rand(2,Math.min(5,max-1));b=rand(1,Math.min(5,max-a))}
+    else {a=rand(Math.min(3,max-1),Math.min(8,max-1));b=rand(1,Math.min(3,max-a))}
+    return {a,b,sum:a+b,countOn:stage===3,max};
+  }
+  function start(){unlockAudio();round=0;sessionStage=effectiveStage();renderProgress();show('gameScreen');newProblem()}
+  function newProblem(){
+    locked=false;firstTry=true;arrived=0;selected=null;counted=new Set();problem=makeProblem();
+    $('firstNumber').textContent=problem.a;$('secondNumber').textContent=problem.b;$('storyCopy').textContent=`${problem.a}ひき いるよ。あとから ${problem.b}ひき くるよ。`;
+    $('equationReveal').classList.remove('show');$('equationReveal').textContent='';$('successOverlay').classList.remove('show');$('countBubble').textContent=problem.countOn?problem.a:0;
+    $('countLabel').textContent=problem.countOn?'いま':'かぞえた数';$('gentle').textContent='バスの おともだちを よんでね';$('bringBtn').textContent='おともだちを よぶ';$('bringBtn').classList.remove('done');
+    renderSeats();renderBus();renderAnswers();setTimeout(()=>speak(`${problem.a}ひき いるよ。あとから ${problem.b}ひき くるよ`),250);
+  }
+  function renderProgress(){$('progress').innerHTML='';for(let i=0;i<5;i++){const x=document.createElement('i');x.textContent=i<round?'★':'';if(i<round)x.className='done';$('progress').appendChild(x)}}
+  function renderSeats(){
+    const floor=$('danceFloor');floor.innerHTML='';const shown=problem.max<=5?5:10,total=problem.a+arrived;
+    for(let i=0;i<10;i++){const s=document.createElement('button');s.type='button';s.className='seat';if(i>=shown)s.classList.add('locked');
+      if(i<total){s.classList.add('filled');s.innerHTML=`<span class="mini-friend ${i>=problem.a?'arrival':''}"></span>`;if(counted.has(i))s.classList.add('counted');s.addEventListener('click',()=>countFriend(i))}floor.appendChild(s)}
+  }
+  function renderBus(){const box=$('busFriends');box.innerHTML='';for(let i=arrived;i<problem.b;i++){const x=document.createElement('span');x.className='bus-dot';x.textContent='♪';box.appendChild(x)}}
+  function bringFriend(){
+    if(locked||arrived>=problem.b)return;arrived++;playTone(430+arrived*45,.09);renderSeats();renderBus();
+    if(problem.countOn){const now=problem.a+arrived;$('countBubble').textContent=now;speak(String(now));$('gentle').textContent=arrived===problem.b?'つづきから 数えられたね。数字をえらぼう':'もうひとり よんでみよう'}
+    else speak('ひとり きたよ');
+    if(arrived===problem.b){$('bringBtn').textContent='みんな きたよ';$('bringBtn').classList.add('done');if(!problem.countOn){$('gentle').textContent='会場の おともだちを、ひとりずつタップして数えよう';$('storyCopy').textContent='みんな あわせると、なんびきかな？'}}
+  }
+  function countFriend(i){
+    if(locked||problem.countOn||arrived<problem.b||counted.has(i))return;counted.add(i);const n=counted.size;$('countBubble').textContent=n;playTone(490+n*30,.07);speak(String(n));renderSeats();
+    $('gentle').textContent=n===problem.sum?'ぜんぶ 数えられたね。数字をえらぼう':'まだ数えていない おともだちをタップしよう';
+  }
+  function renderAnswers(){const box=$('answers');box.innerHTML='';for(let n=1;n<=problem.max;n++){const b=document.createElement('button');b.type='button';b.className='answer-btn';b.textContent=n;b.addEventListener('click',()=>{if(locked)return;selected=n;box.querySelectorAll('button').forEach(x=>x.classList.toggle('selected',Number(x.textContent)===n));playTone(430+n*20,.06)});box.appendChild(b)}}
+  function check(){
+    if(locked)return;if(arrived<problem.b){$('gentle').textContent='まず、バスの おともだちを みんなよんでね';playTone(220,.13);return}if(selected===null){$('gentle').textContent='数字を ひとつ えらんでね';playTone(220,.13);return}
+    if(selected===problem.sum)success();else{firstTry=false;playTone(210,.18);$('gentle').textContent=problem.countOn?`${problem.a}から、来たおともだちの分だけ数えてみよう`:'会場の おともだちを ひとりずつ数えてみよう';const wrong=[...$('answers').children].find(x=>Number(x.textContent)===selected);wrong?.classList.add('wrong');setTimeout(()=>wrong?.classList.remove('wrong'),500);if(!problem.countOn){counted=new Set();$('countBubble').textContent=0;renderSeats()}speak('もういちど 数えてみよう')}
+  }
+  function success(){
+    locked=true;round++;save.total++;if(firstTry&&save.step==='auto'){const key=`mastery${Math.min(sessionStage,3)}`;save[key]=Math.min(5,(save[key]||0)+1)}persist();renderProgress();$('equationReveal').textContent=`${problem.a} ＋ ${problem.b} ＝ ${problem.sum}`;$('equationReveal').classList.add('show');$('successDetail').textContent=`${problem.a}ひきと ${problem.b}ひきで、${problem.sum}ひき！`;$('successOverlay').classList.add('show');playSuccess();speak(`${problem.a}たす${problem.b}は${problem.sum}。できたね`);confetti(12)
+  }
+  function next(){round>=5?prepareComplete():newProblem()}
+  function prepareComplete(){
+    justUnlocked='';if(save.step==='auto'){if(save.stage===1&&save.mastery1>=5){save.stage=2;justUnlocked='five'}else if(save.stage===2&&save.mastery2>=5){save.stage=3;justUnlocked='count'}else if(save.stage===3&&save.mastery3>=5){save.stage=4;justUnlocked='mix'}}persist();theme='🎀';$('chosenTheme').textContent=theme;document.querySelectorAll('.theme-btn').forEach((b,i)=>b.classList.toggle('selected',i===0));
+    $('completeTitle').textContent=justUnlocked?'あたらしい あそびが ひらいた！':'パーティーが できたよ！';$('completeCopy').textContent=justUnlocked==='five'?'つぎは、合計10までを5のまとまりで見てみよう':justUnlocked==='count'?'つぎは、いる数の続きから数えてみよう':justUnlocked==='mix'?'いろいろな足し算をまぜて遊べるよ！':'さいごのテーマを えらんでね';show('completeScreen');confetti(28)
+  }
+  function saveParty(){save.parties.push({theme,date:new Date().toISOString()});if(save.parties.length>30)save.parties=save.parties.slice(-30);persist();renderGallery();show('galleryScreen');playSuccess()}
+  function renderGallery(){const box=$('galleryGrid');box.innerHTML='';$('galleryCount').textContent=`${save.parties.length}この パーティーを ひらいたよ`;if(!save.parties.length){box.innerHTML='<div class="empty-gallery">まだパーティーはないよ。<br>5もんできると かんせい！</div>';return}[...save.parties].reverse().forEach((p,i)=>{const d=document.createElement('div');d.className='gallery-item';d.innerHTML=`${p.theme}<small>パーティー ${save.parties.length-i}</small>`;box.appendChild(d)})}
+  function openSettings(){document.querySelectorAll('.limit-btn').forEach(b=>b.classList.toggle('selected',b.dataset.limit===String(save.limit)));document.querySelectorAll('.step-btn').forEach(b=>b.classList.toggle('selected',b.dataset.step===String(save.step)));$('voiceToggle').classList.toggle('on',save.voice);show('settingsScreen')}
+  let audioCtx=null;function unlockAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}function playTone(f,d){if(!save.sound)return;try{unlockAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.09,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}catch(e){}}function playSuccess(){[523,659,784].forEach((n,i)=>setTimeout(()=>playTone(n,.23),i*120))}function speak(t){if(!save.sound||!save.voice||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=.82;u.pitch=1.2;u.volume=.85;speechSynthesis.speak(u)}catch(e){}}function confetti(n){const p=['🎈','✨','🌸','⭐','💗'];for(let i=0;i<n;i++){const x=document.createElement('div');x.className='confetti';x.textContent=p[i%p.length];x.style.left=`${Math.random()*96}vw`;x.style.animationDelay=`${Math.random()*.3}s`;document.body.appendChild(x);setTimeout(()=>x.remove(),1600)}}function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+  $('playBtn').addEventListener('click',start);$('homeBtn').addEventListener('click',()=>show('titleScreen'));$('bringBtn').addEventListener('click',bringFriend);$('checkBtn').addEventListener('click',check);$('nextBtn').addEventListener('click',next);$('savePartyBtn').addEventListener('click',saveParty);
+  $('galleryBtn').addEventListener('click',()=>{renderGallery();show('galleryScreen')});$('galleryBackBtn').addEventListener('click',()=>show('titleScreen'));$('settingsBtn').addEventListener('click',openSettings);$('settingsBackBtn').addEventListener('click',()=>{persist();show('titleScreen')});
+  $('soundBtn').addEventListener('click',()=>{save.sound=!save.sound;$('soundBtn').textContent=save.sound?'🔊':'🔇';persist();if(save.sound)playTone(560,.12)});$('voiceToggle').addEventListener('click',()=>{save.voice=!save.voice;$('voiceToggle').classList.toggle('on',save.voice);persist()});
+  document.querySelectorAll('.limit-btn').forEach(b=>b.addEventListener('click',()=>{save.limit=b.dataset.limit;document.querySelectorAll('.limit-btn').forEach(x=>x.classList.toggle('selected',x===b));persist()}));document.querySelectorAll('.step-btn').forEach(b=>b.addEventListener('click',()=>{save.step=b.dataset.step;document.querySelectorAll('.step-btn').forEach(x=>x.classList.toggle('selected',x===b));persist()}));document.querySelectorAll('.theme-btn').forEach(b=>b.addEventListener('click',()=>{theme=b.dataset.theme;$('chosenTheme').textContent=theme;document.querySelectorAll('.theme-btn').forEach(x=>x.classList.toggle('selected',x===b));playTone(620,.09)}));
+  document.addEventListener('contextmenu',e=>e.preventDefault());$('soundBtn').textContent=save.sound?'🔊':'🔇';updateTitle();
+})();
+</script>
+</body>
+</html>
