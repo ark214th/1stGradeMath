@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#ff8fbd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ももちゃんのスイーツショップ</title>
+  <style>
+    :root {
+      --ink:#683a56; --pink:#ff72ad; --pink2:#ffb5d2; --cream:#fff9ec;
+      --mint:#bcebdc; --yellow:#ffe181; --card:rgba(255,255,255,.90);
+      --shadow:0 12px 30px rgba(116,55,86,.18);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;overflow-x:hidden;overscroll-behavior:none}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:var(--ink);background:#ffe9f2;user-select:none;-webkit-user-select:none}
+    button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+    .app{min-height:100dvh;position:relative;overflow:hidden;background:
+      radial-gradient(ellipse at 12% 9%,rgba(255,255,255,.9) 0 5%,transparent 6%),
+      radial-gradient(ellipse at 88% 16%,rgba(255,255,255,.7) 0 7%,transparent 8%),
+      linear-gradient(180deg,#c8f1eb 0 34%,#fff0f6 34% 100%)}
+    .cloud{position:absolute;width:160px;height:45px;border-radius:50%;background:rgba(255,255,255,.6);filter:blur(1px);pointer-events:none}
+    .cloud:before,.cloud:after{content:"";position:absolute;border-radius:50%;background:inherit}
+    .cloud:before{width:68px;height:68px;left:25px;bottom:0}.cloud:after{width:85px;height:85px;right:20px;bottom:0}
+    .c1{left:-35px;top:7%}.c2{right:-45px;top:14%;transform:scale(.75)}
+    .screen{display:none;min-height:100dvh;position:relative;z-index:1;padding:max(14px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom))}
+    .screen.active{display:flex;animation:fade .28s ease-out}
+    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .round-btn{min-height:52px;padding:10px 18px;border-radius:999px;background:#fff;border:3px solid rgba(255,114,173,.25);font-weight:900;box-shadow:0 7px 0 rgba(161,75,116,.12)}
+    .round-btn:active{transform:translateY(3px);box-shadow:0 4px 0 rgba(161,75,116,.12)}
+    .primary{color:white;background:linear-gradient(#ff8cbd,#ff5fa5);border-color:#fff;font-size:clamp(20px,4vw,28px);padding:15px 30px}
+    .icon-btn{width:52px;padding:0;font-size:24px;display:grid;place-items:center}
+
+    /* title */
+    #titleScreen{align-items:center;justify-content:center}
+    .shop-front{width:min(720px,96vw);text-align:center;position:relative;padding-top:78px}
+    .awning{height:102px;position:absolute;top:0;left:4%;right:4%;border-radius:32px 32px 18px 18px;background:repeating-linear-gradient(90deg,#ff80b5 0 58px,#fff9ef 58px 116px);box-shadow:var(--shadow);border:5px solid white}
+    .shop-card{position:relative;background:rgba(255,252,245,.94);border:6px solid white;border-radius:34px;padding:34px 20px 26px;box-shadow:var(--shadow)}
+    .logo-small{font-weight:900;color:#a64c78;letter-spacing:.1em;font-size:clamp(14px,2.8vw,19px)}
+    h1{font-size:clamp(34px,8vw,64px);line-height:1.13;margin:8px 0 8px;color:#8d3e69;text-shadow:0 4px white}
+    .title-copy{margin:0 0 18px;font-weight:800;font-size:clamp(16px,3.3vw,22px)}
+    .title-mascots{display:flex;justify-content:center;align-items:flex-end;gap:clamp(8px,4vw,30px);margin:4px 0 22px}
+    .character{width:124px;height:132px;position:relative;filter:drop-shadow(0 8px 7px rgba(97,50,75,.16))}
+    .ear{position:absolute;width:39px;height:78px;border-radius:50% 50% 42% 42%;background:#fff;top:0;border:3px solid #f2c9da}
+    .ear:after{content:"";position:absolute;inset:11px 9px 13px;border-radius:inherit;background:#ffc1d9}
+    .ear.l{left:17px;transform:rotate(-9deg)}.ear.r{right:17px;transform:rotate(9deg)}
+    .head{position:absolute;width:112px;height:98px;left:6px;bottom:0;border-radius:48% 48% 44% 44%;background:#fff;border:3px solid #f2c9da}
+    .eye{position:absolute;width:10px;height:14px;background:#61384c;border-radius:50%;top:43px}.eye.l{left:28px}.eye.r{right:28px}
+    .cheek{position:absolute;width:22px;height:10px;border-radius:50%;background:#ffb8d2;top:61px}.cheek.l{left:12px}.cheek.r{right:12px}
+    .mouth{position:absolute;left:50%;top:62px;width:20px;height:13px;transform:translateX(-50%);border-bottom:4px solid #714057;border-radius:50%}
+    .bow{position:absolute;right:0;top:30px;font-size:35px;z-index:3;transform:rotate(10deg)}
+    .big-cake{width:148px;height:111px;position:relative;margin-bottom:6px}
+    .cake-layer{position:absolute;left:8px;right:8px;height:47px;border-radius:20px;background:linear-gradient(#fff7d6,#ffd08e);border:4px solid white;bottom:0;box-shadow:0 7px 0 #e7a873}
+    .cake-layer:before{content:"";position:absolute;left:-4px;right:-4px;height:25px;top:-13px;border-radius:50%;background:#ff91bc;border:4px solid white}
+    .berry{position:absolute;width:30px;height:29px;border-radius:50% 50% 45% 45%;background:#fa4f70;top:20px;left:59px;z-index:2;border:3px solid white}
+    .berry:after{content:"";position:absolute;width:14px;height:9px;left:5px;top:-7px;background:#69b985;border-radius:80% 10% 80% 10%;transform:rotate(-20deg)}
+    .save-line{font-size:14px;font-weight:750;color:#91647a;margin:14px 0 0}
+
+    /* game */
+    #gameScreen{flex-direction:column;gap:10px;max-width:1000px;margin:auto}
+    .hud{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .progress{display:flex;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.83);box-shadow:0 5px 16px rgba(92,54,72,.12)}
+    .progress i{width:25px;height:25px;border-radius:50%;display:block;background:#f1dce5;border:2px solid white}
+    .progress i.done{background:#ff7eae;animation:pop .35s ease}
+    .scene{flex:1;display:grid;grid-template-columns:minmax(170px,.65fr) minmax(320px,1.35fr);gap:12px;align-items:stretch}
+    .customer-card,.counter{background:var(--card);border:4px solid white;border-radius:30px;box-shadow:var(--shadow)}
+    .customer-card{padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:240px}
+    .customer-wrap{position:relative;height:140px;display:grid;place-items:center}
+    .customer-wrap .character{transform:scale(.96);transform-origin:bottom}
+    .customer-wrap.happy .character{animation:bounce .55s ease}
+    .customer-name{font-weight:900;color:#a05078;margin-top:4px}
+    .speech{position:relative;width:100%;margin-top:10px;padding:11px 8px;border-radius:22px;background:#fff5cf;border:3px solid white;text-align:center;font-weight:900;font-size:clamp(17px,3vw,23px);min-height:76px;display:grid;place-items:center}
+    .speech:before{content:"";position:absolute;top:-15px;left:50%;transform:translateX(-50%) rotate(45deg);width:28px;height:28px;background:#fff5cf;border-left:3px solid white;border-top:3px solid white}
+    .order-number{display:inline-grid;place-items:center;width:58px;height:58px;margin:0 4px;border-radius:18px;background:#fff;color:#ff579e;font-size:44px;line-height:1;box-shadow:0 5px 0 #ffd0df}
+    .counter{padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .counter-title{font-weight:900;font-size:clamp(17px,3vw,23px);text-align:center;margin-bottom:8px}
+    .tray{display:grid;grid-template-columns:repeat(5,minmax(44px,76px));gap:7px;padding:10px;border:5px solid #db9a68;border-radius:24px;background:#f5c795;box-shadow:inset 0 0 0 5px #ffdfb3,0 7px 0 #bd754c}
+    .slot{aspect-ratio:1;border-radius:18px;background:rgba(255,249,230,.85);border:3px dashed rgba(151,94,57,.28);display:grid;place-items:center;min-width:0;position:relative}
+    .slot.locked{display:none}.slot.group-start{box-shadow:inset 5px 0 0 rgba(255,255,255,.9)}
+    .sweet{width:80%;height:80%;border-radius:50%;background:radial-gradient(circle at 34% 28%,#ffb6cb 0 11%,#fa5275 12% 65%,#d93e63 66%);border:3px solid white;box-shadow:0 5px 0 rgba(151,54,75,.18);position:relative;animation:pop .28s cubic-bezier(.2,1.7,.5,1)}
+    .sweet:before{content:"";position:absolute;width:39%;height:24%;top:-12%;left:31%;background:#64ba7d;border-radius:90% 10% 90% 10%;transform:rotate(-24deg)}
+    .sweet:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe59d;left:24%;top:48%;box-shadow:16px -9px #ffe59d,25px 8px #ffe59d,7px 18px #ffe59d}
+    .slot.filled{border-style:solid;border-color:rgba(255,255,255,.85);cursor:pointer}
+    .slot.extra{animation:shake .34s ease;background:#fff0f3}
+    .count-readout{display:flex;align-items:center;gap:9px;margin-top:12px;font-weight:900;font-size:clamp(17px,3vw,22px);min-height:50px}
+    .count-number{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:white;color:#ef4f91;font-size:31px;border:3px solid #ffc0d7}
+    .supply{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:12px}
+    .supply-btn{min-width:210px;min-height:64px;border-radius:25px;background:linear-gradient(#ff91b8,#ff699d);border:4px solid white;color:white;font-weight:900;font-size:clamp(18px,3vw,23px);box-shadow:0 7px 0 #c64d78;display:flex;align-items:center;justify-content:center;gap:10px}
+    .supply-btn:active{transform:translateY(4px);box-shadow:0 3px 0 #c64d78}
+    .mini-sweet{width:38px;height:38px;transform:scale(.85)}
+    .gentle{min-height:28px;text-align:center;font-size:15px;font-weight:800;color:#8e5a72;margin-top:8px}
+    .success-overlay{position:absolute;inset:0;background:rgba(255,250,238,.93);display:none;place-items:center;text-align:center;padding:20px;z-index:6}
+    .success-overlay.show{display:grid;animation:fade .25s ease}
+    .success-word{font-size:clamp(32px,7vw,58px);font-weight:950;color:#e94f94;text-shadow:0 4px white}
+    .success-detail{font-size:clamp(18px,3.5vw,26px);font-weight:900;margin:6px 0 18px}
+
+    /* completion / gallery */
+    #completeScreen,#galleryScreen,#settingsScreen{align-items:center;justify-content:center}
+    .modal{width:min(720px,96vw);max-height:calc(100dvh - 28px);overflow:auto;background:rgba(255,252,246,.96);border:5px solid white;border-radius:34px;padding:22px;text-align:center;box-shadow:var(--shadow)}
+    .modal h2{font-size:clamp(29px,6vw,48px);margin:4px 0 7px;color:#934268}.modal p{font-weight:800;line-height:1.6}
+    .finished-cake{width:240px;height:188px;margin:6px auto;position:relative}
+    .finished-cake .cake-layer{left:18px;right:18px;height:75px;border-radius:30px;bottom:15px;box-shadow:0 11px 0 #e5a16f}
+    .finished-cake .cake-layer:before{height:39px;top:-20px}
+    .topper{position:absolute;z-index:4;left:50%;top:32px;transform:translateX(-50%);font-size:70px;filter:drop-shadow(0 5px 2px rgba(100,50,70,.15))}
+    .choice-title{font-weight:900;margin:8px 0}.topper-choices{display:flex;justify-content:center;gap:12px;margin:8px 0 18px}
+    .topper-btn{width:84px;height:74px;border-radius:24px;background:white;border:4px solid #ffd0e0;font-size:43px;box-shadow:0 6px 0 #efd2dc}.topper-btn.selected{background:#fff1a8;border-color:#ffb666;transform:translateY(3px);box-shadow:0 3px 0 #e5c08b}
+    .button-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;min-height:110px}
+    .gallery-item{background:#fff2f7;border:3px solid white;border-radius:22px;padding:8px;font-size:43px;box-shadow:0 5px 12px rgba(120,65,90,.1)}
+    .gallery-item small{display:block;font-size:12px;font-weight:850;color:#916078}.empty-gallery{grid-column:1/-1;padding:30px 8px;font-weight:800;color:#987185}
+    .setting-group{text-align:left;background:#fff3f7;border-radius:22px;padding:14px;margin:12px 0}.setting-group h3{margin:0 0 10px}.level-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.level-btn{min-height:52px;border-radius:17px;background:white;border:3px solid #f3d7e2;font-weight:900}.level-btn.selected{background:#ffe382;border-color:#ffc65b}
+    .toggle-row{display:flex;justify-content:space-between;align-items:center;font-weight:900}.toggle{width:68px;height:40px;border-radius:999px;background:#d7cbd0;padding:4px}.toggle span{display:block;width:32px;height:32px;border-radius:50%;background:white;transition:.2s}.toggle.on{background:#ff74aa}.toggle.on span{transform:translateX(28px)}
+    .confetti{position:fixed;z-index:30;pointer-events:none;top:-30px;animation:fall 1.2s ease-in forwards;font-size:24px}
+    @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.35}}
+    @keyframes pop{0%{transform:scale(.45)}75%{transform:scale(1.12)}100%{transform:scale(1)}}
+    @keyframes bounce{0%,100%{transform:translateY(0)}45%{transform:translateY(-18px) rotate(-3deg)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+    @media(max-width:700px){
+      .screen{padding-left:9px;padding-right:9px}.scene{grid-template-columns:1fr;grid-template-rows:auto 1fr}.customer-card{min-height:0;padding:7px;display:grid;grid-template-columns:110px 1fr;gap:5px}.customer-wrap{height:112px}.customer-wrap .character{transform:scale(.72)}.customer-name{display:none}.speech{margin:0;min-height:74px}.speech:before{left:-11px;top:45%;transform:rotate(-45deg)}.counter{padding:9px}.tray{grid-template-columns:repeat(5,minmax(38px,62px));gap:5px;padding:7px}.slot{border-radius:14px}.supply{margin-top:7px}.supply-btn{min-height:58px}.gentle{margin-top:5px}.count-readout{margin-top:8px}.shop-front{padding-top:61px}.awning{height:84px}.shop-card{padding-top:25px}.title-mascots{margin-bottom:15px}}
+    @media(max-height:700px) and (orientation:landscape){.screen{min-height:100dvh}.scene{grid-template-columns:200px 1fr;grid-template-rows:1fr}.customer-card{display:flex}.customer-wrap{height:105px}.customer-wrap .character{transform:scale(.7)}.speech{font-size:16px;min-height:60px}.tray{grid-template-columns:repeat(5,52px)}.slot{border-radius:13px}.supply-btn{min-height:52px}.count-readout{margin-top:6px}.gentle{margin:2px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="cloud c1"></div><div class="cloud c2"></div>
+
+  <section id="titleScreen" class="screen active">
+    <div class="shop-front">
+      <div class="awning"></div>
+      <div class="shop-card">
+        <div class="logo-small">かずでつくろう</div>
+        <h1>ももちゃんの<br>スイーツショップ</h1>
+        <p class="title-copy">ちゅうもんの かずだけ、いちごを のせよう</p>
+        <div class="title-mascots">
+          <div class="character" aria-hidden="true"><div class="ear l"></div><div class="ear r"></div><div class="head"><i class="eye l"></i><i class="eye r"></i><i class="cheek l"></i><i class="cheek r"></i><i class="mouth"></i></div><div class="bow">🎀</div></div>
+          <div class="big-cake" aria-hidden="true"><div class="berry"></div><div class="cake-layer"></div></div>
+        </div>
+        <button id="playBtn" class="round-btn primary">おみせを ひらく</button>
+        <div class="button-row"><button id="galleryBtn" class="round-btn">ケーキずかん</button><button id="settingsBtn" class="round-btn icon-btn" aria-label="おとなの設定">⚙️</button></div>
+        <p id="saveLine" class="save-line"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="screen">
+    <div class="hud">
+      <button id="homeBtn" class="round-btn icon-btn" aria-label="おみせを閉じる">⌂</button>
+      <div id="progress" class="progress" aria-label="今日のできた数"></div>
+      <button id="soundBtn" class="round-btn icon-btn" aria-label="音の切り替え">🔊</button>
+    </div>
+    <div class="scene">
+      <div class="customer-card">
+        <div id="customerWrap" class="customer-wrap">
+          <div class="character" aria-hidden="true"><div class="ear l"></div><div class="ear r"></div><div class="head"><i class="eye l"></i><i class="eye r"></i><i class="cheek l"></i><i class="cheek r"></i><i class="mouth"></i></div><div class="bow" id="customerBow">🌼</div></div>
+        </div>
+        <div class="customer-name">きょうの おきゃくさん</div>
+        <div id="speech" class="speech" aria-live="polite"></div>
+      </div>
+      <div class="counter">
+        <div id="counterTitle" class="counter-title">トレーに いれてね</div>
+        <div id="tray" class="tray" aria-label="いちごを入れるトレー"></div>
+        <div class="count-readout"><span>いま</span><span id="countNumber" class="count-number">0</span><span>こ</span></div>
+        <div class="supply"><button id="addBtn" class="supply-btn"><span class="sweet mini-sweet" aria-hidden="true"></span>いちごを いれる</button></div>
+        <div id="gentle" class="gentle">いれたい ぶんだけ タップしよう</div>
+        <div id="successOverlay" class="success-overlay"><div><div class="success-word">ぴったり！</div><div id="successDetail" class="success-detail"></div><button id="nextBtn" class="round-btn primary">おきゃくさんへ</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="completeScreen" class="screen">
+    <div class="modal">
+      <h2>ケーキが できたよ！</h2><p>さいごの かざりを えらんでね</p>
+      <div class="finished-cake"><div id="chosenTopper" class="topper">🎀</div><div class="cake-layer"></div></div>
+      <div class="choice-title">どれを のせる？</div>
+      <div class="topper-choices"><button class="topper-btn selected" data-topper="🎀">🎀</button><button class="topper-btn" data-topper="🌸">🌸</button><button class="topper-btn" data-topper="🦄">🦄</button></div>
+      <button id="saveCakeBtn" class="round-btn primary">ずかんに しまう</button>
+    </div>
+  </section>
+
+  <section id="galleryScreen" class="screen"><div class="modal"><h2>ケーキずかん</h2><p id="galleryCount"></p><div id="galleryGrid" class="gallery-grid"></div><button id="galleryBackBtn" class="round-btn primary">もどる</button></div></section>
+
+  <section id="settingsScreen" class="screen"><div class="modal"><h2>おとなの設定</h2><p>お子さんの様子に合わせて変えられます。</p>
+    <div class="setting-group"><h3>出てくる数</h3><div class="level-buttons"><button class="level-btn" data-level="auto">おまかせ</button><button class="level-btn" data-level="3">1〜3</button><button class="level-btn" data-level="5">1〜5</button><button class="level-btn" data-level="10">1〜10</button></div></div>
+    <div class="setting-group toggle-row"><span>数を読み上げる</span><button id="voiceToggle" class="toggle" aria-label="読み上げ切り替え"><span></span></button></div>
+    <p style="font-size:14px;color:#8b6577">「おまかせ」は、遊んだ回数に合わせて少しずつ数を増やします。記録はこの端末だけに保存されます。</p>
+    <button id="settingsBackBtn" class="round-btn primary">もどる</button>
+  </div></section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const KEY='momoSweetsSaveV1';
+  const defaults={total:0,cakes:[],level:'auto',sound:true,voice:true};
+  let save=load(), order=1, count=0, round=0, selectedTopper='🎀', locked=false;
+  const $=id=>document.getElementById(id);
+  const screens=[...document.querySelectorAll('.screen')];
+  const bows=['🌼','🎀','🌷','⭐','🍒'];
+
+  function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return {...defaults}}}
+  function persist(){localStorage.setItem(KEY,JSON.stringify(save));updateSaveLine()}
+  function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo(0,0)}
+  function updateSaveLine(){$('saveLine').textContent=save.total?`${save.total}かい ちゅうもんを つくったよ`:'はじめての おきゃくさんが まってるよ'}
+  function maxNumber(){if(save.level!=='auto')return Number(save.level);return save.total<5?3:save.total<15?5:10}
+  function newOrder(){
+    locked=false;count=0;order=1+Math.floor(Math.random()*maxNumber());
+    $('customerBow').textContent=bows[(save.total+round)%bows.length];
+    $('customerWrap').classList.remove('happy');
+    $('successOverlay').classList.remove('show');
+    $('gentle').textContent='いれたい ぶんだけ タップしよう';
+    $('counterTitle').textContent='トレーに いれてね';
+    $('speech').innerHTML=`いちごを <span class="order-number">${order}</span> こ ください`;
+    renderTray();updateCount();setTimeout(()=>speak(`いちごを ${order}こ ください`),300);
+  }
+  function renderProgress(){
+    $('progress').innerHTML='';for(let i=0;i<5;i++){const dot=document.createElement('i');if(i<round)dot.className='done';$('progress').appendChild(dot)}
+  }
+  function renderTray(){
+    const tray=$('tray');tray.innerHTML='';const max=maxNumber()<=5?5:10;
+    for(let i=0;i<10;i++){
+      const slot=document.createElement('button');slot.className='slot';slot.type='button';
+      if(i>=max)slot.classList.add('locked');if(i===5)slot.classList.add('group-start');
+      slot.setAttribute('aria-label',i<count?`${i+1}こめのいちごを戻す`:'からの場所');
+      if(i<count){slot.classList.add('filled');slot.innerHTML='<span class="sweet"></span>';slot.addEventListener('click',()=>removeOne(i))}
+      tray.appendChild(slot);
+    }
+  }
+  function addOne(){
+    if(locked||count>=10)return;unlockAudio();count++;playTone(470+count*35,.07);speak(String(count));renderTray();updateCount();
+    if(count===order)setTimeout(success,430);
+    else if(count>order){$('gentle').textContent='ひとつ おおいかも。いちごを タップして もどせるよ';const slots=$('tray').children;slots[count-1]?.classList.add('extra')}
+    else $('gentle').textContent=`あと ${order-count}こで ちゅうもんどおり`;
+  }
+  function removeOne(index){
+    if(locked)return;count=Math.max(0,count-1);playTone(300,.06);renderTray();updateCount();
+    $('gentle').textContent=count<order?`あと ${order-count}こで ちゅうもんどおり`:'いれたい ぶんだけ タップしよう';
+  }
+  function updateCount(){$('countNumber').textContent=count}
+  function success(){
+    if(locked||count!==order)return;locked=true;round++;save.total++;persist();renderProgress();
+    $('customerWrap').classList.add('happy');$('successDetail').textContent=`${order} と ${order}こが いっしょだね`;
+    $('successOverlay').classList.add('show');playSuccess();speak(`${order}こ。ぴったり！`);confetti(12);
+  }
+  function next(){if(round>=5){selectedTopper='🎀';$('chosenTopper').textContent=selectedTopper;document.querySelectorAll('.topper-btn').forEach((b,i)=>b.classList.toggle('selected',i===0));show('completeScreen');confetti(28)}else newOrder()}
+  function start(){unlockAudio();round=0;renderProgress();show('gameScreen');newOrder()}
+  function saveCake(){save.cakes.push({topper:selectedTopper,date:new Date().toISOString()});if(save.cakes.length>30)save.cakes=save.cakes.slice(-30);persist();renderGallery();show('galleryScreen');playSuccess()}
+  function renderGallery(){
+    const grid=$('galleryGrid');grid.innerHTML='';$('galleryCount').textContent=`${save.cakes.length}この ケーキを つくったよ`;
+    if(!save.cakes.length){grid.innerHTML='<div class="empty-gallery">まだケーキはないよ。<br>5かい ちゅうもんをつくると かんせい！</div>';return}
+    [...save.cakes].reverse().forEach((c,i)=>{const d=document.createElement('div');d.className='gallery-item';d.innerHTML=`${c.topper}<small>ケーキ ${save.cakes.length-i}</small>`;grid.appendChild(d)})
+  }
+  let audioCtx=null;
+  function unlockAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
+  function playTone(freq,duration){if(!save.sound)return;try{unlockAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.09,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}}
+  function playSuccess(){[523,659,784].forEach((n,i)=>setTimeout(()=>playTone(n,.24),i*120))}
+  function speak(text){if(!save.sound||!save.voice||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ja-JP';u.rate=.82;u.pitch=1.22;u.volume=.85;speechSynthesis.speak(u)}catch(e){}}
+  function confetti(n){const pieces=['🌸','✨','💗','⭐','🍓'];for(let i=0;i<n;i++){const x=document.createElement('div');x.className='confetti';x.textContent=pieces[i%pieces.length];x.style.left=`${Math.random()*96}vw`;x.style.animationDelay=`${Math.random()*.35}s`;x.style.fontSize=`${18+Math.random()*18}px`;document.body.appendChild(x);setTimeout(()=>x.remove(),1700)}}
+  function openSettings(){document.querySelectorAll('.level-btn').forEach(b=>b.classList.toggle('selected',b.dataset.level===String(save.level)));$('voiceToggle').classList.toggle('on',save.voice);show('settingsScreen')}
+
+  $('playBtn').addEventListener('click',start);$('homeBtn').addEventListener('click',()=>show('titleScreen'));$('addBtn').addEventListener('click',addOne);$('nextBtn').addEventListener('click',next);
+  $('galleryBtn').addEventListener('click',()=>{renderGallery();show('galleryScreen')});$('galleryBackBtn').addEventListener('click',()=>show('titleScreen'));
+  $('settingsBtn').addEventListener('click',openSettings);$('settingsBackBtn').addEventListener('click',()=>{persist();show('titleScreen')});
+  $('soundBtn').addEventListener('click',()=>{save.sound=!save.sound;$('soundBtn').textContent=save.sound?'🔊':'🔇';persist();if(save.sound)playTone(560,.12)});
+  $('voiceToggle').addEventListener('click',()=>{save.voice=!save.voice;$('voiceToggle').classList.toggle('on',save.voice);persist()});
+  document.querySelectorAll('.level-btn').forEach(b=>b.addEventListener('click',()=>{save.level=b.dataset.level;document.querySelectorAll('.level-btn').forEach(x=>x.classList.toggle('selected',x===b));persist()}));
+  document.querySelectorAll('.topper-btn').forEach(b=>b.addEventListener('click',()=>{selectedTopper=b.dataset.topper;$('chosenTopper').textContent=selectedTopper;document.querySelectorAll('.topper-btn').forEach(x=>x.classList.toggle('selected',x===b));playTone(620,.1)}));
+  $('saveCakeBtn').addEventListener('click',saveCake);
+  document.addEventListener('contextmenu',e=>e.preventDefault());
+  $('soundBtn').textContent=save.sound?'🔊':'🔇';updateSaveLine();
+})();
+</script>
+</body>
+</html>
