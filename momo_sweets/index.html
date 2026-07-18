@@ -236,7 +236,8 @@
   }
   function removeOne(index){
     if(locked)return;count=Math.max(0,count-1);playTone(300,.06);renderTray();updateCount();
-    $('gentle').textContent=count<order?`あと ${order-count}こで ちゅうもんどおり`:'いれたい ぶんだけ タップしよう';
+    if(count===order){$('gentle').textContent='ちゅうもんと おなじかな？';setTimeout(success,350)}
+    else $('gentle').textContent=count<order?`あと ${order-count}こで ちゅうもんどおり`:'いれたい ぶんだけ タップしよう';
   }
   function updateCount(){$('countNumber').textContent=count}
   function success(){
