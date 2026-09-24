@@ -1,0 +1,1465 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffc9e6">
+<title>ゆめかわ かずうさガーデン</title>
+<style>
+:root{--ink:#7a3563;--pink:#ff7fbf;--deep:#d94b93;--lav:#b9a2ff;--cream:#fff8fc}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;overflow:hidden;font-family:"Hiragino Maru Gothic ProN","Hiragino Maru Gothic Pro","M PLUS Rounded 1c","Yu Gothic",sans-serif;color:var(--ink);touch-action:manipulation;background:#ffd9ec}
+button{font:inherit;color:inherit;cursor:pointer}
+#bg{position:fixed;inset:0;background:
+  radial-gradient(circle at 15% 12%,rgba(255,255,255,.9) 0 2px,transparent 3px),
+  radial-gradient(circle at 78% 20%,rgba(255,255,255,.9) 0 2px,transparent 3px),
+  radial-gradient(circle at 60% 8%,rgba(255,255,255,.8) 0 1.5px,transparent 2.5px),
+  radial-gradient(circle at 35% 30%,rgba(255,255,255,.7) 0 1.5px,transparent 2.5px),
+  radial-gradient(circle at 90% 45%,rgba(255,255,255,.7) 0 2px,transparent 3px),
+  radial-gradient(ellipse at 20% 0%,#ffd0ec 0%,transparent 55%),
+  radial-gradient(ellipse at 100% 10%,#e3d2ff 0%,transparent 50%),
+  linear-gradient(180deg,#ffc9e6 0%,#f1d3ff 38%,#d6ecff 72%,#d4fbef 100%)}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.nlabel{position:absolute;left:0;top:0;will-change:transform;font-weight:900;color:var(--ink);background:#fff;border:5px solid var(--c);border-radius:999px;min-width:1.55em;height:1.55em;padding:0 .2em;display:flex;align-items:center;justify-content:center;font-size:40px;line-height:1;box-shadow:0 5px 0 rgba(160,60,120,.12),0 8px 18px rgba(160,60,120,.18);transition:opacity .25s}
+.nlabel.s{font-size:21px;border-width:3px;box-shadow:0 3px 0 rgba(160,60,120,.12)}
+.nlabel.rainbow{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#ff8fa3,#ffb36b,#ffe066,#9ee493,#7fd0f5,#a39bff,#e79bff) border-box}
+.nlabel.pearl{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#ffb8dc,#d4c2ff,#b5eaff,#ffe9b0,#ffb8dc) border-box}
+.nlabel.pop{animation:lpop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes lpop{0%{scale:.3}100%{scale:1}}
+.anchor{position:absolute;left:0;top:0;will-change:transform}
+.bubble{background:#fff;border-radius:26px;padding:10px 20px;font-size:34px;font-weight:900;white-space:nowrap;box-shadow:0 6px 0 rgba(160,60,120,.12),0 10px 22px rgba(160,60,120,.2);animation:lpop .5s cubic-bezier(.3,1.6,.5,1)}
+.bubble:after{content:"";position:absolute;left:50%;bottom:-14px;margin-left:-12px;border:12px solid transparent;border-top-color:#fff;border-bottom:0}
+.hand{font-size:64px;animation:handb .8s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(120,40,90,.25))}
+@keyframes handb{0%,100%{translate:0 0}50%{translate:0 14px}}
+
+#ui{position:fixed;inset:0;pointer-events:none}
+.layer{position:absolute;inset:0;pointer-events:none;display:none}
+.layer.on{display:block}
+.pe{pointer-events:auto}
+.btn{border:0;border-radius:999px;font-weight:900;color:#fff;background:linear-gradient(180deg,#ffa6d4,#ff6fb3);box-shadow:0 6px 0 var(--deep),0 12px 24px rgba(200,60,130,.28);padding:14px 30px;font-size:26px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(180,40,110,.3);position:relative;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--deep)}
+.btn.lav{background:linear-gradient(180deg,#cbb8ff,#9d82f5);box-shadow:0 6px 0 #7258d6,0 12px 24px rgba(110,80,200,.25)}
+.btn.lav:active{box-shadow:0 2px 0 #7258d6}
+.btn.mint{background:linear-gradient(180deg,#9ff0d4,#4fd1a8);box-shadow:0 6px 0 #2ea883,0 12px 24px rgba(40,160,120,.25);text-shadow:0 2px 0 rgba(20,120,90,.3)}
+.btn.mint:active{box-shadow:0 2px 0 #2ea883}
+.btn.white{background:#fff;color:var(--ink);text-shadow:none;box-shadow:0 6px 0 #f0bcd8,0 12px 24px rgba(200,60,130,.18)}
+.btn.white:active{box-shadow:0 2px 0 #f0bcd8}
+.pill{background:rgba(255,255,255,.88);border-radius:999px;padding:8px 18px;font-weight:900;box-shadow:0 4px 0 rgba(200,90,150,.15)}
+.ibtn{border:0;background:rgba(255,255,255,.92);border-radius:24px;width:78px;height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:34px;box-shadow:0 5px 0 #f0bcd8,0 10px 20px rgba(200,60,130,.15);position:relative}
+.ibtn small{font-size:13px;font-weight:900;margin-top:2px}
+.ibtn:active{transform:translateY(3px);box-shadow:0 2px 0 #f0bcd8}
+.dot{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;background:#ff5a9e;border:3px solid #fff;animation:beat 1s infinite}
+@keyframes beat{50%{scale:1.2}}
+
+/* splash */
+#splash{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(40px,env(safe-area-inset-top)) 16px max(46px,env(safe-area-inset-bottom))}
+.title{text-align:center}
+.title h1{margin:0;font-size:clamp(40px,7vw,76px);line-height:1.15;color:#fff;letter-spacing:.04em;text-shadow:0 4px 0 #ff82bf,0 8px 0 #c77dff,0 14px 24px rgba(160,60,140,.3);-webkit-text-stroke:2px #ff9fd0}
+.title p{margin:10px 0 0;font-weight:900;font-size:22px;color:#a04a86}
+#startBtn{font-size:34px;padding:20px 54px;animation:breath 1.6s ease-in-out infinite}
+@keyframes breath{50%{scale:1.06}}
+#loadMsg{font-weight:900;font-size:20px;background:#fff;padding:10px 20px;border-radius:20px;margin-top:12px;display:none}
+
+/* garden */
+#gTop{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));gap:10px}
+.logo{font-size:24px;font-weight:900;color:#c24d8f;background:rgba(255,255,255,.9);padding:10px 20px;border-radius:999px;box-shadow:0 4px 0 rgba(200,90,150,.15)}
+#friends{display:flex;gap:5px;margin-top:10px;background:rgba(255,255,255,.75);padding:7px 10px;border-radius:999px;width:max-content}
+#friends span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;background:#eee;color:#bbb;border:3px solid #fff}
+#friends span.m{background:var(--c);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.gbtns{display:flex;gap:12px}
+#gBottom{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;padding-bottom:max(26px,env(safe-area-inset-bottom))}
+#playBtn{font-size:36px;padding:20px 58px;animation:breath 1.8s ease-in-out infinite}
+#giftTag{margin-bottom:14px;font-size:20px;animation:beat 1.4s infinite}
+#doneTag{margin-bottom:14px;font-size:18px}
+
+/* play */
+#pTop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 16px 0}
+#homeBtn{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top));width:64px;height:64px;font-size:30px}
+#prog{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(22px,calc(env(safe-area-inset-top) + 10px));font-size:28px;letter-spacing:2px;background:rgba(255,255,255,.8);padding:4px 12px;border-radius:999px}
+#prog .cur{display:inline-block;animation:beat 1s infinite}
+#eq{background:rgba(255,255,255,.94);border-radius:999px;padding:4px 34px;font-size:64px;font-weight:900;display:flex;align-items:center;gap:14px;box-shadow:0 6px 0 rgba(200,90,150,.15),0 12px 26px rgba(200,90,150,.18);min-height:96px}
+#eq .op{color:#e57fb6;font-size:52px}
+#eq .q{display:inline-grid;place-items:center;width:78px;height:78px;border-radius:22px;background:#ffeef7;border:4px dashed #ff9fcf;color:#ff7ab8;animation:beat 1.2s infinite}
+#eq .ans{animation:lpop .6s cubic-bezier(.3,1.6,.5,1)}
+#pBottom{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;padding:0 12px max(18px,env(safe-area-inset-bottom));gap:12px}
+#instr{font-size:26px;font-weight:900;background:#fff;border-radius:26px;padding:10px 24px;box-shadow:0 5px 0 rgba(200,90,150,.14);min-height:54px;display:flex;align-items:center;gap:8px;transition:opacity .2s}
+#instr:empty{opacity:0}
+#choices{display:flex;gap:22px;min-height:170px;align-items:flex-end}
+.choice{border:0;width:170px;height:170px;border-radius:36px;background:#fff;box-shadow:0 8px 0 var(--c),0 14px 26px rgba(160,60,120,.18);display:flex;align-items:center;justify-content:center;gap:10px;position:relative;animation:lpop .45s cubic-bezier(.3,1.6,.5,1) backwards;border:5px solid var(--c)}
+.choice:active{transform:translateY(5px);box-shadow:0 3px 0 var(--c)}
+.choice .cn{font-size:84px;font-weight:900;color:var(--ink);line-height:1}
+.choice.pic .cn{font-size:62px}
+.choice.wrong{opacity:.35;filter:grayscale(.6);animation:shake .45s}
+.choice.right{animation:lpop .5s;box-shadow:0 0 0 8px #fff,0 0 0 14px var(--c)}
+@keyframes shake{20%,60%{translate:-10px 0}40%,80%{translate:10px 0}}
+.mb{display:flex;gap:3px;align-items:flex-end}
+.mb .col{display:flex;flex-direction:column-reverse;gap:3px}
+.mb i{width:17px;height:17px;border-radius:5px;display:block;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
+#hintBtn{position:absolute;right:max(18px,env(safe-area-inset-right));bottom:max(200px,calc(env(safe-area-inset-bottom) + 190px));font-size:22px;padding:12px 20px;display:none}
+
+/* dress */
+#dTop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 16px 0}
+#dBack{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top));width:64px;height:64px;font-size:30px}
+#dPanel{position:absolute;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(920px,calc(100% - 24px));background:rgba(255,255,255,.93);border-radius:34px;padding:14px 16px;box-shadow:0 10px 30px rgba(160,60,120,.2)}
+#dTabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+#dTabs button{width:54px;height:54px;border-radius:50%;border:4px solid #fff;background:var(--c);color:#fff;font-size:24px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 3px 0 rgba(0,0,0,.1)}
+#dTabs button.sel{outline:5px solid #ff6fb3;transform:scale(1.1)}
+#dItems{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#dItems button{border:0;background:#fff4fa;border-radius:22px;width:92px;height:92px;font-size:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 0 #f5c9e0}
+#dItems button small{font-size:11px;font-weight:900;margin-top:2px;line-height:1.1;text-align:center}
+#dItems button.sel{background:#ffd7eb;outline:4px solid #ff8fc6}
+.empty{font-weight:900;padding:18px;text-align:center;font-size:20px}
+
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(120,50,100,.28);display:none;align-items:center;justify-content:center;padding:16px;pointer-events:auto;z-index:10}
+#modal.on{display:flex}
+.card{background:var(--cream);border-radius:40px;padding:26px 28px;width:min(720px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 50px rgba(120,40,90,.3);border:6px solid #fff;text-align:center;animation:lpop .45s cubic-bezier(.3,1.5,.5,1);-webkit-user-select:none}
+.card h2{margin:0 0 12px;font-size:34px;color:#c24d8f}
+.card p{font-size:22px;font-weight:800;margin:8px 0}
+.row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.stk{border:0;width:150px;height:150px;border-radius:36px;background:#fff;font-size:88px;box-shadow:0 7px 0 #f3c3dc,0 12px 24px rgba(200,60,130,.18);animation:lpop .5s cubic-bezier(.3,1.6,.5,1) backwards}
+.stk:active{transform:translateY(4px)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+.cal div{aspect-ratio:1;background:#fff;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#c9a0b8;position:relative}
+.cal div b{font-size:clamp(22px,4.4vw,40px);line-height:1}
+.cal div.h{background:transparent;color:var(--ink);font-size:16px;aspect-ratio:auto;padding:4px}
+.cal div.t{outline:4px solid #ff8fc6}
+.cal div.x{background:transparent}
+.cal b.land{animation:stamp .8s cubic-bezier(.3,1.6,.5,1)}
+@keyframes stamp{0%{scale:4;opacity:0;rotate:-30deg}100%{scale:1;opacity:1;rotate:0deg}}
+.calnav{display:flex;justify-content:space-between;align-items:center}
+.calnav button{border:0;background:#fff;border-radius:50%;width:52px;height:52px;font-size:24px;box-shadow:0 3px 0 #f3c3dc}
+.big{font-size:90px;line-height:1.1;margin:6px 0}
+/* parent */
+.ptab{border-collapse:separate;border-spacing:4px;margin:10px auto}
+.ptab td,.ptab th{width:44px;height:40px;border-radius:10px;font-size:13px;font-weight:900}
+.ptab th{color:#a36b8e}
+.ptab td{background:#fff}
+.ptab td.b0{background:#ffe3ee}.ptab td.b1{background:#ffc7de}.ptab td.b2{background:#e3cbff}.ptab td.b3{background:#bfe6ff}.ptab td.b4{background:#b5f0cd}
+.ptab td.na{background:transparent}
+.legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-size:13px;font-weight:800}
+.legend span{padding:4px 10px;border-radius:10px}
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border-radius:18px;padding:10px 16px;margin:8px 0;font-weight:900;font-size:18px;text-align:left}
+.seg{display:flex;gap:6px}
+.seg button{border:0;border-radius:12px;padding:8px 12px;background:#ffeaf4;font-weight:900;font-size:16px}
+.seg button.sel{background:#ff8fc6;color:#fff}
+.small{font-size:15px!important;font-weight:700!important;color:#8d5a7a}
+#parentBtn .ring{position:absolute;inset:-4px;border-radius:28px;border:5px solid #ff8fc6;clip-path:inset(0 100% 0 0);pointer-events:none}
+#parentBtn.hold .ring{transition:clip-path 1.2s linear;clip-path:inset(0 0 0 0)}
+#skipBtn{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));font-size:18px;padding:10px 18px}
+#bigMsg{position:absolute;left:0;right:0;top:max(24px,env(safe-area-inset-top));display:flex;justify-content:center;padding:0 16px}
+#bigMsg div{font-size:30px;font-weight:900;background:rgba(255,255,255,.94);border-radius:28px;padding:12px 28px;box-shadow:0 6px 0 rgba(200,90,150,.14);text-align:center;animation:lpop .5s cubic-bezier(.3,1.6,.5,1)}
+#bigMsg:empty{display:none}
+#bottomBtn{position:absolute;left:0;right:0;bottom:max(30px,env(safe-area-inset-bottom));display:flex;justify-content:center}
+@media (max-aspect-ratio:1/1){#prog{right:auto;left:50%;transform:translateX(-50%);top:calc(max(12px,env(safe-area-inset-top)) + 112px);font-size:22px}}
+@media (max-width:700px){
+  #eq{font-size:44px;padding:4px 20px;min-height:72px}#eq .q{width:56px;height:56px}
+  .choice{width:108px;height:120px;border-radius:28px}.choice .cn{font-size:58px}.choice.pic .cn{font-size:40px}.mb i{width:11px;height:11px;border-radius:3px}
+  #choices{gap:12px;min-height:124px}#instr{font-size:19px}
+  .logo{font-size:18px}.ibtn{width:62px;height:62px;font-size:26px}#friends span{width:22px;height:22px;font-size:11px}
+  #playBtn{font-size:28px}.stk{width:100px;height:100px;font-size:58px}
+  #hintBtn{bottom:170px}
+}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="bg"></div>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="ui">
+  <div class="layer on" id="L-splash"><div id="splash" style="height:100%">
+    <div class="title"><h1>ゆめかわ<br>かずうさガーデン</h1><p>かずの うさぎたちと なかよくなろう</p></div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <button class="btn pe" id="startBtn">▶ はじめる</button>
+      <div id="loadMsg">よみこみちゅう…</div>
+    </div>
+  </div></div>
+
+  <div class="layer" id="L-garden">
+    <div id="gTop">
+      <div><div class="logo">🌸 かずうさガーデン</div><div id="friends"></div></div>
+      <div class="gbtns pe">
+        <button class="ibtn" id="calBtn">📒<small>シール</small></button>
+        <button class="ibtn" id="dressBtn">🎀<small>きせかえ</small></button>
+        <button class="ibtn" id="parentBtn">⚙️<small>おうち</small><span class="ring"></span></button>
+      </div>
+    </div>
+    <div id="gBottom">
+      <div class="pill" id="giftTag">🎁 きょうの プレゼントが まってるよ！</div>
+      <div class="pill" id="doneTag">✨ きょうの シール もらったね！ また あそべるよ</div>
+      <button class="btn pe" id="playBtn">🐰 あそぶ！</button>
+    </div>
+  </div>
+
+  <div class="layer" id="L-play">
+    <div id="pTop"><div id="eq"></div></div>
+    <button class="ibtn pe" id="homeBtn">🏠</button>
+    <div id="prog"></div>
+    <button class="btn lav pe" id="hintBtn">💡 かぞえる</button>
+    <div id="pBottom"><div id="instr"></div><div id="choices" class="pe"></div></div>
+  </div>
+
+  <div class="layer" id="L-show">
+    <div id="bigMsg"></div>
+    <button class="btn white pe" id="skipBtn" style="display:none">スキップ ▶</button>
+    <div id="bottomBtn" class="pe"></div>
+  </div>
+
+  <div class="layer" id="L-dress">
+    <div id="dTop"><div class="logo">🎀 きせかえ</div></div>
+    <button class="ibtn pe" id="dBack">🏡</button>
+    <div id="dPanel" class="pe"><div id="dTabs"></div><div id="dItems"></div></div>
+  </div>
+</div>
+<div id="modal"></div>
+
+<script>
+  // three.js の読み込みに失敗したとき用
+  setTimeout(function(){ if(!window.__kzReady){ var m=document.getElementById('loadMsg'); m.style.display='block'; m.textContent='インターネットに つないで もういちど ひらいてね'; } }, 9000);
+  document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+  document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* ================= 基本ユーティリティ ================= */
+const $ = s => document.querySelector(s);
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const ease = {
+  io: t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+  out: t => 1 - Math.pow(1 - t, 3),
+  in: t => t * t * t,
+  lin: t => t,
+  back: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+};
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const tweens = new Set();
+function tween(dur, fn, e = ease.io) {
+  return new Promise(res => { if (dur <= 0) { fn(1); res(); return; } tweens.add({ t: 0, dur, fn, e, res }); });
+}
+const wait = s => tween(s, () => {});
+function updateTweens(dt) {
+  for (const tw of [...tweens]) {
+    tw.t += dt; const k = Math.min(1, tw.t / tw.dur);
+    tw.fn(tw.e(k));
+    if (k >= 1) { tweens.delete(tw); tw.res(); }
+  }
+}
+
+/* 流れ（シーン）の中断管理 */
+let FLOW = 0; const ABORT = Symbol('abort');
+function newFlow() { FLOW++; Voice.stop(); P.tap = null; hideHand(); return FLOW; }
+const guard = tok => { if (tok !== FLOW) throw ABORT; };
+async function run(fn) { try { await fn(); } catch (e) { if (e !== ABORT) console.error(e); } }
+
+/* ================= セーブ ================= */
+const KEY = 'kazuusa_garden_v1';
+const DEF = () => ({ introDone: false, unlocked: 5, met: [], facts: {}, stickers: {}, items: [], outfits: {}, lastGift: '', stars: 0, total: 0, sessions: 0, settings: { voice: true, bgm: true, qn: 5 } });
+let S;
+try { const raw = JSON.parse(localStorage.getItem(KEY) || '{}'); S = Object.assign(DEF(), raw); S.settings = Object.assign(DEF().settings, raw.settings || {}); }
+catch (e) { S = DEF(); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+/* ================= かずの キャラクター設定 ================= */
+const YOMI = ['ぜろ', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう', 'じゅう'];
+const KO = ['', 'ひとつ', 'ふたつ', 'みっつ', 'よっつ', 'いつつ', 'むっつ', 'ななつ', 'やっつ', 'ここのつ', 'とお'];
+const MAIN = { 1: '#ff86c0', 2: '#ffa48f', 3: '#ffd45e', 4: '#86dea0', 5: '#72cdf0', 6: '#b29bff', 7: '#ff8fa3', 8: '#f28fe0', 9: '#8ea8ff', 10: '#ffd9ee' };
+const INK = { 1: '#e0428f', 2: '#e2603f', 3: '#c98d00', 4: '#2f9e57', 5: '#1d8fc0', 6: '#7a5ce0', 7: '#e0508a', 8: '#c24aae', 9: '#4a66db', 10: '#d0579a' };
+const RAINBOW = ['#ff8fa3', '#ffb36b', '#ffe066', '#9ee493', '#7fd0f5', '#a39bff', '#e79bff'];
+const PEARL = ['#ffd9ee', '#e9dcff', '#d6f1ff', '#fff0cf', '#dcfbe8'];
+const cubeColor = (n, i) => n === 7 ? RAINBOW[i % 7] : n === 10 ? PEARL[i % 5] : MAIN[n];
+const earColor = n => n === 7 ? '#ffb3c8' : n === 10 ? '#fff3fa' : MAIN[n];
+const cssColor = n => n === 7 ? 'linear-gradient(135deg,#ff8fa3,#ffe066,#7fd0f5,#e79bff)' : n === 10 ? 'linear-gradient(135deg,#ffc2e2,#d9c7ff,#bfeeff)' : MAIN[n];
+
+/* ================= おと ================= */
+const AC = {
+  ctx: null,
+  init() {
+    if (this.ctx) { this.ctx.resume(); return; }
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+    this.ctx = new C();
+    this.out = this.ctx.createGain(); this.out.gain.value = .9; this.out.connect(this.ctx.destination);
+    this.sfx = this.ctx.createGain(); this.sfx.gain.value = .55; this.sfx.connect(this.out);
+    this.bgm = this.ctx.createGain(); this.bgm.gain.value = 0; this.bgm.connect(this.out);
+    this.startBgm();
+  },
+  now() { return this.ctx ? this.ctx.currentTime : 0; },
+  note(f, t0, dur, { type = 'sine', vol = .3, g = this.sfx, slide = 0, attack = .006 } = {}) {
+    const c = this.ctx; if (!c) return;
+    const o = c.createOscillator(), a = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, t0 + dur);
+    a.gain.setValueAtTime(.0001, t0); a.gain.exponentialRampToValueAtTime(vol, t0 + attack); a.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(a); a.connect(g); o.start(t0); o.stop(t0 + dur + .05);
+  },
+  pop(p = 1) { const t = this.now(); this.note(380 * p, t, .16, { vol: .35, slide: 2.2 }); },
+  tap() { const t = this.now(); this.note(880, t, .1, { type: 'triangle', vol: .18, slide: 1.4 }); },
+  count(n) { const sc = [523, 587, 659, 784, 880, 1047, 1175, 1319, 1568, 1760]; const f = sc[(n - 1) % 10], t = this.now(); this.note(f, t, .4, { type: 'triangle', vol: .3 }); this.note(f * 2, t, .3, { vol: .07 }); },
+  sparkle() { const t = this.now(); [1319, 1568, 1760, 2093, 2637, 3136].forEach((f, i) => this.note(f, t + i * .055, .35, { vol: .11 })); },
+  fanfare() { const t = this.now(); [[523, 0], [659, .11], [784, .22], [1047, .33]].forEach(([f, d]) => { this.note(f, t + d, .5, { type: 'triangle', vol: .26 }); this.note(f / 2, t + d, .4, { vol: .1 }); }); this.note(1319, t + .45, .9, { vol: .13 }); this.note(1568, t + .45, .9, { vol: .1 }); },
+  boing() { const t = this.now(); this.note(300, t, .4, { vol: .25, slide: .6 }); this.note(240, t + .12, .35, { type: 'triangle', vol: .12, slide: .7 }); },
+  whoosh() { const t = this.now(); this.note(300, t, .35, { vol: .12, slide: 3 }); },
+  shake() { const t = this.now(); [0, .07, .14].forEach(d => this.note(200 + Math.random() * 80, t + d, .08, { type: 'square', vol: .05 })); },
+  magic() { const t = this.now(); for (let i = 0; i < 10; i++) this.note(700 + i * 140, t + i * .04, .25, { vol: .07 }); },
+  startBgm() {
+    // オルゴール風の やさしい ループ
+    const N = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, D6: 1174.66, E6: 1318.5 };
+    const mel = ['E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'C5', 'D5', 'E5', 'G5', 'C6', 'A5', 'G5', 0, 0, 0,
+      'A5', 'C6', 'D6', 'C6', 'A5', 'G5', 'E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'C5', 0, 0, 0];
+    const bass = [130.81, 110, 174.61, 196];
+    const step = 60 / 100 / 2; let next = this.ctx.currentTime + .2, i = 0;
+    setInterval(() => {
+      if (!this.ctx || this.ctx.state !== 'running') return;
+      while (next < this.ctx.currentTime + .4) {
+        const m = mel[i % 32];
+        if (m) { this.note(N[m], next, .9, { vol: .16, g: this.bgm }); this.note(N[m] * 2, next, .5, { vol: .03, g: this.bgm }); }
+        if (i % 8 === 0) { const b = bass[Math.floor(i / 8) % 4]; this.note(b * 2, next, 1.6, { type: 'triangle', vol: .09, g: this.bgm }); this.note(b * 3, next + step * 2, 1.0, { vol: .04, g: this.bgm }); }
+        next += step; i++;
+      }
+    }, 120);
+    this.applyBgm();
+  },
+  ducked: false,
+  applyBgm() { if (!this.ctx) return; const v = S.settings.bgm ? (this.ducked ? .12 : .38) : 0; this.bgm.gain.setTargetAtTime(v, this.ctx.currentTime, .25); },
+  duck(on) { this.ducked = on; this.applyBgm(); },
+};
+
+/* ================= こえ ================= */
+const Voice = {
+  ok: 'speechSynthesis' in window, v: null,
+  init() {
+    if (!this.ok) return;
+    const pv = () => {
+      const vs = speechSynthesis.getVoices().filter(v => /^ja/i.test(v.lang));
+      this.v = vs.find(v => /Kyoko|O-ren|Nanami|Haruka|Ayumi|Mizuki/i.test(v.name)) || vs.find(v => /Google/i.test(v.name)) || vs[0] || null;
+    };
+    pv(); speechSynthesis.onvoiceschanged = pv;
+  },
+  say(text, { pitch = 1.3, rate = 1, interrupt = false } = {}) {
+    return new Promise(res => {
+      if (!this.ok || !S.settings.voice) { setTimeout(res, 200 + text.length * 70); return; }
+      if (interrupt) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ja-JP'; if (this.v) u.voice = this.v; u.pitch = pitch; u.rate = rate;
+      let done = false; const fin = () => { if (done) return; done = true; AC.duck(false); res(); };
+      u.onend = fin; u.onerror = fin; setTimeout(fin, 900 + text.length * 230);
+      AC.duck(true); speechSynthesis.speak(u);
+    });
+  },
+  stop() { if (this.ok) speechSynthesis.cancel(); },
+};
+
+/* ================= three.js ================= */
+const canvas = $('#c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(36, 1, .1, 200);
+scene.add(new THREE.HemisphereLight(0xfff4fb, 0xe4d4ff, 1.35));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(-4, 10, 8); scene.add(sun);
+
+const gradTex = new THREE.DataTexture(new Uint8Array([165, 165, 165, 255, 218, 218, 218, 255, 255, 255, 255, 255]), 3, 1);
+gradTex.minFilter = gradTex.magFilter = THREE.NearestFilter; gradTex.needsUpdate = true;
+const toon = (color, o = {}) => new THREE.MeshToonMaterial({ color, gradientMap: gradTex, ...o });
+const tcache = {};
+const T = c => tcache[c] ||= toon(c);
+
+function canvasTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const shadowTex = canvasTex(128, 128, (g) => { const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, 'rgba(170,80,150,.38)'); r.addColorStop(.6, 'rgba(170,80,150,.18)'); r.addColorStop(1, 'rgba(170,80,150,0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); });
+const emojiCache = {};
+const emojiMat = e => emojiCache[e] ||= new THREE.SpriteMaterial({ map: canvasTex(128, 128, g => { g.font = '100px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 64, 72); }), transparent: true, depthWrite: false });
+const badgeCache = {};
+const badgeMat = n => badgeCache[n] ||= new THREE.SpriteMaterial({
+  map: canvasTex(128, 128, g => {
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(64, 64, 56, 0, Math.PI * 2); g.fill();
+    g.lineWidth = 10; g.strokeStyle = '#ff6fb3'; g.stroke();
+    g.fillStyle = '#e8438f'; g.font = `900 ${n >= 10 ? 58 : 76}px "Hiragino Maru Gothic ProN","Arial Rounded MT Bold",sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 64, 70);
+  }), depthTest: false, transparent: true,
+});
+
+/* 形 */
+const GEO = {
+  cube: new RoundedBoxGeometry(.94, .94, .94, 4, .17),
+  eye: new THREE.SphereGeometry(.1, 20, 14),
+  shine: new THREE.SphereGeometry(.034, 10, 8),
+  shine2: new THREE.SphereGeometry(.018, 8, 6),
+  cheek: new THREE.CircleGeometry(.085, 24),
+  mouth: new THREE.TorusGeometry(.042, .013, 6, 18, Math.PI),
+  happy: new THREE.TorusGeometry(.075, .022, 6, 18, Math.PI),
+  ear: new THREE.CapsuleGeometry(.14, .46, 6, 14),
+  earIn: new THREE.CapsuleGeometry(.075, .34, 6, 12),
+  tail: new THREE.SphereGeometry(.17, 16, 12),
+  plane: new THREE.PlaneGeometry(1, 1),
+  sph: new THREE.SphereGeometry(1, 20, 14),
+  sphLo: new THREE.SphereGeometry(1, 12, 8),
+};
+const MAT = {
+  eye: new THREE.MeshBasicMaterial({ color: 0x3b1f3f }),
+  white: new THREE.MeshBasicMaterial({ color: 0xffffff }),
+  cheek: new THREE.MeshBasicMaterial({ color: 0xff78ad, transparent: true, opacity: .55 }),
+  mouth: new THREE.MeshBasicMaterial({ color: 0x7a2f55 }),
+  earIn: toon('#ffc6de'), earInW: toon('#fff4fa'), tail: toon('#ffffff'),
+  shadow: new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }),
+};
+const slot = i => new THREE.Vector3(Math.floor(i / 5), (i % 5) + .5, 0);
+
+/* ================= ラベル・アンカー ================= */
+function makeLabel(n, size = 'm') { const el = document.createElement('div'); el.className = 'nlabel ' + size; setLabelN(el, n); $('#labels').appendChild(el); return el; }
+function setLabelN(el, n, pop) {
+  el.textContent = n; el.style.setProperty('--c', MAIN[n]); el.style.setProperty('--ink', INK[n]);
+  el.classList.toggle('rainbow', n === 7); el.classList.toggle('pearl', n === 10);
+  if (pop) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+}
+function shown(o) { while (o) { if (!o.visible) return false; if (o === scene) return true; o = o.parent; } return false; }
+const _v = new THREE.Vector3();
+let W = innerWidth, H = innerHeight;
+function toScreen(v) { v.project(camera); return v.z > 1 ? null : [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H]; }
+const anchors = new Set();
+function anchor(el, obj, off = new THREE.Vector3(), tag = 'stage') { el.classList.add('anchor'); $('#labels').appendChild(el); const a = { el, obj, off, tag }; anchors.add(a); return a; }
+function unanchor(a) { if (!a) return; a.el.remove(); anchors.delete(a); }
+function clearAnchors(tag) { for (const a of [...anchors]) if (a.tag === tag) unanchor(a); }
+function updateAnchors() {
+  for (const a of anchors) {
+    if (!shown(a.obj)) { a.el.style.display = 'none'; continue; }
+    a.obj.getWorldPosition(_v); _v.add(a.off); const p = toScreen(_v);
+    if (!p) { a.el.style.display = 'none'; continue; }
+    a.el.style.display = ''; a.el.style.transform = `translate(${p[0]}px,${p[1]}px) translate(-50%,-100%)`;
+  }
+}
+
+/* ================= パーティクル ================= */
+const parts = [];
+function burst(pos, { n = 14, emojis = ['✨', '💖', '⭐'], speed = 4, size = .55, life = 1.2, up = 2.5, gravity = -5 } = {}) {
+  for (let i = 0; i < n; i++) {
+    const sp = new THREE.Sprite(emojiMat(pick(emojis)).clone());
+    sp.position.copy(pos); const s = size * rand(.7, 1.25); sp.scale.setScalar(s);
+    const v = new THREE.Vector3(rand(-1, 1), rand(0, 1), rand(-.6, .6)).normalize().multiplyScalar(speed * rand(.5, 1)); v.y += up;
+    scene.add(sp); parts.push({ sp, v, life: life * rand(.8, 1.2), age: 0, rot: rand(-3, 3), s });
+  }
+}
+function updateParts(dt) {
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.age += dt; p.v.y += (p.gravity ?? -5) * dt;
+    p.sp.position.addScaledVector(p.v, dt); p.sp.material.rotation += p.rot * dt;
+    const k = p.age / p.life; p.sp.material.opacity = 1 - k * k;
+    if (k >= 1) { scene.remove(p.sp); p.sp.material.dispose(); parts.splice(i, 1); }
+  }
+}
+
+/* ================= うさぎ（かずうさ） ================= */
+const bunnies = new Set();
+class Bunny {
+  constructor(n, { scale = 1, label = 'm' } = {}) {
+    this.n = n; this.alive = true;
+    this.root = new THREE.Group(); this.body = new THREE.Group(); this.root.add(this.body);
+    this.root.scale.setScalar(scale);
+    this.cubes = [];
+    for (let i = 0; i < n; i++) this.addCube(i, cubeColor(n, i));
+    this.earMat = toon(earColor(n));
+    this.makeHead(); this.body.add(this.head);
+    this.tail = new THREE.Mesh(GEO.tail, MAT.tail); this.tail.position.set(0, .45, -.52); this.body.add(this.tail);
+    this.shadow = new THREE.Mesh(GEO.plane, MAT.shadow.clone()); this.shadow.rotation.x = -Math.PI / 2; this.shadow.position.y = .02; this.root.add(this.shadow);
+    this.t = rand(0, 10); this.blinkT = rand(1, 4); this.sq = 0; this.hopY = 0; this.busy = false; this.labelOn = !!label;
+    this.label = label ? makeLabel(n, label) : null;
+    this.layout(false); this.personality();
+    this.setAcc(S.outfits[n]);
+    bunnies.add(this);
+  }
+  addCube(i, color) {
+    const m = new THREE.Mesh(GEO.cube, toon(color)); m.userData = { bunny: this, cube: true, glow: false };
+    m.position.copy(slot(i)); this.cubes.push(m); this.body.add(m); return m;
+  }
+  makeHead() {
+    const h = this.head = new THREE.Group(); h.userData.headOf = this;
+    const f = new THREE.Group(); f.position.z = .475; h.add(f);
+    this.eyes = []; this.happyEyes = [];
+    for (const s of [-1, 1]) {
+      const e = new THREE.Group(); e.position.set(s * .19, .06, 0);
+      const ball = new THREE.Mesh(GEO.eye, MAT.eye); ball.scale.set(1, 1.18, .42); e.add(ball);
+      const sh = new THREE.Mesh(GEO.shine, MAT.white); sh.position.set(.035, .05, .05); e.add(sh);
+      const sh2 = new THREE.Mesh(GEO.shine2, MAT.white); sh2.position.set(-.035, -.045, .05); e.add(sh2);
+      f.add(e); this.eyes.push(e);
+      const hp = new THREE.Mesh(GEO.happy, MAT.eye); hp.position.set(s * .19, .02, .01); hp.visible = false; f.add(hp); this.happyEyes.push(hp);
+      const ck = new THREE.Mesh(GEO.cheek, MAT.cheek); ck.position.set(s * .31, -.085, .006); ck.scale.y = .75; f.add(ck);
+      const mo = new THREE.Mesh(GEO.mouth, MAT.mouth); mo.rotation.z = Math.PI; mo.position.set(s * .042, -.075, .012); f.add(mo);
+    }
+    this.ears = [];
+    for (const s of [-1, 1]) {
+      const p = new THREE.Group(); p.position.set(s * .2, .42, -.04); p.userData.base = -s * .14;
+      const e = new THREE.Mesh(GEO.ear, this.earMat); e.position.y = .36; e.scale.z = .55; p.add(e);
+      const ei = new THREE.Mesh(GEO.earIn, this.n === 1 || this.n === 8 ? MAT.earInW : MAT.earIn); ei.position.set(0, .36, .06); ei.scale.z = .32; p.add(ei);
+      h.add(p); this.ears.push(p);
+    }
+    this.acc = new THREE.Group(); h.add(this.acc);
+  }
+  personality() { // 耳のかたちで こせい
+    const n = this.n, [l, r] = this.ears;
+    l.userData.base = .14; r.userData.base = -.14; l.userData.bx = 0; r.userData.bx = 0;
+    if (n % 3 === 2) r.userData.base = -.95;
+    if (n % 4 === 3) { l.userData.base = .3; r.userData.base = -.3; }
+    if (n === 10) { l.userData.bx = -.15; r.userData.bx = -.15; }
+  }
+  setAcc(id) {
+    this.acc.clear(); this.accId = id || null; this.accTall = (id && ACC_TALL[id]) || 0;
+    if (id && ACC[id]) this.acc.add(ACC[id]());
+  }
+  get width() { return this.n > 5 ? 2 : 1; }
+  get tall() { return Math.min(this.n, 5); }
+  layout(anim = true, dur = .45) {
+    const hp = slot(this.tall - 1), bx = this.n > 5 ? -.5 : 0, sw = this.width * 1.25 + .2;
+    if (!anim) { this.head.position.copy(hp); this.body.position.x = bx; this.shadow.scale.set(sw, 1.5, 1); return Promise.resolve(); }
+    const h0 = this.head.position.clone(), b0 = this.body.position.x, s0 = this.shadow.scale.x;
+    return tween(dur, k => {
+      this.head.position.lerpVectors(h0, hp, k); this.head.position.y += Math.sin(k * Math.PI) * .7;
+      this.body.position.x = b0 + (bx - b0) * k; this.shadow.scale.x = s0 + (sw - s0) * k;
+    });
+  }
+  update(dt) {
+    this.t += dt; this.blinkT -= dt;
+    let es = 1;
+    if (this.blinkT < 0) { const b = -this.blinkT; es = b < .1 ? 1 - b / .1 * .9 : b < .2 ? .1 + (b - .1) / .1 * .9 : 1; if (b > .2) this.blinkT = rand(2, 5); }
+    for (const e of this.eyes) e.scale.y = es;
+    const br = Math.sin(this.t * 2.6) * .016;
+    this.body.scale.set(1 + this.sq * .55, (1 + br) * (1 - this.sq), 1 + this.sq * .55);
+    this.body.position.y = this.hopY;
+    this.ears.forEach((p, i) => { p.rotation.z = p.userData.base + Math.sin(this.t * 3 + i * 1.7) * .05 + (i ? -1 : 1) * this.sq * .8; p.rotation.x = p.userData.bx + Math.sin(this.t * 2.2 + i) * .03; });
+    const ss = 1 / (1 + this.hopY * .35); this.shadow.material.opacity = ss;
+    if (this.label) {
+      if (!this.labelOn || !shown(this.root)) this.label.style.opacity = 0;
+      else {
+        this.root.localToWorld(_v.set(0, this.hopY + (this.tall + .88) * this.body.scale.y + (this.accTall || 0), 0));
+        const p = toScreen(_v);
+        if (!p) this.label.style.opacity = 0;
+        else { this.label.style.opacity = 1; this.label.style.transform = `translate(${p[0]}px,${p[1]}px) translate(-50%,-100%)`; }
+      }
+    }
+  }
+  setHappy(on) { this.eyes.forEach(e => e.visible = !on); this.happyEyes.forEach(e => e.visible = on); }
+  async hop({ to = null, h = .75, dur = .45, sq = .16 } = {}) {
+    const r = this.root.position, from = r.clone();
+    if (to) { const dx = to.x - from.x, dz = to.z - from.z; if (Math.hypot(dx, dz) > .05) this.turn(Math.atan2(dx, dz)); }
+    await tween(.09, k => this.sq = sq * k, ease.out);
+    await tween(dur, k => {
+      this.hopY = Math.sin(k * Math.PI) * h; this.sq = sq * (1 - Math.min(1, k * 3)) - .07 * Math.sin(k * Math.PI);
+      if (to) { r.x = from.x + (to.x - from.x) * k; r.z = from.z + (to.z - from.z) * k; }
+    }, ease.lin);
+    this.hopY = 0;
+    await tween(.16, k => this.sq = sq * .9 * Math.sin(k * Math.PI)); this.sq = 0;
+  }
+  turn(a, dur = .22) { const r0 = this.root.rotation.y; let d = a - r0; d = Math.atan2(Math.sin(d), Math.cos(d)); return tween(dur, k => this.root.rotation.y = r0 + d * k); }
+  async dropIn(delay = 0, from = 9) {
+    this.root.visible = false; await wait(delay); this.root.visible = true;
+    const y0 = this.root.position.y; AC.whoosh();
+    await tween(.5, k => this.root.position.y = y0 + from * (1 - k), ease.in);
+    AC.pop(.8); burst(this.root.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, .2, .5)), { n: 6, emojis: ['✨', '💫'], speed: 3, up: 1, size: .4 });
+    await tween(.22, k => this.sq = .22 * Math.sin(k * Math.PI)); this.sq = 0;
+  }
+  showBadge(i, num) {
+    const c = this.cubes[i]; if (!c) return;
+    if (c.userData.badge) c.remove(c.userData.badge);
+    const sp = new THREE.Sprite(badgeMat(num)); sp.renderOrder = 20; c.add(sp); c.userData.badge = sp;
+    this.placeBadge(i); tween(.3, k => sp.scale.setScalar(.48 * ease.back(k)), ease.lin);
+  }
+  placeBadge(i) { const c = this.cubes[i], b = c && c.userData.badge; if (b) b.position.set(Math.floor(i / 5) === 0 ? -.66 : .66, 0, .3); }
+  clearBadges() { this.cubes.forEach(c => { if (c.userData.badge) { c.remove(c.userData.badge); c.userData.badge = null; } }); }
+  glow(i, on = true) {
+    const c = this.cubes[i]; if (!c) return; c.userData.glow = on;
+    if (on) c.material.emissive.copy(c.material.color).multiplyScalar(.32); else c.material.emissive.setRGB(0, 0, 0);
+  }
+  unglowAll() { this.cubes.forEach((c, i) => this.glow(i, false)); }
+  popCube(i) { const c = this.cubes[i]; if (!c) return; return tween(.28, k => c.scale.setScalar(1 + Math.sin(k * Math.PI) * .22), ease.lin); }
+  async countOne(i, num, { voice = true, gap = .45 } = {}) {
+    this.showBadge(i, num); this.glow(i); this.popCube(i); AC.count(num);
+    await Promise.all([voice ? Voice.say(YOMI[num], { rate: 1.05 }) : null, wait(gap)]);
+  }
+  async countAll({ from = 1, voice = true, gap = .45, tok } = {}) {
+    for (let i = 0; i < this.n; i++) { await this.countOne(i, from + i, { voice, gap }); if (tok !== undefined) guard(tok); }
+  }
+  async countFive({ tok, voice = true } = {}) { // 5のかたまり → のこりを かぞえる
+    if (this.n <= 5) return this.countAll({ tok, voice });
+    for (let i = 0; i < 5; i++) { this.showBadge(i, i + 1); this.glow(i); this.popCube(i); }
+    AC.sparkle(); await Promise.all([voice ? Voice.say('ご！') : null, wait(.7)]); if (tok !== undefined) guard(tok);
+    for (let i = 5; i < this.n; i++) { await this.countOne(i, i + 1, { voice }); if (tok !== undefined) guard(tok); }
+  }
+  async recolor(dur = .5) {
+    const from = this.cubes.map(c => c.material.color.clone()), to = this.cubes.map((c, i) => new THREE.Color(cubeColor(this.n, i)));
+    const e0 = this.earMat.color.clone(), e1 = new THREE.Color(earColor(this.n));
+    await tween(dur, k => {
+      this.cubes.forEach((c, i) => {
+        c.material.color.lerpColors(from[i], to[i], k);
+        const fl = Math.sin(k * Math.PI) * .45;
+        c.material.emissive.copy(c.material.color).multiplyScalar((c.userData.glow ? .32 : 0) + fl);
+      });
+      this.earMat.color.lerpColors(e0, e1, k);
+    });
+    this.cubes.forEach((c, i) => this.glow(i, c.userData.glow));
+  }
+  // B を がったい（Bは きえて、Aが大きくなる）
+  async absorb(B, { stagger = .1, dur = .55 } = {}) {
+    const a = this.n, b = B.n, total = a + b;
+    B.labelOn = false; B.busy = true; AC.magic();
+    const hw = B.head.getWorldPosition(new THREE.Vector3());
+    burst(hw, { n: 8, emojis: ['✨', '💖'], speed: 2.5, up: 1.5, size: .45 });
+    tween(.3, k => { B.head.scale.setScalar(1 - k); B.tail.scale.setScalar(1 - k); B.shadow.scale.multiplyScalar(.9); });
+    this.root.updateMatrixWorld(true); B.root.updateMatrixWorld(true);
+    const moving = B.cubes.slice(); B.cubes = [];
+    moving.forEach(c => { this.body.attach(c); c.userData.bunny = this; this.cubes.push(c); });
+    this.n = total;
+    const lay = this.layout(true, .45 + stagger * b);
+    const moves = moving.map((c, j) => {
+      const from = c.position.clone(), to = slot(a + j), r0 = c.rotation.clone(), s0 = c.scale.x;
+      return wait(j * stagger).then(() => tween(dur, k => {
+        c.position.lerpVectors(from, to, k); c.position.y += Math.sin(k * Math.PI) * 1.3;
+        c.rotation.set(r0.x * (1 - k), r0.y * (1 - k), r0.z * (1 - k)); c.scale.setScalar(s0 + (1 - s0) * k);
+      })).then(() => { AC.pop(1 + j * .08); this.placeBadge(a + j); });
+    });
+    await Promise.all([...moves, lay]);
+    this.cubes.forEach((c, i) => this.placeBadge(i));
+    B.dispose();
+    this.personality(); this.setAcc(this.accId);
+    if (this.label) setLabelN(this.label, total, true);
+    AC.sparkle();
+    burst(this.root.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, this.tall * this.root.scale.y * .6, .6)), { n: 16, emojis: ['✨', '⭐', '💖', '🌸'], speed: 4 * this.root.scale.y, size: .55 * this.root.scale.y });
+    await this.recolor(.55);
+  }
+  // k こ と のこりに わかれる。あたらしい うさぎを かえす
+  async split(k) {
+    const m = this.n - k, sc = this.root.scale.x;
+    const B = new Bunny(m, { scale: sc, label: this.label ? (this.label.classList.contains('s') ? 's' : 'm') : null });
+    this.root.parent.add(B.root);
+    B.root.rotation.y = this.root.rotation.y;
+    const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), this.root.rotation.y);
+    B.root.position.copy(this.root.position).addScaledVector(right, (this.width * .5 + .9 + B.width * .5) * sc);
+    B.root.updateMatrixWorld(true); this.root.updateMatrixWorld(true);
+    const moving = this.cubes.slice(k);
+    B.cubes.forEach((c, j) => {
+      const w = moving[j].getWorldPosition(new THREE.Vector3()); B.body.worldToLocal(w);
+      c.userData.to = c.position.clone(); c.position.copy(w); c.material.color.copy(moving[j].material.color);
+    });
+    moving.forEach(c => { this.body.remove(c); c.material.dispose(); });
+    this.cubes.length = k; this.n = k;
+    B.head.scale.setScalar(0); B.tail.scale.setScalar(0);
+    AC.magic();
+    const lay = this.layout(true, .5);
+    const mv = B.cubes.map((c, j) => { const f = c.position.clone(), t = c.userData.to; return wait(j * .06).then(() => tween(.5, e => { c.position.lerpVectors(f, t, e); c.position.y += Math.sin(e * Math.PI) * .9; })); });
+    tween(.4, e => { B.head.scale.setScalar(ease.back(e)); B.tail.scale.setScalar(e); }, ease.lin);
+    await Promise.all([...mv, lay]);
+    this.personality(); this.setAcc(this.accId);
+    if (this.label) setLabelN(this.label, k, true);
+    await Promise.all([this.recolor(.45), B.recolor(.45)]);
+    return B;
+  }
+  dispose() {
+    this.alive = false; this.root.parent && this.root.parent.remove(this.root);
+    if (this.label) this.label.remove();
+    this.cubes.forEach(c => c.material.dispose()); this.earMat.dispose(); this.shadow.material.dispose(); bunnies.delete(this);
+  }
+}
+
+/* ================= アイテム（きせかえ・おにわ） ================= */
+function M3(geo, color, x = 0, y = 0, z = 0, o = {}) {
+  const m = new THREE.Mesh(geo, typeof color === 'string' ? T(color) : color); m.position.set(x, y, z);
+  if (o.rx) m.rotation.x = o.rx; if (o.ry) m.rotation.y = o.ry; if (o.rz) m.rotation.z = o.rz;
+  if (o.s !== undefined) Array.isArray(o.s) ? m.scale.set(...o.s) : m.scale.setScalar(o.s);
+  return m;
+}
+const grp = (...a) => { const g = new THREE.Group(); a.forEach(x => g.add(x)); return g; };
+function heartGeo(size = 1, depth = .25) {
+  const s = new THREE.Shape(), x = -.25, y = -.5;
+  s.moveTo(x + .25, y + .25); s.bezierCurveTo(x + .25, y + .25, x + .2, y, x, y); s.bezierCurveTo(x - .3, y, x - .3, y + .35, x - .3, y + .35);
+  s.bezierCurveTo(x - .3, y + .55, x - .1, y + .77, x + .25, y + .95); s.bezierCurveTo(x + .6, y + .77, x + .8, y + .55, x + .8, y + .35);
+  s.bezierCurveTo(x + .8, y + .35, x + .8, y, x + .5, y); s.bezierCurveTo(x + .35, y, x + .25, y + .25, x + .25, y + .25);
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: true, bevelSize: .06, bevelThickness: .06, bevelSegments: 3, curveSegments: 16 });
+  g.center(); g.rotateZ(Math.PI); g.scale(size, size, size); return g;
+}
+function starGeo(r = .5, depth = .15) {
+  const s = new THREE.Shape();
+  for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 + Math.PI / 2, rr = i % 2 ? r * .45 : r; const px = Math.cos(a) * rr, py = Math.sin(a) * rr; i ? s.lineTo(px, py) : s.moveTo(px, py); }
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: true, bevelSize: .04, bevelThickness: .04, bevelSegments: 2 }); g.center(); return g;
+}
+const HEART = heartGeo(1), STAR = starGeo(.5);
+const bow = (color, s = 1) => { const g = grp(M3(new THREE.ConeGeometry(.15, .3, 16), color, -.15, 0, 0, { rz: -Math.PI / 2 }), M3(new THREE.ConeGeometry(.15, .3, 16), color, .15, 0, 0, { rz: Math.PI / 2 }), M3(GEO.sph, color, 0, 0, 0, { s: .08 })); g.scale.setScalar(s); return g; };
+
+// 頭の中心が原点、上の面は y=.47、顔は z=+.47
+const ACC = {
+  ribbon: () => { const g = bow('#ff5fa8', 1); g.position.set(.3, .5, .12); g.rotation.z = -.35; return g; },
+  crown: () => {
+    const g = new THREE.Group(), gold = toon('#ffd35c', { side: THREE.DoubleSide });
+    g.add(M3(new THREE.CylinderGeometry(.25, .27, .16, 24, 1, true), gold, 0, .56, 0));
+    for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; g.add(M3(new THREE.ConeGeometry(.055, .15, 10), gold, Math.sin(a) * .25, .7, Math.cos(a) * .25)); g.add(M3(GEO.sph, i % 2 ? '#ff7fbf' : '#7fd6ff', Math.sin(a) * .265, .56, Math.cos(a) * .265, { s: .04 })); }
+    return g;
+  },
+  flower: () => { const g = new THREE.Group(); for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; g.add(M3(GEO.sph, '#ff9fcf', Math.cos(a) * .1, Math.sin(a) * .1, 0, { s: [.08, .08, .04] })); } g.add(M3(GEO.sph, '#ffe066', 0, 0, .02, { s: .055 })); g.position.set(-.32, .42, .4); g.rotation.y = -.3; g.scale.setScalar(1.3); return g; },
+  unicorn: () => { const g = new THREE.Group(); g.add(M3(new THREE.ConeGeometry(.085, .46, 18), '#fff0b8', 0, .23, 0)); ['#ff9fcf', '#b8a4ff', '#8fdcff'].forEach((c, i) => g.add(M3(new THREE.TorusGeometry(.07 - i * .018, .014, 6, 16), c, 0, .08 + i * .12, 0, { rx: Math.PI / 2 }))); g.position.set(0, .47, .22); g.rotation.x = .3; return g; },
+  glasses: () => { const g = new THREE.Group(), m = toon('#ff6fb1', { transparent: true, opacity: .85 }); for (const s of [-1, 1]) g.add(M3(HEART, m, s * .19, 0, 0, { s: [.26, .26, .2] })); g.add(M3(new THREE.CylinderGeometry(.015, .015, .12, 6), '#ff6fb1', 0, .03, 0, { rz: Math.PI / 2 })); g.position.set(0, .07, .53); return g; },
+  hat: () => { const g = new THREE.Group(); g.add(M3(new THREE.ConeGeometry(.22, .55, 20), '#b8a4ff', 0, .27, 0)); g.add(M3(new THREE.TorusGeometry(.2, .035, 8, 20), '#ffffff', 0, .04, 0, { rx: Math.PI / 2 })); g.add(M3(GEO.sph, '#ff9fcf', 0, .57, 0, { s: .08 })); [[.1, .2], [-.08, .32], [.04, .12]].forEach(([x, y]) => g.add(M3(GEO.sph, '#fff27a', x, y, .16 - y * .2, { s: .03 }))); g.position.set(-.05, .47, 0); g.rotation.z = .2; return g; },
+  angel: () => { const g = new THREE.Group(); g.add(M3(new THREE.TorusGeometry(.22, .04, 10, 28), toon('#ffe27a', { emissive: new THREE.Color('#665500') }), 0, 1.05, 0, { rx: Math.PI / 2 })); for (const s of [-1, 1]) g.add(M3(GEO.sph, '#ffffff', s * .42, -.05, -.45, { s: [.28, .2, .06], rz: s * .5 })); return g; },
+  cherry: () => { const g = new THREE.Group(); g.add(M3(GEO.sph, '#ff5b7a', -.07, 0, 0, { s: .075 })); g.add(M3(GEO.sph, '#ff5b7a', .07, -.02, 0, { s: .075 })); g.add(M3(new THREE.CylinderGeometry(.01, .01, .2, 6), '#5cc26c', -.03, .1, 0, { rz: .4 })); g.add(M3(new THREE.CylinderGeometry(.01, .01, .2, 6), '#5cc26c', .05, .09, 0, { rz: -.3 })); g.add(M3(GEO.sph, '#7fd67f', .02, .2, 0, { s: [.07, .03, .04] })); g.position.set(.34, .4, .38); g.scale.setScalar(1.3); return g; },
+  tiara: () => { const g = new THREE.Group(), m = toon('#efe6ff'); g.add(M3(new THREE.TorusGeometry(.26, .025, 8, 28, Math.PI), m, 0, 0, 0)); g.add(M3(STAR, '#fff27a', 0, .3, .02, { s: .22 })); g.add(M3(GEO.sph, '#7fd6ff', -.17, .2, .02, { s: .045 })); g.add(M3(GEO.sph, '#ff8fc6', .17, .2, .02, { s: .045 })); g.position.set(0, .47, .18); g.scale.set(1, .8, 1); return g; },
+};
+const ACC_TALL = { crown: .25, unicorn: .3, hat: .5, angel: .55, tiara: .2 };
+
+function cottonTree(colors = ['#ffb3d9', '#e0c8ff', '#b8f0e0']) {
+  const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(.14, .2, 1.6, 10), '#fff1e6', 0, .8, 0));
+  [[0, 2.1, 0, .95], [-.55, 1.7, .1, .7], [.55, 1.75, -.05, .72], [.1, 2.7, 0, .6]].forEach(([x, y, z, s], i) => g.add(M3(GEO.sph, colors[i % colors.length], x, y, z, { s })));
+  return g;
+}
+function cloud(s = 1) { const g = new THREE.Group(); [[0, 0, 0, 1], [1, -.15, 0, .75], [-1, -.2, 0, .7], [.45, .45, 0, .7]].forEach(([x, y, z, r]) => g.add(M3(GEO.sph, '#ffffff', x, y, z, { s: r }))); g.scale.setScalar(s); return g; }
+const DECO = {
+  rainbow: () => { const g = new THREE.Group(); RAINBOW.slice(0, 6).forEach((c, i) => g.add(M3(new THREE.TorusGeometry(3.6 - i * .34, .19, 10, 48, Math.PI), c, 0, 0, 0))); g.add(cloud(.9).translateX(-3.2).translateY(.3)); g.add(cloud(.9).translateX(3.2).translateY(.3)); return g; },
+  castle: () => {
+    const g = new THREE.Group();
+    g.add(M3(new THREE.CylinderGeometry(.9, .95, 2.4, 20), '#ffe7f3', 0, 1.2, 0)); g.add(M3(new THREE.ConeGeometry(1.1, 1.4, 20), '#c9a4ff', 0, 3.1, 0));
+    for (const s of [-1, 1]) { g.add(M3(new THREE.CylinderGeometry(.5, .52, 1.8, 16), '#fff3f9', s * 1.3, .9, .2)); g.add(M3(new THREE.ConeGeometry(.64, 1.1, 16), '#ff9fd0', s * 1.3, 2.35, .2)); }
+    g.add(M3(new THREE.BoxGeometry(.6, .9, .1), '#d86aa6', 0, .45, .92)); g.add(M3(HEART, '#ff6fb3', 0, 1.75, .9, { s: .35 }));
+    g.add(M3(new THREE.CylinderGeometry(.02, .02, .7, 6), '#ffffff', 0, 4.1, 0)); g.add(M3(new THREE.BoxGeometry(.4, .25, .02), '#ff6fb3', .2, 4.3, 0));
+    return g;
+  },
+  cake: () => {
+    const g = new THREE.Group();
+    g.add(M3(new THREE.CylinderGeometry(1.3, 1.3, 1, 28), '#fff3f8', 0, .5, 0)); g.add(M3(new THREE.TorusGeometry(1.3, .14, 8, 36), '#ffb6d5', 0, 1, 0, { rx: Math.PI / 2 }));
+    g.add(M3(new THREE.CylinderGeometry(.9, .9, .8, 28), '#ffe0ee', 0, 1.4, 0)); g.add(M3(new THREE.TorusGeometry(.9, .12, 8, 30), '#ffffff', 0, 1.8, 0, { rx: Math.PI / 2 }));
+    g.add(M3(GEO.sph, '#ff4f79', 0, 2.1, 0, { s: [.34, .4, .34] })); for (let i = 0; i < 4; i++) g.add(M3(new THREE.ConeGeometry(.08, .25, 6), '#5cc26c', Math.cos(i * 1.57) * .12, 2.45, Math.sin(i * 1.57) * .12, { rz: Math.cos(i * 1.57) * -.8, rx: Math.sin(i * 1.57) * .8 }));
+    g.add(M3(new THREE.BoxGeometry(.5, .7, .1), '#c77dab', 0, .35, 1.28)); g.add(M3(GEO.sph, '#ffe066', .12, .35, 1.34, { s: .04 }));
+    return g;
+  },
+  mushroom: () => {
+    const g = new THREE.Group();
+    g.add(M3(new THREE.CylinderGeometry(.65, .75, 1.5, 20), '#fff7ea', 0, .75, 0)); g.add(M3(new THREE.SphereGeometry(1.35, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2), '#ff8fb8', 0, 1.35, 0, { s: [1, .85, 1] }));
+    [[.6, 2.1, .7], [-.7, 2, .6], [0, 2.45, .3], [.9, 1.75, -.4], [-.3, 1.9, -.9]].forEach(([x, y, z]) => g.add(M3(GEO.sph, '#ffffff', x, y, z, { s: .16 })));
+    g.add(M3(new THREE.CylinderGeometry(.25, .25, .1, 16, 1, false, 0, Math.PI), '#c77dab', 0, .35, .72, { rx: Math.PI / 2, rz: Math.PI / 2 }));
+    g.add(M3(new THREE.BoxGeometry(.42, .6, .1), '#c77dab', 0, .35, .72)); g.add(M3(new THREE.CircleGeometry(.18, 16), '#bfeaff', .4, .95, .62, { ry: .5 }));
+    return g;
+  },
+  fountain: () => {
+    const g = new THREE.Group();
+    g.add(M3(new THREE.CylinderGeometry(1.4, 1.5, .5, 28), '#efe8ff', 0, .25, 0)); g.add(M3(new THREE.CylinderGeometry(1.2, 1.2, .1, 28), '#a8e6ff', 0, .48, 0));
+    g.add(M3(new THREE.CylinderGeometry(.18, .25, 1.2, 12), '#efe8ff', 0, 1, 0)); g.add(M3(new THREE.CylinderGeometry(.6, .3, .3, 20), '#efe8ff', 0, 1.6, 0)); g.add(M3(new THREE.CylinderGeometry(.5, .5, .05, 20), '#a8e6ff', 0, 1.74, 0));
+    const drops = []; for (let i = 0; i < 10; i++) { const d = M3(GEO.sphLo, '#bff0ff', 0, 1.8, 0, { s: .08 }); d.userData.ph = i / 10; g.add(d); drops.push(d); }
+    g.userData.tick = (t) => drops.forEach((d, i) => { const k = (t * .8 + d.userData.ph) % 1, a = i / 10 * Math.PI * 2; d.position.set(Math.cos(a) * k * .9, 1.8 + k * 1.2 - k * k * 1.7, Math.sin(a) * k * .9); });
+    return g;
+  },
+  balloons: () => {
+    const g = new THREE.Group(), cols = ['#ff8fc6', '#b8a4ff', '#8fdcff', '#ffe066', '#9ee493'], bs = [];
+    cols.forEach((c, i) => { const b = new THREE.Group(); const x = (i - 2) * .45, h = 2.2 + (i % 2) * .5; b.add(M3(HEART, c, 0, h, 0, { s: .55 })); b.add(M3(new THREE.CylinderGeometry(.008, .008, h, 4), '#ffffff', 0, h / 2, 0)); b.position.x = x; b.userData.ph = i; g.add(b); bs.push(b); });
+    g.add(M3(new THREE.BoxGeometry(.5, .3, .5), '#ffd1e8', 0, .15, 0));
+    g.userData.tick = t => bs.forEach(b => { b.rotation.z = Math.sin(t * 1.3 + b.userData.ph) * .08; b.rotation.y = Math.sin(t * .7 + b.userData.ph) * .4; });
+    return g;
+  },
+  lollipop: () => {
+    const g = new THREE.Group();
+    for (const [x, z, s] of [[0, 0, 1], [1.2, .5, .75]]) {
+      const l = new THREE.Group(); l.add(M3(new THREE.CylinderGeometry(.07, .07, 2.4, 8), '#ffffff', 0, 1.2, 0));
+      ['#ff8fc6', '#ffffff', '#b8a4ff', '#ffffff', '#8fdcff'].forEach((c, i) => l.add(M3(new THREE.TorusGeometry(.7 - i * .14, .08, 8, 28), c, 0, 2.6, 0)));
+      l.add(M3(GEO.sph, '#ffe066', 0, 2.6, 0, { s: [.1, .1, .06] })); l.position.set(x, 0, z); l.scale.setScalar(s); g.add(l);
+    }
+    return g;
+  },
+  pond: () => {
+    const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(1.6, 1.6, .06, 32), '#aee6ff', 0, .04, 0)); g.add(M3(new THREE.TorusGeometry(1.6, .12, 8, 32), '#efe8ff', 0, .06, 0, { rx: Math.PI / 2 }));
+    [[.5, .3], [-.6, -.2], [.1, -.7]].forEach(([x, z], i) => { g.add(M3(new THREE.CylinderGeometry(.35, .35, .03, 16), '#8fdc9f', x, .09, z)); if (i < 2) for (let j = 0; j < 6; j++) g.add(M3(new THREE.ConeGeometry(.08, .3, 6), '#ff9fcf', x + Math.cos(j) * .08, .2, z + Math.sin(j) * .08, { rx: Math.sin(j) * .5, rz: -Math.cos(j) * .5 })); });
+    return g;
+  },
+  teaset: () => {
+    const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(1, 1, .1, 24), '#ffffff', 0, .8, 0)); g.add(M3(new THREE.CylinderGeometry(.12, .2, .8, 10), '#ffd1e8', 0, .4, 0));
+    g.add(M3(GEO.sph, '#ff9fcf', 0, 1.1, 0, { s: .28 })); g.add(M3(new THREE.CylinderGeometry(.04, .06, .3, 8), '#ff9fcf', .3, 1.15, 0, { rz: -.8 })); g.add(M3(GEO.sph, '#ffffff', 0, 1.4, 0, { s: .07 }));
+    [[.55, .3], [-.5, .35], [0, -.6]].forEach(([x, z], i) => { g.add(M3(new THREE.CylinderGeometry(.13, .1, .18, 12), ['#b8a4ff', '#8fdcff', '#ffe066'][i], x, .94, z)); });
+    for (const [x, z] of [[1.4, .2], [-1.4, .2]]) g.add(M3(new THREE.CylinderGeometry(.35, .35, .5, 16), '#ffe0ee', x, .25, z));
+    return g;
+  },
+};
+const ITEMS = [
+  { id: 'ribbon', type: 'acc', name: 'りぼん', icon: '🎀' }, { id: 'crown', type: 'acc', name: 'おうかん', icon: '👑' },
+  { id: 'flower', type: 'acc', name: 'おはな', icon: '🌸' }, { id: 'unicorn', type: 'acc', name: 'ユニコーンの つの', icon: '🦄' },
+  { id: 'glasses', type: 'acc', name: 'ハートめがね', icon: '💗' }, { id: 'hat', type: 'acc', name: 'とんがりぼうし', icon: '🎉' },
+  { id: 'angel', type: 'acc', name: 'てんしの わっか', icon: '👼' }, { id: 'cherry', type: 'acc', name: 'さくらんぼ', icon: '🍒' },
+  { id: 'tiara', type: 'acc', name: 'ティアラ', icon: '💎' },
+  { id: 'rainbow', type: 'deco', name: 'にじ', icon: '🌈' }, { id: 'castle', type: 'deco', name: 'おしろ', icon: '🏰' },
+  { id: 'cake', type: 'deco', name: 'ケーキの おうち', icon: '🎂' }, { id: 'mushroom', type: 'deco', name: 'きのこの おうち', icon: '🍄' },
+  { id: 'fountain', type: 'deco', name: 'ふんすい', icon: '⛲' }, { id: 'balloons', type: 'deco', name: 'ハートの ふうせん', icon: '🎈' },
+  { id: 'lollipop', type: 'deco', name: 'キャンディの き', icon: '🍭' }, { id: 'pond', type: 'deco', name: 'はすの いけ', icon: '🪷' },
+  { id: 'teaset', type: 'deco', name: 'おちゃかい', icon: '☕' },
+];
+const itemById = id => ITEMS.find(i => i.id === id);
+const DECO_POS = { rainbow: [0, 0, -7.2, 0], mushroom: [-4.3, 0, -5.1, .5], castle: [-6.3, 0, -1.6, 1.1], cake: [-5.8, 0, 2.9, 1.9], teaset: [-3.4, 0, 5.8, 2.6], pond: [3.4, 0, 5.8, 0], balloons: [5.9, 0, 2.9, -1.9], fountain: [6.2, 0, -1.6, 0], lollipop: [4.2, 0, -5.2, -.5] };
+
+function giftBox(color = '#ff9fd0', s = 1) {
+  const g = new THREE.Group();
+  const body = M3(new RoundedBoxGeometry(1.6, 1.25, 1.6, 3, .12), color, 0, .63, 0);
+  g.add(body); g.add(M3(new THREE.BoxGeometry(.3, 1.27, 1.62), '#ffffff', 0, .63, 0)); g.add(M3(new THREE.BoxGeometry(1.62, 1.27, .3), '#ffffff', 0, .63, 0));
+  const lid = new THREE.Group(); lid.position.y = 1.25;
+  lid.add(M3(new RoundedBoxGeometry(1.76, .34, 1.76, 3, .1), color, 0, .1, 0)); lid.add(M3(new THREE.BoxGeometry(.32, .36, 1.78), '#ffffff', 0, .1, 0)); lid.add(M3(new THREE.BoxGeometry(1.78, .36, .32), '#ffffff', 0, .1, 0));
+  const b = bow('#ffffff', 2.2); b.position.y = .45; lid.add(b);
+  g.add(lid); g.userData.lid = lid; g.scale.setScalar(s);
+  g.traverse(o => o.userData.gift = g);
+  return g;
+}
+
+/* ================= ステージ（もんだい・イベント用） ================= */
+const stage = new THREE.Group(); scene.add(stage);
+const stageDyn = new THREE.Group(); stage.add(stageDyn);
+(() => {
+  stage.add(M3(new THREE.CylinderGeometry(9, 9.2, .5, 64), '#fff0f7', 0, -.25, 0));
+  stage.add(M3(new THREE.CylinderGeometry(6.5, 6.5, .52, 64), '#ffe3f1', 0, -.24, 0));
+  for (let i = 0; i < 44; i++) { const a = i / 44 * Math.PI * 2; stage.add(M3(GEO.sphLo, i % 2 ? '#ffb3d9' : '#d9c6ff', Math.cos(a) * 9.05, .02, Math.sin(a) * 9.05, { s: .34 })); }
+  const c1 = cloud(1.2); c1.position.set(-9, 4.5, -8); stage.add(c1); const c2 = cloud(1); c2.position.set(9, 6, -9); stage.add(c2);
+  const t1 = cottonTree(); t1.position.set(-7, 0, -5); stage.add(t1); const t2 = cottonTree(['#d9c6ff', '#ffc2e0', '#bdf0ff']); t2.position.set(7.2, 0, -4.5); t2.scale.setScalar(.85); stage.add(t2);
+})();
+const floaters = [];
+for (let i = 0; i < 14; i++) { const sp = new THREE.Sprite(emojiMat(pick(['💗', '✨', '🫧', '⭐', '🌸', '🎀']))); sp.scale.setScalar(rand(.5, .9)); sp.position.set(rand(-14, 14), rand(-2, 12), rand(-14, -8)); sp.userData.v = rand(.3, .7); stage.add(sp); floaters.push(sp); }
+
+function clearStage() {
+  for (const b of [...bunnies]) if (isIn(b.root, stage)) b.dispose();
+  stageDyn.clear(); clearAnchors('stage');
+}
+const isIn = (o, g) => { while (o) { if (o === g) return true; o = o.parent; } return false; };
+
+/* ================= おにわ ================= */
+const garden = { group: new THREE.Group(), world: new THREE.Group(), decos: new THREE.Group(), bun: [], on: false, gen: 0, rot: 0, sky: new THREE.Group() };
+scene.add(garden.group); garden.group.add(garden.world); garden.world.add(garden.decos); garden.group.add(garden.sky);
+const clouds = [];
+(() => {
+  const w = garden.world;
+  w.add(M3(new THREE.CylinderGeometry(8.5, 8.5, .6, 72), '#ffd9ec', 0, -.3, 0));
+  w.add(M3(new THREE.CylinderGeometry(6, 6, .62, 72), '#ffe6f2', 0, -.29, 0));
+  w.add(M3(new THREE.CylinderGeometry(8.55, 8.2, 1.4, 72), '#fff3e3', 0, -1.25, 0));
+  for (let i = 0; i < 46; i++) { const a = i / 46 * Math.PI * 2; w.add(M3(GEO.sphLo, i % 3 === 0 ? '#ffb3d9' : i % 3 === 1 ? '#ffc9e4' : '#e5d3ff', Math.cos(a) * 8.45, -.6, Math.sin(a) * 8.45, { s: [.42, .6, .42] })); }
+  w.add(M3(new THREE.ConeGeometry(8.2, 6, 72), '#dccbff', 0, -4.9, 0, { rx: Math.PI }));
+  // おはな
+  const petal = new THREE.InstancedMesh(GEO.sphLo, toon('#ffffff'), 40 * 6); let k = 0; const mtx = new THREE.Matrix4(), col = new THREE.Color();
+  for (let i = 0; i < 40; i++) {
+    const r = rand(1.5, 7.8), a = rand(0, Math.PI * 2), x = Math.cos(a) * r, z = Math.sin(a) * r, pc = pick(['#ffffff', '#fff27a', '#ffc2e0', '#cdbbff', '#bff0ff']);
+    for (let j = 0; j < 6; j++) {
+      const px = j < 5 ? x + Math.cos(j * 1.256) * .13 : x, pz = j < 5 ? z + Math.sin(j * 1.256) * .13 : z;
+      mtx.compose(new THREE.Vector3(px, .03, pz), new THREE.Quaternion(), new THREE.Vector3(j < 5 ? .1 : .07, .05, j < 5 ? .1 : .07));
+      petal.setMatrixAt(k, mtx); petal.setColorAt(k, col.set(j < 5 ? pc : '#ffd24d')); k++;
+    }
+  }
+  w.add(petal);
+  for (const [x, z, s, c] of [[-2.6, -7.2, 1, undefined], [2.6, -7.3, .9, ['#d9c6ff', '#ffc2e0', '#bdf0ff']], [-7.6, 1.2, .7, ['#bdf0ff', '#ffb3d9']], [7.6, 1, .7, ['#ffe9a8', '#ffb3d9', '#d9c6ff']]]) { const t = cottonTree(c); t.position.set(x, 0, z); t.scale.setScalar(s); w.add(t); }
+  for (let i = 0; i < 7; i++) { const c = cloud(rand(.8, 1.4)); c.userData = { a: i / 7 * Math.PI * 2, r: rand(12, 15), y: rand(-3.5, 1.5), sp: rand(.02, .05) }; garden.group.add(c); clouds.push(c); }
+})();
+
+function buildDecos() {
+  garden.decos.clear();
+  for (const it of S.items) {
+    const d = DECO[it]; if (!d) continue; const p = DECO_POS[it]; const o = d();
+    o.position.set(p[0], p[1], p[2]); o.rotation.y = p[3]; garden.decos.add(o);
+  }
+  garden.sky.clear();
+  for (let i = 0; i < Math.min(S.stars, 40); i++) { const sp = new THREE.Sprite(emojiMat('⭐').clone()); const a = i * 2.39; sp.position.set(Math.cos(a) * rand(6, 13), rand(7, 11), Math.sin(a) * 6 - 6); sp.scale.setScalar(.7); garden.sky.add(sp); }
+}
+
+function renderFriends() {
+  const f = $('#friends'); f.innerHTML = '';
+  for (let n = 1; n <= 10; n++) { const s = document.createElement('span'); if (S.met.includes(n)) { s.className = 'm'; s.style.setProperty('--c', MAIN[n]); if (n === 7 || n === 10) s.style.background = cssColor(n); s.textContent = n; } else s.textContent = '?'; f.appendChild(s); }
+}
+
+function enterGarden() {
+  const tok = newFlow(); mode = 'garden'; clearStage(); stage.visible = false; garden.group.visible = true;
+  showLayer('garden'); buildDecos(); renderFriends(); clearAnchors('garden');
+  const today = dayKey(); $('#giftTag').style.display = S.lastGift !== today ? '' : 'none'; $('#doneTag').style.display = S.lastGift === today ? '' : 'none';
+  garden.bun.forEach(b => b.dispose()); garden.bun = [];
+  garden.on = true; const gen = ++garden.gen;
+  const met = [...S.met].sort((a, b) => a - b);
+  met.forEach((n, i) => {
+    const b = new Bunny(n, { scale: .72, label: 's' }); const a = i / met.length * Math.PI * 2 + .4, r = rand(1.5, 4);
+    b.root.position.set(Math.cos(a) * r, 0, Math.sin(a) * r * .8); b.root.rotation.y = -garden.world.rotation.y;
+    garden.world.add(b.root); garden.bun.push(b); b.dropIn(i * .12, 6); wander(b, gen);
+  });
+  gardenFit();
+  run(async () => { await wait(rand(5, 7)); while (gen === garden.gen) { await gardenMerge(gen); await wait(rand(14, 22)); } });
+}
+function leaveGarden() { garden.on = false; garden.gen++; garden.group.visible = false; stage.visible = true; }
+function gardenFit() {
+  const aspect = W / H, fov = THREE.MathUtils.degToRad(camera.fov);
+  const w = aspect < 1 ? 15 : 21; const d = Math.max(18, w / 2 / (Math.tan(fov / 2) * aspect));
+  camTo(new THREE.Vector3(0, d * .42, d), new THREE.Vector3(0, aspect < 1 ? 1.5 : .2, 0));
+}
+const faceCam = () => -garden.world.rotation.y;
+async function wander(b, gen) {
+  await wait(rand(1, 3));
+  while (gen === garden.gen && b.alive) {
+    if (b.busy) { await wait(.4); continue; }
+    const r = Math.sqrt(Math.random()) * 4.4, a = rand(0, Math.PI * 2), tx = Math.cos(a) * r, tz = Math.sin(a) * r;
+    const p = b.root.position, dist = Math.hypot(tx - p.x, tz - p.z), steps = Math.max(1, Math.ceil(dist / .75));
+    const sx = p.x, sz = p.z;
+    for (let i = 1; i <= steps; i++) {
+      if (b.busy || gen !== garden.gen || !b.alive) break;
+      await b.hop({ to: { x: sx + (tx - sx) * i / steps, z: sz + (tz - sz) * i / steps }, h: .45, dur: .34 });
+    }
+    if (b.busy || gen !== garden.gen) continue;
+    await b.turn(faceCam(), .3);
+    await wait(rand(1.5, 4.5));
+  }
+}
+async function gardenTap(b) {
+  if (b.busy) return; b.busy = true;
+  await b.turn(faceCam(), .2); b.setHappy(true); await b.hop({ h: .8 });
+  await b.countAll({ gap: .32 });
+  await Voice.say(`${YOMI[b.n]}ちゃん だよ！`);
+  b.setHappy(false); await wait(.6); b.clearBadges(); b.unglowAll(); b.busy = false;
+}
+async function gardenMerge(gen) {
+  const free = garden.bun.filter(b => !b.busy && b.alive);
+  const pairs = []; for (const x of free) for (const y of free) if (x !== y && x.n + y.n <= 10) pairs.push([x, y]);
+  if (!pairs.length) return;
+  // ちかくに いる ふたりを えらぶ
+  pairs.sort((p, q) => p[0].root.position.distanceTo(p[1].root.position) - q[0].root.position.distanceTo(q[1].root.position));
+  let [A, B] = pick(pairs.slice(0, 3)); A.busy = B.busy = true;
+  await wait(.5); if (gen !== garden.gen) { A.busy = B.busy = false; return; }
+  const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), faceCam());
+  if (A.root.position.dot(right) > B.root.position.dot(right)) [A, B] = [B, A];
+  const mid = A.root.position.clone().add(B.root.position).multiplyScalar(.5); mid.setLength(Math.min(mid.length(), 2));
+  const gap = ((A.width + B.width) * .5 + .7) * .72 * .5;
+  const ta = mid.clone().addScaledVector(right, -gap), tb = mid.clone().addScaledVector(right, gap);
+  const walk = async (b, t) => { const p = b.root.position.clone(), d = p.distanceTo(t), st = Math.max(1, Math.ceil(d / 1.1)); for (let i = 1; i <= st; i++) { if (gen !== garden.gen) return; await b.hop({ to: p.clone().lerp(t, i / st), h: .5, dur: .3, sq: .1 }); } };
+  await Promise.all([walk(A, ta), walk(B, tb)]); if (gen !== garden.gen) return;
+  await Promise.all([A.turn(faceCam()), B.turn(faceCam())]);
+  const a = A.n, b = B.n, s = a + b;
+  const el = document.createElement('div'); el.className = 'bubble'; el.innerHTML = `<span style="color:${INK[a]}">${a}</span> と <span style="color:${INK[b]}">${b}</span> で…？`;
+  el.style.fontSize = '28px'; const an = anchor(el, A.head, new THREE.Vector3(0, 1.45, 0), 'garden');
+  await Promise.all([A.hop({ h: .5 }), B.hop({ h: .5 })]);
+  await A.absorb(B); if (gen !== garden.gen) { unanchor(an); return; }
+  garden.bun = garden.bun.filter(x => x !== B);
+  el.innerHTML = `<span style="color:${INK[a]}">${a}</span> と <span style="color:${INK[b]}">${b}</span> で <span style="color:${INK[s]}">${s}</span>！`;
+  A.setHappy(true); await Voice.say(`${YOMI[a]} と ${YOMI[b]} で ${YOMI[s]}！`);
+  await wait(2.5); if (gen !== garden.gen) { unanchor(an); return; }
+  el.innerHTML = `<span style="color:${INK[s]}">${s}</span> は <span style="color:${INK[a]}">${a}</span> と <span style="color:${INK[b]}">${b}</span>`;
+  const B2 = await A.split(a); garden.bun.push(B2);
+  await Voice.say(`${YOMI[s]} は ${YOMI[a]} と ${YOMI[b]}`);
+  A.setHappy(false); await wait(1.2); unanchor(an);
+  A.busy = false; B2.busy = false; if (gen === garden.gen) wander(B2, gen); else B2.dispose();
+}
+
+/* ================= カメラ ================= */
+const cam = { pos: new THREE.Vector3(0, 8, 18), look: new THREE.Vector3(0, 1, 0), tPos: new THREE.Vector3(0, 8, 18), tLook: new THREE.Vector3(0, 1, 0) };
+function camTo(p, l, instant) { cam.tPos.copy(p); cam.tLook.copy(l); if (instant) { cam.pos.copy(p); cam.look.copy(l); } }
+let fitter = null;
+function fitStage(w, h, cy, top = 130, bot = 250, instant = false) {
+  fitter = () => {
+    const fov = THREE.MathUtils.degToRad(camera.fov), tn = Math.tan(fov / 2), frac = Math.max(.35, (H - top - bot) / H);
+    const d = Math.max(h / (2 * tn * frac), w / (2 * tn * camera.aspect * .95), 8);
+    const hv = 2 * d * tn, ly = cy - (bot - top) / 2 * (hv / H);
+    camTo(new THREE.Vector3(0, ly + d * .2, d), new THREE.Vector3(0, ly, 0), instant);
+  };
+  fitter();
+}
+function onResize() {
+  W = innerWidth; H = innerHeight; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
+  if (mode === 'garden') gardenFit(); else if (fitter) fitter();
+}
+addEventListener('resize', onResize);
+
+/* ================= タップ ================= */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let ptr = null;
+canvas.addEventListener('pointerdown', e => { ptr = { x: e.clientX, y: e.clientY, drag: false, rot: garden.rot }; });
+canvas.addEventListener('pointermove', e => {
+  if (!ptr) return; const dx = e.clientX - ptr.x;
+  if (mode === 'garden' && (ptr.drag || Math.abs(dx) > 12)) { ptr.drag = true; garden.rot = ptr.rot + dx * .006; }
+});
+canvas.addEventListener('pointerup', e => { if (ptr && !ptr.drag) onTap(e.clientX, e.clientY); ptr = null; });
+canvas.addEventListener('pointercancel', () => ptr = null);
+function hitInfo(o) {
+  while (o) {
+    if (o.userData.gift) return { gift: o.userData.gift };
+    if (o.userData.cube) return { bunny: o.userData.bunny, cube: o };
+    if (o.userData.headOf) { const b = o.userData.headOf; return { bunny: b, cube: b.cubes[b.tall - 1] }; }
+    if (o.userData.numbox) return { box: o.userData.numbox };
+    o = o.parent;
+  }
+  return null;
+}
+function onTap(x, y) {
+  ndc.set(x / W * 2 - 1, -(y / H) * 2 + 1); ray.setFromCamera(ndc, camera);
+  const root = mode === 'garden' ? garden.world : stageDyn;
+  const hits = ray.intersectObject(root, true);
+  for (const h of hits) {
+    const r = hitInfo(h.object); if (!r) continue;
+    if (mode === 'garden' && r.bunny) { run(() => gardenTap(r.bunny)); return; }
+    if (r.bunny && P.tap) { tapCube(r.bunny, r.cube); return; }
+    if (r.gift && P.onGift) { P.onGift(); return; }
+    if (r.box && P.onBox) { P.onBox(); return; }
+    if (mode === 'dress' && r.bunny) { run(async () => { if (r.bunny.busy) return; r.bunny.busy = true; r.bunny.setHappy(true); AC.pop(); await r.bunny.hop({ h: .9 }); Voice.say(pick(['かわいい？', 'にあう？', 'えへへ'])); r.bunny.setHappy(false); r.bunny.busy = false; }); return; }
+    return;
+  }
+}
+
+/* ================= UI ヘルパー ================= */
+let mode = 'splash';
+function showLayer(n) { document.querySelectorAll('.layer').forEach(l => l.classList.toggle('on', l.id === 'L-' + n)); }
+function modal(html) { const m = $('#modal'); m.innerHTML = `<div class="card">${html}</div>`; m.classList.add('on'); return m.firstChild; }
+function closeModal() { $('#modal').classList.remove('on'); $('#modal').innerHTML = ''; }
+const waitClick = el => new Promise(r => el.addEventListener('click', () => { AC.pop(); r(); }, { once: true }));
+function bigMsg(t) { $('#bigMsg').innerHTML = t ? `<div>${t}</div>` : ''; }
+function bottomBtn(label, cls = '') { const b = document.createElement('button'); b.className = 'btn ' + cls; b.textContent = label; $('#bottomBtn').innerHTML = ''; $('#bottomBtn').appendChild(b); return waitClick(b).then(() => { $('#bottomBtn').innerHTML = ''; }); }
+let handA = null;
+function showHand(obj) { hideHand(); const el = document.createElement('div'); el.className = 'hand'; el.textContent = '👆'; handA = anchor(el, obj, new THREE.Vector3(0, 0, .6), 'stage'); el.style.marginTop = '72px'; }
+function hideHand() { if (handA) { unanchor(handA); handA = null; } }
+function miniBlocks(v) {
+  let h = '<span class="mb">';
+  for (let c = 0; c < (v > 5 ? 2 : 1); c++) { h += '<span class="col">'; for (let i = c * 5; i < Math.min(v, c * 5 + 5); i++) h += `<i style="background:${cubeColor(v, i)}"></i>`; h += '</span>'; }
+  return h + '</span>';
+}
+
+/* ================= もんだい の きろく ================= */
+function allFacts(max) { const r = []; for (let a = 1; a < max; a++) for (let b = 1; a + b <= max; b++) r.push([a, b]); return r; }
+const fkey = (a, b) => a + '+' + b;
+const fact = (a, b) => S.facts[fkey(a, b)] ||= { box: 0, seen: 0, ok: 0, ng: 0, last: 0, lw: false, best: 0 };
+const stageOf = f => f.box <= 0 ? 1 : f.box === 1 ? 2 : f.box === 2 ? 3 : 4;
+function pickQuestions(n) {
+  const now = Date.now();
+  const pool = allFacts(S.unlocked).map(([a, b]) => {
+    const f = S.facts[fkey(a, b)], box = f ? f.box : 0;
+    let w = f && f.seen ? [6, 5, 3, 2, 1][box] : 5;
+    if (f && f.lw) w += 4; if (a + b === S.unlocked) w += 2; if (f && now - f.last < 3 * 60e3) w *= .35;
+    return { q: [a, b], w, box };
+  });
+  const out = [];
+  while (out.length < n && pool.length) {
+    let r = Math.random() * pool.reduce((s, p) => s + p.w, 0), i = 0;
+    for (; i < pool.length - 1; i++) { r -= pool[i].w; if (r <= 0) break; }
+    out.push(pool.splice(i, 1)[0]);
+  }
+  // さいしょは とくいな もんだいで じしんを つける
+  const bi = out.reduce((bi, p, i) => p.box > out[bi].box ? i : bi, 0); out.unshift(out.splice(bi, 1)[0]);
+  return out.map(p => p.q);
+}
+function record(a, b, { first, time, hinted, st }) {
+  const f = fact(a, b); f.seen++; f.last = Date.now();
+  if (first) {
+    f.ok++; f.lw = false;
+    if (st <= 2 || (!hinted && time < (st === 3 ? 9000 : 6000))) f.box = Math.min(4, f.box + 1);
+  } else { f.ng++; f.lw = true; f.box = Math.max(0, f.box - 1); }
+  S.total++; save();
+}
+function checkUnlock() {
+  if (S.unlocked >= 10) return 0;
+  const pool = allFacts(S.unlocked), good = pool.filter(([a, b]) => (S.facts[fkey(a, b)]?.box || 0) >= 2).length;
+  if (good / pool.length >= .6) { S.unlocked++; save(); return S.unlocked; }
+  return 0;
+}
+
+/* ================= あそぶ（もんだい） ================= */
+const P = { tap: null };
+function setEq(a, b, ans) {
+  $('#eq').innerHTML = `<span style="color:${INK[a]}">${a}</span><span class="op">＋</span><span style="color:${INK[b]}">${b}</span><span class="op">＝</span>` +
+    (ans ? `<span class="ans" style="color:${INK[ans]}">${ans}</span>` : '<span class="q">？</span>');
+}
+const instr = t => $('#instr').innerHTML = t || '';
+function renderProg() { const n = P.qs.length; $('#prog').innerHTML = P.qs.map((_, i) => i < P.idx ? '💖' : i === P.idx ? '<span class="cur">🤍</span>' : '🤍').join(''); }
+
+function tapCube(bunny, cube) {
+  const t = P.tap; if (!t) return;
+  const i = bunny.cubes.indexOf(cube);
+  if (bunny !== t.bunny) { AC.tap(); return; }
+  if (i < 0 || t.done.has(i)) { AC.tap(); return; }
+  t.done.add(i); const num = t.next++;
+  bunny.showBadge(i, num); bunny.glow(i); bunny.popCube(i); AC.count(num); Voice.say(YOMI[num], { interrupt: true, rate: 1.1 });
+  if (t.done.size >= bunny.n) { hideHand(); P.tap = null; setTimeout(t.res, 700); }
+  else { const nx = bunny.cubes.findIndex((c, k) => !t.done.has(k)); showHand(bunny.cubes[nx]); }
+}
+const tapCount = (bunny, start) => new Promise(res => {
+  P.tap = { bunny, next: start, done: new Set(), res };
+  showHand(bunny.cubes[0]);
+});
+function numBox(n) {
+  const g = giftBox(MAIN[n], .8); g.traverse(o => { o.userData.gift = null; o.userData.numbox = g; });
+  const el = document.createElement('div'); el.className = 'nlabel'; setLabelN(el, n); g.userData.an = anchor(el, g, new THREE.Vector3(0, 2, 0));
+  return g;
+}
+
+async function startSession() {
+  const tok = newFlow(); leaveGarden(); mode = 'play'; clearStage(); showLayer('play');
+  P.qs = pickQuestions(S.settings.qn); P.idx = 0; P.log = [];
+  renderProg(); instr(''); $('#choices').innerHTML = ''; $('#hintBtn').style.display = 'none';
+  await run(async () => {
+    for (; P.idx < P.qs.length; P.idx++) { renderProg(); await question(P.qs[P.idx], tok); guard(tok); }
+    renderProg(); await sessionEnd(tok);
+  });
+}
+
+async function question([a, b], tok) {
+  clearStage(); instr(''); $('#choices').innerHTML = ''; $('#hintBtn').style.display = 'none';
+  const sum = a + b, f = fact(a, b), st = stageOf(f);
+  setEq(a, b);
+  const A = new Bunny(a), B = new Bunny(b);
+  const gap = .8; A.root.position.x = -(gap + A.width / 2); B.root.position.x = gap + B.width / 2;
+  const cx = (A.root.position.x + B.root.position.x) / 2; A.root.position.x -= cx; B.root.position.x -= cx;
+  stageDyn.add(A.root, B.root);
+  fitStage(A.width + B.width + gap * 2 + 3.2, 8.2, 3.4, 150, 250);
+  let boxes = null, opened = st < 4;
+  const openBoxes = async () => {
+    if (opened) return; opened = true; P.onBox = null;
+    AC.magic();
+    await Promise.all(boxes.map(async (bx, i) => { await wait(i * .15); burst(bx.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 1, .5)), { n: 12, emojis: ['✨', '🎀', '💖'] }); unanchor(bx.userData.an); await tween(.25, k => bx.scale.setScalar(.8 * (1 - k))); stageDyn.remove(bx); }));
+    A.labelOn = B.labelOn = true; await Promise.all([A.dropIn(0, 4), B.dropIn(.1, 4)]);
+  };
+  if (st === 4) {
+    A.root.visible = B.root.visible = false; A.labelOn = B.labelOn = false;
+    boxes = [numBox(a), numBox(b)]; boxes[0].position.copy(A.root.position); boxes[1].position.copy(B.root.position);
+    stageDyn.add(...boxes); boxes.forEach(bx => { const s = bx.scale.x; bx.scale.setScalar(.01); tween(.5, k => bx.scale.setScalar(s * Math.max(.01, k)), ease.back); });
+    P.onBox = () => { AC.shake(); boxes.forEach(bx => tween(.3, k => bx.rotation.z = Math.sin(k * Math.PI * 4) * .12, ease.lin)); };
+  } else { A.dropIn(0); await wait(.25); B.dropIn(0); }
+  await wait(.7); guard(tok);
+  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は いくつかな？`); guard(tok);
+
+  if (st === 1) {
+    instr('👆 ブロックを タッチして かぞえよう'); Voice.say('ブロックを タッチして かぞえてね');
+    await tapCount(A, 1); guard(tok);
+    await tapCount(B, a + 1); guard(tok);
+    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ だった？');
+  } else if (st === 2) {
+    const [L, Sm] = a >= b ? [A, B] : [B, A];
+    L.cubes.forEach((c, i) => L.glow(i)); L.showBadge(L.tall - 1, L.n); L.popCube(L.tall - 1); AC.sparkle(); L.hop({ h: .5 });
+    instr(`<b style="color:${INK[L.n]};font-size:34px">${L.n}</b> の つぎから かぞえよう`);
+    await Voice.say(`${YOMI[L.n]}！ ${YOMI[L.n]}の つぎから かぞえてね`); guard(tok);
+    await tapCount(Sm, L.n + 1); guard(tok);
+    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ？');
+  } else {
+    instr(st === 3 ? 'いくつに なるかな？' : 'はこの なかは なにかな？ こたえを えらんでね');
+  }
+
+  // こたえ
+  const correct = sum;
+  const cands = [sum - 1, sum + 1, sum - 2, sum + 2].filter(v => v >= 2 && v <= 10 && v !== sum);
+  const opts = shuffle([sum, ...shuffle(cands.slice(0, 2).concat(shuffle(cands.slice(2)))).slice(0, 2)]);
+  const pic = st <= 2;
+  let firstTry = true, hinted = false, lock = false; const t0 = performance.now();
+  const box = $('#choices'); box.innerHTML = '';
+  let resolveAns; const answered = new Promise(r => resolveAns = r);
+  const demo = async () => { // いっしょに かぞえる
+    lock = true; $('#hintBtn').style.display = 'none';
+    await openBoxes(); guard(tok);
+    A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
+    await A.countAll({ tok, gap: .4 }); await B.countAll({ from: a + 1, tok, gap: .4 });
+    instr('いくつ だったかな？'); lock = false;
+  };
+  opts.forEach((v, i) => {
+    const bt = document.createElement('button'); bt.className = 'choice' + (pic ? ' pic' : '');
+    bt.style.setProperty('--c', MAIN[v] === '#ffd9ee' ? '#f3b6d8' : MAIN[v]); bt.style.setProperty('--ink', INK[v]); bt.style.animationDelay = i * .08 + 's';
+    bt.innerHTML = (pic ? miniBlocks(v) : '') + `<span class="cn">${v}</span>`;
+    bt.onclick = () => run(async () => {
+      if (lock || bt.classList.contains('wrong')) return;
+      if (v === correct) { lock = true; bt.classList.add('right'); resolveAns(); return; }
+      firstTry = false; bt.classList.add('wrong'); AC.boing(); lock = true;
+      await Voice.say(pick(['おしい！', 'ざんねん！', 'あれれ？']) + ' いっしょに かぞえて みよう'); guard(tok);
+      await demo();
+    });
+    box.appendChild(bt);
+  });
+  if (st >= 3) {
+    const hb = $('#hintBtn'); hb.textContent = st === 4 ? '🎁 あけてみる' : '💡 かぞえる'; hb.style.display = '';
+    hb.onclick = () => run(async () => {
+      if (lock) return; AC.pop(); hinted = true;
+      if (!opened) { lock = true; await openBoxes(); guard(tok); lock = false; hb.textContent = '💡 かぞえる'; return; }
+      await demo();
+    });
+  }
+  await answered; guard(tok);
+  const time = performance.now() - t0;
+  $('#hintBtn').style.display = 'none';
+
+  // せいかい！ がったい
+  AC.fanfare(); setEq(a, b, sum); instr('');
+  await wait(.4); guard(tok);
+  $('#choices').innerHTML = '';
+  if (!opened) { await openBoxes(); guard(tok); }
+  const counted = A.cubes.some(c => c.userData.badge);
+  await Promise.all([A.hop({ h: .6 }), B.hop({ h: .6 })]); guard(tok);
+  if (!counted) { A.unglowAll(); B.unglowAll(); }
+  await A.absorb(B); guard(tok);
+  { const x0 = A.root.position.x; await tween(.5, k => A.root.position.x = x0 * (1 - k)); }
+  if (!counted) { await A.countFive({ tok }); }
+  A.setHappy(true);
+  burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
+  instr(`<span style="color:${INK[a]}">${a}</span> たす <span style="color:${INK[b]}">${b}</span> は <b style="color:${INK[sum]};font-size:36px">${sum}</b>`);
+  A.hop({ h: 1 });
+  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は ${YOMI[sum]}！ ${firstTry ? pick(['すごい！', 'やったね！', 'せいかい！', 'かんぺき！', 'じょうず！']) : 'できたね！'}`); guard(tok);
+  record(a, b, { first: firstTry, time, hinted, st });
+  for (const n of [a, b, sum]) if (!S.met.includes(n) && n <= S.unlocked) S.met.push(n);
+  P.log.push({ a, b, sum, firstTry });
+  await wait(.8); guard(tok);
+}
+
+async function sessionEnd(tok) {
+  clearStage(); showLayer('show'); bigMsg(''); mode = 'show';
+  const sums = P.log.map(l => l.sum);
+  // みんなで おいわい
+  const row = [...new Set(sums)].sort((x, y) => x - y).slice(0, 5);
+  const bs = row.map((n, i) => { const b = new Bunny(n); b.root.position.x = (i - (row.length - 1) / 2) * 2.4; stageDyn.add(b.root); b.dropIn(i * .15); return b; });
+  fitStage(row.length * 2.4 + 2, 7.4, 3, 110, 150);
+  bigMsg('🎉 おさんぽ クリア！ 🎉');
+  AC.fanfare(); await wait(.8); guard(tok);
+  bs.forEach((b, i) => { b.setHappy(true); wait(i * .1).then(() => b.hop({ h: 1.2 })); });
+  burst(new THREE.Vector3(0, 4, 1), { n: 30, emojis: ['💖', '✨', '⭐', '🌸', '🎀', '🍓'], speed: 6 });
+  await Voice.say('よく がんばったね！'); guard(tok);
+  S.sessions++; save();
+  const today = dayKey();
+  if (S.lastGift !== today) {
+    await bottomBtn('つぎへ ▶'); guard(tok);
+    await stickerPick(tok); guard(tok);
+    await openGift(tok); guard(tok);
+    S.lastGift = today; save();
+  } else {
+    bigMsg('きょうの シールと プレゼントは もらったよ<br>また あしたも あそぼうね 🌙');
+    await bottomBtn('つぎへ ▶'); guard(tok);
+  }
+  const nf = checkUnlock();
+  if (nf) { await newFriend(nf, tok); guard(tok); }
+  enterGarden();
+}
+
+const STICKERS = ['🍓', '🎀', '🦄', '🌈', '⭐', '🍰', '🧁', '🍭', '💖', '🌸', '🐰', '🍩', '🍒', '🌷', '🍑', '🎠', '👑', '🍬', '🦋', '🌙', '💎', '🧸', '🎈', '🍮', '🐣', '🌟', '🍨', '🐱', '🌼', '🫧'];
+function stickerPick(tok) {
+  return new Promise(res => {
+    const opts = shuffle(STICKERS.slice()).slice(0, 3);
+    const c = modal(`<h2>すきな シールを えらんでね</h2><div class="row">${opts.map((s, i) => `<button class="stk" style="animation-delay:${i * .1}s" data-s="${s}">${s}</button>`).join('')}</div>`);
+    Voice.say('すきな シールを えらんでね');
+    c.querySelectorAll('.stk').forEach(b => b.onclick = () => {
+      AC.sparkle(); S.stickers[dayKey()] = b.dataset.s; save();
+      showCalendar(new Date(), dayKey(), async () => { res(); });
+      Voice.say('シールを はったよ！');
+    });
+  });
+}
+function showCalendar(d, land, onClose) {
+  const y = d.getFullYear(), m = d.getMonth(), first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate(), today = dayKey();
+  const total = Object.keys(S.stickers).length;
+  let cells = ['にち', 'げつ', 'か', 'すい', 'もく', 'きん', 'ど'].map(w => `<div class="h">${w}</div>`).join('');
+  for (let i = 0; i < first; i++) cells += '<div class="x"></div>';
+  for (let i = 1; i <= days; i++) { const k = dayKey(new Date(y, m, i)), s = S.stickers[k]; cells += `<div class="${k === today ? 't' : ''}">${i}${s ? `<b class="${k === land ? 'land' : ''}">${s}</b>` : ''}</div>`; }
+  const c = modal(`<div class="calnav"><button id="cp">◀</button><h2 style="margin:0">${m + 1}がつの シール</h2><button id="cn">▶</button></div>
+    <div class="cal">${cells}</div><p>ぜんぶで <b style="font-size:30px;color:#e0428f">${total}</b> まい</p><div class="row"><button class="btn" id="cc">${onClose ? 'つぎへ ▶' : 'とじる'}</button></div>`);
+  c.querySelector('#cp').onclick = () => { AC.tap(); showCalendar(new Date(y, m - 1, 1), null, onClose); };
+  c.querySelector('#cn').onclick = () => { AC.tap(); showCalendar(new Date(y, m + 1, 1), null, onClose); };
+  c.querySelector('#cc').onclick = () => { AC.pop(); closeModal(); onClose && onClose(); };
+}
+
+async function openGift(tok) {
+  closeModal(); clearStage(); mode = 'show'; bigMsg('🎁 プレゼントが とどいたよ！ タッチして あけてね');
+  const g = giftBox('#ff9fd0', 1.2); stageDyn.add(g); fitStage(6, 7.5, 2.4, 170, 150);
+  g.scale.setScalar(.01); await tween(.6, k => g.scale.setScalar(1.2 * Math.max(.01, k)), ease.back);
+  await Voice.say('プレゼントが とどいたよ！ タッチして あけてね'); guard(tok);
+  await new Promise(res => {
+    let taps = 0;
+    P.onGift = () => {
+      taps++; AC.shake();
+      tween(.35, k => { g.rotation.z = Math.sin(k * Math.PI * 4) * .12 * (1 - k); g.scale.setScalar(1.2 * (1 + Math.sin(k * Math.PI) * .08 * taps)); }, ease.lin);
+      if (taps >= 3) { P.onGift = null; res(); } else bigMsg(taps === 1 ? 'もういっかい！' : 'あと いっかい！');
+    };
+  });
+  guard(tok); await wait(.35);
+  // なかみ
+  const owned = new Set(S.items); const left = ITEMS.filter(i => !owned.has(i.id));
+  let item = null;
+  if (left.length) {
+    if (!S.items.length) item = itemById('ribbon');
+    else { const lastType = itemById(S.items[S.items.length - 1])?.type; const other = left.filter(i => i.type !== lastType); item = pick(other.length ? other : left); }
+    S.items.push(item.id);
+  } else S.stars++;
+  save();
+  const lid = g.userData.lid; AC.fanfare();
+  tween(.7, k => { lid.position.y = 1.25 + k * 3; lid.rotation.z = k * 1.2; lid.position.x = k * 2; });
+  burst(new THREE.Vector3(0, 2.5, 0), { n: 34, emojis: ['✨', '💖', '⭐', '🎀', '🌸', '🍬'], speed: 6, up: 4 });
+  let model;
+  if (item && item.type === 'acc') { const b = new Bunny(pick(S.met.length ? S.met : [1]), { label: null }); b.setAcc(item.id); model = b.root; b.setHappy(true); }
+  else if (item) { model = DECO[item.id](); model.scale.setScalar(.45); }
+  else { model = new THREE.Sprite(emojiMat('⭐')); model.scale.setScalar(2); }
+  const holder = new THREE.Group(); holder.add(model); stageDyn.add(holder); holder.position.set(0, 1, 0);
+  await tween(.8, k => { holder.position.y = 1 + k * .9; holder.scale.setScalar(Math.max(.01, k)); g.scale.setScalar(1.2 * (1 - k * .6)); g.position.z = -k * 2; }, ease.back);
+  holder.userData.spin = true;
+  const name = item ? `${item.icon} ${item.name}` : '⭐ キラキラぼし';
+  bigMsg(`<span style="font-size:40px">${name}</span><br>を ゲット！` + (item ? (item.type === 'acc' ? '<br><small style="font-size:20px">きせかえで つけてみてね</small>' : '<br><small style="font-size:20px">おにわに かざったよ</small>') : '<br><small style="font-size:20px">おそらに ひかるよ</small>'));
+  await Voice.say(`やったー！ ${item ? item.name : 'キラキラぼし'} だよ！`); guard(tok);
+  await bottomBtn('やったー！'); guard(tok);
+  holder.userData.spin = false;
+}
+
+async function newFriend(n, tok) {
+  clearStage(); showLayer('show'); mode = 'show'; bigMsg('あれれ？ なにか おこるよ…！');
+  const A = new Bunny(5), B = new Bunny(n - 5);
+  A.root.position.x = -1.6; B.root.position.x = 1.2 + B.width / 2; stageDyn.add(A.root, B.root);
+  fitStage(7, 7.5, 3, 110, 150);
+  A.dropIn(0); B.dropIn(.3); await wait(1); guard(tok);
+  await Voice.say(`ごちゃんと ${YOMI[n - 5]}ちゃんが がったいするよ！`); guard(tok);
+  await Promise.all([A.hop({ h: .8 }), B.hop({ h: .8 })]); guard(tok);
+  await A.absorb(B, { stagger: .15 }); guard(tok);
+  await tween(.5, k => A.root.position.x = -1.6 * (1 - k) - .0);
+  AC.fanfare(); A.setHappy(true);
+  burst(new THREE.Vector3(0, 3, 1), { n: 40, emojis: ['💖', '✨', '⭐', '🌸', '🎀', '🌈'], speed: 7, up: 4 });
+  bigMsg(`🎊 あたらしい おともだち！ <span style="color:${INK[n]}">${n}</span>ちゃん 🎊`);
+  await Voice.say(`あたらしい おともだち！ ${YOMI[n]}ちゃん だよ！`); guard(tok);
+  A.setHappy(false); await A.countFive({ tok }); guard(tok);
+  bigMsg(`<span style="color:${INK[5]}">5</span> と <span style="color:${INK[n - 5]}">${n - 5}</span> で <span style="color:${INK[n]}">${n}</span>！`);
+  await Voice.say(`ご と ${YOMI[n - 5]} で ${YOMI[n]}！`); guard(tok);
+  A.setHappy(true); A.hop({ h: 1.2 });
+  if (!S.met.includes(n)) S.met.push(n); save();
+  await bottomBtn('よろしくね！'); guard(tok);
+}
+
+/* ================= はじめての しょうかい ================= */
+async function intro() {
+  const tok = newFlow(); leaveGarden(); mode = 'show'; clearStage(); showLayer('show'); bigMsg('');
+  $('#skipBtn').style.display = ''; $('#skipBtn').onclick = () => { AC.pop(); finishIntro(); };
+  fitStage(12, 7.5, 3, 110, 150);
+  await run(async () => {
+    bigMsg('ここは かずうさガーデン');
+    await Voice.say('ここは かずうさガーデン。 かずの うさぎたちが すんでいるよ。'); guard(tok);
+    const bs = [];
+    for (let n = 1; n <= 5; n++) {
+      const b = new Bunny(n); b.root.position.x = (n - 3) * 2.3; stageDyn.add(b.root); bs.push(b);
+      await b.dropIn(0); guard(tok);
+      bigMsg(`<span style="color:${INK[n]};font-size:44px">${n}</span>ちゃん`);
+      await b.countAll({ tok, gap: .38 });
+      b.setHappy(true); b.hop({ h: .8 });
+      await Voice.say(n === 1 ? 'ぼくは いちちゃん！ ブロックが ひとつ だよ。' : `${YOMI[n]}ちゃん！ ブロックが ${KO[n]}。`); guard(tok);
+      b.setHappy(false); b.clearBadges(); b.unglowAll();
+    }
+    bigMsg('みんなで たしざんして あそぼう！');
+    bs.forEach((b, i) => { b.setHappy(true); wait(i * .1).then(() => b.hop({ h: 1.1 })); });
+    burst(new THREE.Vector3(0, 4, 1), { n: 30, emojis: ['💖', '✨', '⭐', '🌸'], speed: 6 });
+    await Voice.say('がったいすると かずが ふえるよ。 みんなで たしざんして あそぼう！'); guard(tok);
+    await wait(.6); guard(tok);
+    finishIntro();
+  });
+}
+function finishIntro() {
+  $('#skipBtn').style.display = 'none'; bigMsg('');
+  S.introDone = true; for (let n = 1; n <= S.unlocked; n++) if (!S.met.includes(n)) S.met.push(n); save();
+  enterGarden();
+}
+
+/* ================= きせかえ ================= */
+let dressSel = 1, dressBunny = null;
+function enterDress() {
+  newFlow(); leaveGarden(); mode = 'dress'; clearStage(); showLayer('dress');
+  dressSel = S.met.includes(dressSel) ? dressSel : (S.met[0] || 1);
+  fitStage(4.5, 7.8, 3.1, 100, 330);
+  renderDress(true);
+}
+function renderDress(drop) {
+  if (dressBunny) dressBunny.dispose();
+  dressBunny = new Bunny(dressSel); stageDyn.add(dressBunny.root); if (drop) dressBunny.dropIn(0, 5);
+  const tabs = $('#dTabs'); tabs.innerHTML = '';
+  [...S.met].sort((a, b) => a - b).forEach(n => { const b = document.createElement('button'); b.textContent = n; b.style.setProperty('--c', MAIN[n]); b.style.background = cssColor(n); if (n === dressSel) b.className = 'sel'; b.onclick = () => { AC.pop(); dressSel = n; renderDress(true); }; tabs.appendChild(b); });
+  const accs = ITEMS.filter(i => i.type === 'acc' && S.items.includes(i.id)), box = $('#dItems'); box.innerHTML = '';
+  if (!accs.length) { box.innerHTML = '<div class="empty">まだ かざりが ないよ。<br>あそぶと プレゼントで もらえるよ 🎁</div>'; return; }
+  const cur = S.outfits[dressSel];
+  const none = document.createElement('button'); none.innerHTML = '🚫<small>はずす</small>'; if (!cur) none.className = 'sel'; none.onclick = () => { AC.pop(); delete S.outfits[dressSel]; save(); dressBunny.setAcc(null); renderDress(false); }; box.appendChild(none);
+  accs.forEach(it => {
+    const b = document.createElement('button'); b.innerHTML = `${it.icon}<small>${it.name}</small>`; if (cur === it.id) b.className = 'sel';
+    b.onclick = () => { AC.sparkle(); S.outfits[dressSel] = it.id; save(); renderDress(false); dressBunny.setHappy(true); dressBunny.hop({ h: .8 }); burst(new THREE.Vector3(0, dressBunny.tall + .5, .8), { n: 12, emojis: ['✨', '💖'] }); Voice.say(pick(['かわいい！', 'にあうね！', 'すてき！'])); };
+    box.appendChild(b);
+  });
+}
+
+/* ================= おうちの人 ================= */
+function parentPanel() {
+  let rows = '<tr><th></th>' + Array.from({ length: 9 }, (_, i) => `<th>+${i + 1}</th>`).join('') + '</tr>';
+  for (let a = 1; a <= 9; a++) {
+    rows += `<tr><th>${a}</th>`;
+    for (let b = 1; b <= 9; b++) {
+      if (a + b > 10) { rows += '<td class="na"></td>'; continue; }
+      const f = S.facts[fkey(a, b)]; const cls = f && f.seen ? 'b' + f.box : ''; rows += `<td class="${cls}" title="${a}+${b}">${f && f.seen ? (f.box >= 4 ? '★' : f.ok + '/' + f.seen) : ''}</td>`;
+    }
+    rows += '</tr>';
+  }
+  const seg = (key, vals, labels) => `<div class="seg" data-k="${key}">${vals.map((v, i) => `<button data-v="${v}" class="${String(S.settings[key] ?? S[key]) === String(v) ? 'sel' : ''}">${labels[i]}</button>`).join('')}</div>`;
+  const c = modal(`<h2>おうちの人へ</h2>
+    <p class="small">これまで ${S.total}もん ／ ${S.sessions}かい あそびました ／ シール ${Object.keys(S.stickers).length}まい ／ いま ${S.unlocked} までの たしざん</p>
+    <table class="ptab">${rows}</table>
+    <div class="legend"><span style="background:#ffe3ee">ぜんぶ数える</span><span style="background:#ffc7de">数えたす</span><span style="background:#e3cbff">見てわかる</span><span style="background:#bfe6ff">数字だけ</span><span style="background:#b5f0cd">★すらすら</span></div>
+    <p class="small">表の数字は「1回目で正解した回数／出題回数」。まちがえた問題や数えている問題が、多めに出題されます。</p>
+    <div class="set">こえ ${seg('voice', ['true', 'false'], ['オン', 'オフ'])}</div>
+    <div class="set">BGM ${seg('bgm', ['true', 'false'], ['オン', 'オフ'])}</div>
+    <div class="set">1回の もんだい数 ${seg('qn', [3, 5, 7], ['3', '5', '7'])}</div>
+    <div class="set">こたえの 大きさ（〜まで） ${seg('unlocked', [5, 6, 7, 8, 9, 10], ['5', '6', '7', '8', '9', '10'])}</div>
+    <p class="small">ふだんは自動で少しずつ大きな数に進みます（新しい友だちが登場）。</p>
+    <div class="row"><button class="btn white" id="pReset" style="font-size:16px">データを けす</button><button class="btn" id="pClose">とじる</button></div>`);
+  c.querySelectorAll('.seg').forEach(sg => sg.querySelectorAll('button').forEach(b => b.onclick = () => {
+    const k = sg.dataset.k, v = b.dataset.v; AC.tap();
+    if (k === 'unlocked') { S.unlocked = +v; for (let n = 1; n <= S.unlocked; n++) if (!S.met.includes(n)) S.met.push(n); }
+    else S.settings[k] = k === 'qn' ? +v : v === 'true';
+    save(); AC.applyBgm(); if (!S.settings.voice) Voice.stop(); parentPanel();
+  }));
+  c.querySelector('#pClose').onclick = () => { AC.pop(); closeModal(); enterGarden(); };
+  c.querySelector('#pReset').onclick = () => { if (confirm('ほんとうに すべての きろくを けしますか？')) { S = DEF(); save(); closeModal(); location.reload(); } };
+}
+{ // ながおしで ひらく
+  const b = $('#parentBtn'); let t = null;
+  const start = e => { e.preventDefault(); b.classList.add('hold'); t = setTimeout(() => { b.classList.remove('hold'); AC.pop(); parentPanel(); }, 1200); };
+  const stop = () => { b.classList.remove('hold'); clearTimeout(t); };
+  b.addEventListener('pointerdown', start); b.addEventListener('pointerup', stop); b.addEventListener('pointerleave', stop); b.addEventListener('pointercancel', stop);
+  b.addEventListener('click', () => { if (!$('#modal').classList.contains('on')) { bigTip('ながおし してね'); } });
+}
+function bigTip(t) { const el = document.createElement('div'); el.className = 'pill'; el.textContent = t; Object.assign(el.style, { position: 'fixed', right: '20px', top: '110px', zIndex: 20, pointerEvents: 'none' }); document.body.appendChild(el); setTimeout(() => el.remove(), 1200); }
+
+/* ================= ボタン ================= */
+$('#playBtn').onclick = () => { AC.pop(); startSession(); };
+$('#calBtn').onclick = () => { AC.pop(); showCalendar(new Date(), null, null); };
+$('#dressBtn').onclick = () => { AC.pop(); enterDress(); };
+$('#dBack').onclick = () => { AC.pop(); dressBunny = null; enterGarden(); };
+$('#homeBtn').onclick = () => {
+  AC.pop();
+  const c = modal('<h2>おにわに もどる？</h2><div class="row"><button class="btn white" id="hN">つづける</button><button class="btn" id="hY">もどる</button></div>');
+  c.querySelector('#hN').onclick = () => { AC.pop(); closeModal(); };
+  c.querySelector('#hY').onclick = () => { AC.pop(); closeModal(); enterGarden(); };
+};
+$('#startBtn').onclick = () => {
+  AC.init(); Voice.init(); AC.pop();
+  if (!S.introDone) intro();
+  else { enterGarden(); Voice.say(pick(['おかえり！', 'きょうも あそぼう！', 'まってたよ！'])); }
+};
+document.addEventListener('visibilitychange', () => { if (!AC.ctx) return; if (document.hidden) { AC.ctx.suspend(); Voice.stop(); } else AC.ctx.resume(); });
+
+/* ================= タイトル画面の うさぎ ================= */
+function splashScene() {
+  clearStage(); garden.group.visible = false;
+  const bs = [1, 2, 3, 4, 5].map((n, i) => { const b = new Bunny(n, { label: 's' }); b.root.position.x = (i - 2) * 2.3; stageDyn.add(b.root); b.dropIn(.3 + i * .15); return b; });
+  if (S.outfits) bs.forEach(b => b.setAcc(S.outfits[b.n]));
+  fitStage(12.5, 7, 3, H * .36, H * .25, true);
+  const gen = FLOW;
+  run(async () => { await wait(1.5); while (mode === 'splash' && gen === FLOW) { const b = pick(bs); if (b.alive) { b.setHappy(true); await b.hop({ h: .9 }); b.setHappy(false); } await wait(rand(.2, .8)); } });
+}
+
+/* ================= ループ ================= */
+let last = performance.now(), T0 = 0;
+function loop(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now; T0 += dt;
+  updateTweens(dt);
+  const k = 1 - Math.exp(-dt * 3.5); cam.pos.lerp(cam.tPos, k); cam.look.lerp(cam.tLook, k); camera.position.copy(cam.pos); camera.lookAt(cam.look);
+  if (garden.group.visible) {
+    garden.world.rotation.y += (garden.rot - garden.world.rotation.y) * Math.min(1, dt * 6);
+    garden.decos.children.forEach(d => d.userData.tick && d.userData.tick(T0));
+    clouds.forEach(c => { const u = c.userData; u.a += u.sp * dt; c.position.set(Math.cos(u.a) * u.r, u.y + Math.sin(T0 + u.a * 3) * .3, Math.sin(u.a) * u.r); });
+    garden.sky.children.forEach((s, i) => s.material.opacity = .6 + Math.sin(T0 * 2 + i) * .4);
+  }
+  if (stage.visible) floaters.forEach(f => { f.position.y += f.userData.v * dt; if (f.position.y > 14) f.position.y = -3; });
+  stageDyn.children.forEach(o => { if (o.userData.spin) o.rotation.y += dt * 1.2; });
+  for (const b of bunnies) b.update(dt);
+  updateParts(dt);
+  renderer.render(scene, camera);
+  updateAnchors();
+  requestAnimationFrame(loop);
+}
+onResize(); splashScene(); requestAnimationFrame(loop);
+window.__kzReady = true; $('#loadMsg').style.display = 'none';
+window.KZ = { P, tapCube, garden, gardenMerge, get mode() { return mode; }, S, startSession, enterGarden, intro, enterDress, openGift: () => run(() => openGift(FLOW)), newFriend: n => run(() => newFriend(n, FLOW)), save };
+</script>
+</body>
+</html>
