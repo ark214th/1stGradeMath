@@ -150,3 +150,94 @@ test('記録の読みこみ：こわれたデータでも あそべる', () => {
   assert.equal(Core.stars(s.kanji['山']), 2);
   assert.equal(Core.stars(undefined), 0);
 });
+
+/* ---------- ごほうび ---------- */
+const Rw = require('./rewards.js');
+
+test('じゅもんの字と 島の字で 80字 ぜんぶ', () => {
+  for (const k of Rw.SPELLS) assert.ok(ORDER.includes(k), k);
+  const spells = ORDER.filter(k => Rw.roleOf(k) === 'spell');
+  assert.equal(spells.length, [...Rw.SPELLS].length);
+  assert.ok(ORDER.filter(k => Rw.roleOf(k) === 'obj').length >= 50);
+});
+
+test('きせかえ：もらえる ものは ぜんぶ いちらんに あり、いろには いろが ある', () => {
+  const ids = new Set(Rw.OUTFITS.map(o => o.id));
+  assert.equal(ids.size, Rw.OUTFITS.length);
+  for (const id of [...Rw.GIFT_ORDER, ...Rw.SPECIAL_ORDER, ...Object.values(Rw.KANJI_UNLOCK), Rw.ALL_KANJI_UNLOCK, ...Rw.START_OWNED]) assert.ok(ids.has(id), id);
+  for (const o of Rw.OUTFITS.filter(o => o.slot === 'color')) assert.ok(Number.isInteger(o.color), o.id);
+  // どこからも もらえない きせかえが ない
+  const sources = new Set([...Rw.GIFT_ORDER, ...Rw.SPECIAL_ORDER, ...Object.values(Rw.KANJI_UNLOCK), Rw.ALL_KANJI_UNLOCK, ...Rw.START_OWNED]);
+  for (const o of Rw.OUTFITS) assert.ok(sources.has(o.id), `${o.id} が もらえない`);
+  for (const k in Rw.KANJI_UNLOCK) assert.ok(ORDER.includes(k));
+});
+
+test('プレゼントは 1日 1かいだけ（なんかい やっても ふえない）', () => {
+  const rw = Rw.freshRewards();
+  Rw.stamp(rw, '2026-10-10', '山');
+  const g1 = Rw.claimGift(rw, '2026-10-10');
+  assert.deepEqual(g1, { type: 'item', id: 'ribbon', special: false });
+  assert.equal(Rw.claimGift(rw, '2026-10-10'), null);
+  assert.equal(Rw.claimGift(rw, '2026-10-10'), null);
+  assert.equal(rw.owned.filter(id => !Rw.START_OWNED.includes(id)).length, 1);
+  Rw.stamp(rw, '2026-10-11', '川');
+  assert.equal(Rw.claimGift(rw, '2026-10-11').id, 'glasses');
+});
+
+test('毎日つづけると 7日ごとに とくべつ、なくなったら ほし', () => {
+  const rw = Rw.freshRewards();
+  const got = [];
+  for (let d = 1; d <= 60; d++) {
+    const day = Core.dayKey(new Date(2026, 10, d));
+    Rw.stamp(rw, day, '山');
+    got.push(Rw.claimGift(rw, day));
+  }
+  assert.equal(got[6].special, true); // 7日め
+  assert.equal(got[6].id, Rw.SPECIAL_ORDER[0]);
+  assert.equal(got[13].id, Rw.SPECIAL_ORDER[1]);
+  const items = got.filter(g => g.type === 'item');
+  assert.equal(items.length, Rw.GIFT_ORDER.length + Rw.SPECIAL_ORDER.length);
+  assert.equal(new Set(items.map(g => g.id)).size, items.length);
+  assert.ok(got.slice(-5).every(g => g.type === 'star'));
+  // さいしょの 2しゅうかんは まいにち なにか きせかえが もらえる
+  assert.ok(got.slice(0, 14).every(g => g.type === 'item'));
+});
+
+test('あたらしい字は 1日 3つまで', () => {
+  const s = Core.freshState();
+  const day = '2026-10-09';
+  const set1 = Core.pickToday(s, ORDER, day, Rw.newLeftToday(s.r, day));
+  assert.deepEqual(set1, ORDER.slice(0, 3));
+  for (const k of set1) { s.kanji[k] = { traced: 1, quiz: 0, last: day }; Rw.countNew(s.r, day); }
+  assert.equal(Rw.newLeftToday(s.r, day), 0);
+  const set2 = Core.pickToday(s, ORDER, day, Rw.newLeftToday(s.r, day));
+  assert.equal(set2.length, 3);
+  assert.ok(set2.every(k => set1.includes(k)), 'おなじ日の 2かいめは おさらい だけ');
+  const next = '2026-10-10';
+  assert.equal(Rw.newLeftToday(s.r, next), 3);
+  const set3 = Core.pickToday(s, ORDER, next, Rw.newLeftToday(s.r, next));
+  assert.deepEqual(set3.slice(0, 2), ORDER.slice(3, 5));
+  for (const k of set3.slice(0, 2)) { s.kanji[k] = { traced: 1, quiz: 0, last: next }; Rw.countNew(s.r, next); }
+  const set4 = Core.pickToday(s, ORDER, next, Rw.newLeftToday(s.r, next));
+  assert.equal(set4.filter(k => !s.kanji[k]).length, 1, '2かいめは あたらしい字 1つ');
+});
+
+test('字で もらえる きせかえ と、80字で にじいろ', () => {
+  const rw = Rw.freshRewards();
+  assert.deepEqual(Rw.unlockForKanji(rw, '赤', 10, 80), ['red']);
+  assert.deepEqual(Rw.unlockForKanji(rw, '赤', 11, 80), []);
+  assert.deepEqual(Rw.unlockForKanji(rw, '山', 12, 80), []);
+  assert.deepEqual(Rw.unlockForKanji(rw, '円', 80, 80), ['rainbow']);
+});
+
+test('ふるい きろく（v1）を よみこんでも ごほうびが はじめから', () => {
+  const s = Core.normalizeState({ kanji: { 山: { traced: 2, last: '2026-10-09' } }, days: 1 });
+  assert.deepEqual(s.r.outfit, Rw.DEFAULT_OUTFIT);
+  assert.deepEqual(s.r.owned, Rw.START_OWNED);
+  const bad = Core.normalizeState({ r: { owned: ['ribbon', 'nope'], outfit: { head: 'tiara', color: 'milk' }, stamps: { x: '山', '2026-10-09': '山' } } });
+  assert.ok(bad.r.owned.includes('ribbon') && !bad.r.owned.includes('nope'));
+  assert.equal(bad.r.outfit.head, 'head-none', 'もっていない ものは つけられない');
+  assert.deepEqual(bad.r.stamps, { '2026-10-09': '山' });
+  assert.equal(Rw.islandSize(0), 1);
+  assert.equal(Rw.islandSize(80), 4);
+});

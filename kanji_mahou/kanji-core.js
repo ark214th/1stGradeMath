@@ -137,8 +137,10 @@
   /* ---------- 記録 ---------- */
   const SAVE_KEY = 'yumekawaKanji_v1';
 
+  const Rw = () => root.KanjiRewards || (typeof require !== 'undefined' ? require('./rewards.js') : null);
+
   function freshState() {
-    return { v: 1, kanji: {}, days: 0, lastDay: '', today: null, settings: { voice: true, bgm: true } };
+    return { v: 2, kanji: {}, days: 0, lastDay: '', today: null, settings: { voice: true, bgm: true }, r: Rw().freshRewards() };
   }
 
   function normalizeState(raw) {
@@ -154,6 +156,7 @@
     s.lastDay = typeof raw.lastDay === 'string' ? raw.lastDay : '';
     if (raw.today && typeof raw.today === 'object' && Array.isArray(raw.today.list)) s.today = { day: String(raw.today.day || ''), list: raw.today.list.slice(0, 3), done: !!raw.today.done };
     if (raw.settings) s.settings = { voice: raw.settings.voice !== false, bgm: raw.settings.bgm !== false };
+    s.r = Rw().normalizeRewards(raw.r);
     return s;
   }
 
@@ -173,19 +176,21 @@
   /* きょうの かんじ を 3つ えらぶ
    * order: 出す順の漢字の並び
    * あたらしい字 2つ ＋ おさらい 1つ（はじめの日は あたらしい字 3つ）
+   * newLimit: きょう あと いくつ あたらしい字に であえるか（1日の 上限）
    */
-  function pickToday(state, order, today) {
+  function pickToday(state, order, today, newLimit) {
     const met = order.filter(k => state.kanji[k] && state.kanji[k].traced > 0);
     const fresh = order.filter(k => !(state.kanji[k] && state.kanji[k].traced > 0));
     const list = [];
     const review = met
       .filter(k => state.kanji[k].last !== today)
       .sort((a, b) => (state.kanji[a].traced - state.kanji[b].traced) || (state.kanji[a].last < state.kanji[b].last ? -1 : state.kanji[a].last > state.kanji[b].last ? 1 : 0));
-    const nNew = met.length === 0 ? 3 : 2;
+    const nNew = Math.min(met.length === 0 ? 3 : 2, newLimit === undefined ? 3 : newLimit);
     list.push(...fresh.slice(0, nNew));
     while (list.length < 3 && review.length) list.push(review.shift());
-    // 80字ぜんぶ であったあとは おさらい だけ
-    for (const k of order) { if (list.length >= 3) break; if (!list.includes(k)) list.push(k); }
+    // たりないときは きょう もう やった字の おさらい（あたらしい字の 上限は こえない）
+    const again = met.slice().sort((a, b) => state.kanji[a].traced - state.kanji[b].traced);
+    for (const k of again.concat(fresh)) { if (list.length >= 3) break; if (!list.includes(k)) list.push(k); }
     return list;
   }
 
