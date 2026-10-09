@@ -170,6 +170,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 #todayBtn{font-size:30px;padding:16px 44px}
 #todayBtn.pulse{animation:breath 1.5s ease-in-out infinite}
 #bottomBtn{font-size:26px}
+#zoomBtn{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom))}
 .cap{background:rgba(255,255,255,.95);border-radius:28px;padding:10px 24px;font-weight:900;font-size:24px;text-align:center;box-shadow:0 6px 0 rgba(200,90,150,.15),0 12px 26px rgba(160,60,140,.15);animation:pop .4s cubic-bezier(.3,1.6,.5,1);display:flex;align-items:center;gap:14px;max-width:calc(var(--vw) * 0.92)}
 .cap[hidden]{display:none}
 .cap .ck{font-size:54px;line-height:1;color:var(--deep)}
@@ -243,6 +244,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
     <button class="btn" id="todayBtn">✨ きょうの まほう</button>
     <button class="btn" id="bottomBtn" hidden>つぎへ ▶</button>
   </div>
+  <button class="btn white small" id="zoomBtn" hidden>🏝️ もどす</button>
 </section>
 
 <!-- きせかえ -->

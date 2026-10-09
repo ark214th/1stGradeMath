@@ -794,6 +794,10 @@ function renderDress() {
 }
 $('#dressBack').onclick = () => { AC.tap(); goHome(); };
 
+/* ---------- ズーム ---------- */
+world.onZoom = on => { $('#zoomBtn').hidden = !on; };
+$('#zoomBtn').onclick = () => { AC.tap(); world.resetZoom(); };
+
 /* ---------- 島の ものに タッチ ---------- */
 world.onTapKanji = k => {
   if (screen !== 'island' || !$('#todayBtn').offsetParent) return;

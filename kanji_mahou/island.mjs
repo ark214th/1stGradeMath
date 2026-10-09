@@ -489,6 +489,7 @@ export class Island {
     this.objs = new Map(); // k -> group
     this.levels = {};
     this.cam = { dist: 18, h: 7, lookY: 0.8, x: 0, focus: 0 };
+    this.uz = { z: 1, zt: 1, px: 0, pz: 0, ptx: 0, ptz: 0 }; // ゆびで する ズーム
     this.spin = 0; this.spinV = 0; this.spinTarget = null;
     this.setupWorld();
     this.punyu = makePunyu();
@@ -544,24 +545,93 @@ export class Island {
   }
 
   /* ---------- 入力：ドラッグで まわす、タップで えらぶ ---------- */
+  /* ---------- 入力 ----------
+   * 1本ゆび：ドラッグで 島を まわす（ズーム中は 島の うえを みてまわる）／タップで えらぶ
+   * 2本ゆび：つまむ・ひろげる で ズーム（ゆびの あいだを 中心に）
+   * ダブルタップ：その ばしょを ズーム／もう いちど で もとに もどす
+   */
   setupInput() {
     const cv = this.canvas;
-    let down = null;
-    cv.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now(), lx: e.clientX, moved: false }; this.spinTarget = null; });
+    const pts = new Map();
+    let down = null, pinch = null, lastTap = null, idle = false;
+    const mid = () => { const a = [...pts.values()]; return { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2, d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) }; };
+    cv.addEventListener('pointerdown', e => {
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 1) { idle = false; down = { x: e.clientX, y: e.clientY, t: performance.now(), lx: e.clientX, ly: e.clientY, moved: false }; }
+      else if (pts.size === 2 && this.canZoom()) { down = null; const m = mid(); pinch = { d0: Math.max(20, m.d), z0: this.uz.zt, lx: m.x, ly: m.y }; }
+    });
     cv.addEventListener('pointermove', e => {
-      if (!down) return;
-      const dx = e.clientX - down.lx; down.lx = e.clientX;
-      if (Math.abs(e.clientX - down.x) > 8) down.moved = true;
-      if (down.moved && !this.lockSpin) { this.spin += dx * 0.008; this.spinV = dx * 0.008; }
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && pts.size >= 2) {
+        const m = mid();
+        this.zoomAbout(m.x, m.y, pinch.z0 * (m.d / pinch.d0));
+        this.panBy(m.x - pinch.lx, m.y - pinch.ly);
+        pinch.lx = m.x; pinch.ly = m.y;
+        return;
+      }
+      if (!down || idle) return;
+      const dx = e.clientX - down.lx, dy = e.clientY - down.ly; down.lx = e.clientX; down.ly = e.clientY;
+      if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) down.moved = true;
+      if (!down.moved || this.lockSpin) return;
+      if (this.uz.zt > 1.05) this.panBy(dx, dy);
+      else { this.spin += dx * 0.008; this.spinV = dx * 0.008; }
     });
     const up = e => {
+      if (!pts.has(e.pointerId)) return;
+      pts.delete(e.pointerId);
+      if (pinch) { if (pts.size < 2) { pinch = null; idle = true; } return; } // のこった ゆびでは うごかさない
       if (!down) return;
       const d = down; down = null;
-      if (!d.moved && performance.now() - d.t < 600) this.tap(e.clientX, e.clientY);
+      if (d.moved || performance.now() - d.t > 600) return;
+      const now = performance.now();
+      // 1かいめを はなしてから 2かいめを おすまでの みじかさで みる
+      if (lastTap && d.t - lastTap.t < 350 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 40 && this.canZoom()) {
+        lastTap = null;
+        if (this.uz.zt > 1.3) this.resetZoom(); else this.zoomAbout(e.clientX, e.clientY, 2.4);
+        return;
+      }
+      lastTap = { t: now, x: e.clientX, y: e.clientY };
+      this.tap(e.clientX, e.clientY);
     };
     cv.addEventListener('pointerup', up);
-    cv.addEventListener('pointercancel', () => (down = null));
+    cv.addEventListener('pointercancel', up);
+    cv.addEventListener('wheel', e => { e.preventDefault(); if (this.canZoom()) this.zoomAbout(e.clientX, e.clientY, this.uz.zt * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+    // Safari の ページ ズームを とめる
+    document.addEventListener('gesturestart', e => e.preventDefault());
   }
+
+  /* ---------- ズーム ---------- */
+  canZoom() { return this.mode !== 'dress' && !this.gift && !this.spelling && !this.zoomLocked; }
+  groundAt(x, y) {
+    const r = this.canvas.getBoundingClientRect();
+    const v = new T.Vector2(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+    const ray = new T.Raycaster(); ray.setFromCamera(v, this.camera);
+    const hit = new T.Vector3();
+    return ray.ray.intersectPlane(new T.Plane(new T.Vector3(0, 1, 0), 0), hit) ? hit : null;
+  }
+  zoomAbout(x, y, z) {
+    const u = this.uz, zOld = u.zt;
+    z = Math.max(1, Math.min(3.2, z));
+    const g = this.groundAt(x, y);
+    if (g && z > zOld) { const k = 1 - zOld / z; u.ptx += (g.x - u.ptx) * k; u.ptz += (g.z - u.ptz) * k; }
+    u.zt = z;
+    this.clampPan();
+  }
+  panBy(dx, dy) {
+    const u = this.uz;
+    const w = this.canvas.clientWidth || innerWidth;
+    const k = (2 * this.camera.position.distanceTo(this.camLook || new T.Vector3()) * Math.tan((this.camera.fov * Math.PI) / 360) * this.camera.aspect) / w;
+    u.ptx -= dx * k; u.ptz -= dy * k * 1.6;
+    this.clampPan();
+  }
+  clampPan() {
+    const u = this.uz, lim = this.R * 0.85 * (1 - 1 / u.zt), d = Math.hypot(u.ptx, u.ptz);
+    if (d > lim) { u.ptx *= lim / (d || 1); u.ptz *= lim / (d || 1); }
+    const on = u.zt > 1.05;
+    if (on !== this.zoomOn) { this.zoomOn = on; this.onZoom && this.onZoom(on); }
+  }
+  resetZoom() { this.uz.zt = 1; this.clampPan(); }
 
   tap(x, y) {
     // プレゼントの ときは どこを タッチしても あけられる
@@ -742,12 +812,14 @@ export class Island {
     this.mode = mode;
     // きせかえの ときは ぷにゅ だけに する（まわりの ものが カメラの まえに こないように）
     for (const g of this.objs.values()) g.visible = mode !== 'dress';
+    if (mode === 'dress') this.resetZoom();
     this.skyStars.visible = mode !== 'dress';
     if (mode === 'dress') { this.pu.busy = true; this.faceCam = true; }
     else if (mode === 'island') { this.pu.busy = false; this.faceCam = false; }
   }
   // k の ばしょが てまえに くるように まわす
   async lookAt(k, zoom = 0.75) {
+    this.resetZoom();
     // そらの もの・じゅもんは まわさない
     let target = SPOT[k] && !SKY.includes(k) ? -(SPOT[k][0] * Math.PI) / 180 : this.spin;
     const cur = this.spin;
@@ -782,7 +854,11 @@ export class Island {
     }
     const f = this.cam.focus;
     dist *= 1 - f * 0.45; height *= 1 - f * 0.35;
-    const pos = new T.Vector3(x, height, dist), look = new T.Vector3(0, lookY + f * 0.6, f * (R * 0.55));
+    // ゆびの ズーム：ちかづいて、みている ばしょを ずらす
+    const u = this.uz, sm = Math.min(1, dt * 10);
+    u.z += (u.zt - u.z) * sm; u.px += (u.ptx - u.px) * sm; u.pz += (u.ptz - u.pz) * sm;
+    dist /= u.z; height /= u.z; lookY = lookY / u.z + 0.35 * (1 - 1 / u.z);
+    const pos = new T.Vector3(x + u.px, height, dist + u.pz), look = new T.Vector3(u.px, lookY + f * 0.6, f * (R * 0.55) + u.pz);
     if (!this.camLook) { this.camLook = look.clone(); this.camera.position.copy(pos); }
     this.camera.position.lerp(pos, Math.min(1, dt * 3));
     this.camLook.lerp(look, Math.min(1, dt * 3));
@@ -837,8 +913,11 @@ export class Island {
   }
 
   animateObjs(dt, t) {
+    // ズームしても なふだが 大きく なりすぎないように
+    const ts = 1 / Math.pow(this.uz.z, 0.7);
     for (const [k, g] of this.objs) {
       const u = g.userData;
+      if (u.tag) u.tag.scale.setScalar((u.sky ? 0.9 : 0.62) * ts * (1 + (u.tag.userData.pulse || 0)));
       if (u.flame) u.flame.forEach((f, i) => { f.scale.y = (i ? 0.32 : 0.5) * (1 + Math.sin(t * 12 + i * 2) * 0.15); });
       if (u.shimmer) u.shimmer.material.emissiveIntensity = 0.15 + Math.sin(t * 2) * 0.08;
       if (u.bob) u.bob.forEach(b => (b.position.y = b.userData.base + Math.sin(t * 1.6 + b.userData.ph) * 0.06));
@@ -923,7 +1002,7 @@ export class Island {
   wiggle(g) {
     const s0 = g.userData.size || 1;
     this.tween(0.5, k => { g.scale.setScalar(s0 * (1 + Math.sin(k * Math.PI * 3) * 0.12 * (1 - k))); });
-    if (g.userData.tag) { const tg = g.userData.tag; this.tween(0.6, k => tg.scale.setScalar((g.userData.sky ? 0.9 : 0.62) * (1 + Math.sin(k * Math.PI) * 0.8))); }
+    if (g.userData.tag) { const tg = g.userData.tag; this.tween(0.6, k => (tg.userData.pulse = Math.sin(k * Math.PI) * 0.8)); }
   }
   burst(obj, emojis = ['✨', '💖', '⭐', '🌸'], n = 14, speed = 3) {
     const p = new T.Vector3(); obj.getWorldPosition ? obj.getWorldPosition(p) : p.copy(obj);
@@ -994,6 +1073,7 @@ export class Island {
   /* ---------- じゅもん ---------- */
   async spell(k) {
     if (this.spelling) return;
+    this.resetZoom();
     this.spelling = true;
     const P = this.punyu, u = P.userData, s = this.pu;
     s.busy = true;
@@ -1022,6 +1102,7 @@ export class Island {
 
   /* ---------- プレゼント ---------- */
   showGift() {
+    this.resetZoom();
     const g = new T.Group();
     part(g, G.box, 0xff9fd0, [0, 0.45, 0], [1.1, 0.9, 1.1]);
     part(g, G.box, 0xffffff, [0, 0.45, 0], [0.2, 0.92, 1.12]);
