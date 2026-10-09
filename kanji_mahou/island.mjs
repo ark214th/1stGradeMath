@@ -641,9 +641,11 @@ export class Island {
     const ray = new T.Raycaster(); ray.setFromCamera(v, this.camera);
     const targets = [this.punyu, ...this.objs.values()];
     if (this.gift) targets.unshift(this.gift);
+    if (this.tomorrow) targets.unshift(this.tomorrow);
     const hits = ray.intersectObjects(targets, true);
     for (const h of hits) {
       let o = h.object;
+      if (h.object === this.tomorrow) { this.onTapTomorrow && this.onTapTomorrow(); return; }
       while (o && !o.userData.kanji && o !== this.punyu && o !== this.gift) o = o.parent;
       if (!o) continue;
       if (o === this.gift) { this.onTapGift && this.onTapGift(); return; }
@@ -902,6 +904,7 @@ export class Island {
     this.updatePunyu(dt, t);
     this.animateObjs(dt, t);
     for (const s of this.skyStars.children) s.rotation.z = Math.sin(t + s.userData.ph) * 0.4;
+    if (this.tomorrow) { this.tomorrow.position.set(this.R * 0.25, 3.4 + this.R * 0.22 + Math.sin(t * 1.3) * 0.15, -this.R * 0.35); this.tomorrow.visible = this.mode !== 'dress'; }
     for (const f of [...this.fx.children]) {
       const u = f.userData; u.life -= dt;
       if (u.v) { f.position.addScaledVector(u.v, dt); u.v.y -= dt * 3; }
@@ -1068,6 +1071,90 @@ export class Island {
     this.burst(target, ['⭐', '✨'], 12, 3);
     this.wiggle(g);
     await this.wait(0.5);
+  }
+
+  // さいごに まとめて：字が いっせいに 島へ とんで、ぽんっと あらわれる（1びょう ちょっと）
+  async arrive(evs) {
+    this.resetZoom();
+    const f0 = this.cam.focus;
+    await this.tween(0.25, k => (this.cam.focus = lerp(f0, 0, k)));
+    const items = [];
+    for (const ev of evs) {
+      const k = ev.k;
+      this.levels[k] = ev.lv;
+      if (window.KanjiRewards.roleOf(k) === 'spell') {
+        const p = new T.Vector3(); this.punyu.getWorldPosition(p);
+        items.push({ k, spell: true, target: p.add(new T.Vector3(0, 0.5, 0)) });
+        continue;
+      }
+      let g = this.objs.get(k);
+      const fresh = !g;
+      if (fresh) { g = this.addObj(k); this.placeAll(); if (g.userData.flowers) g.userData.flowers.forEach(f => (f.visible = false)); }
+      this.applyLevel(k, g);
+      const target = new T.Vector3(); g.getWorldPosition(target);
+      if (g.userData.flowerTag) target.set(0, 0.5, this.R * 0.3);
+      if (fresh) g.visible = false;
+      items.push({ k, g, fresh, target: target.add(new T.Vector3(0, 0.6, 0)) });
+    }
+    await Promise.all(items.map((it, i) => this.wait(i * 0.12).then(() => this.flyGlyphFast(it.k, it.target)).then(() => {
+      if (it.spell) { this.poke(); this.burst(this.punyu, ['✨', '💫', '💖'], 14, 3); return; }
+      const g = it.g, s0 = g.userData.size || 1;
+      this.burst(it.target, ['✨', '💖', '⭐', '🌸', '💫'], 18, 4);
+      if (it.fresh) {
+        g.visible = true;
+        if (g.userData.flowers) g.userData.flowers.forEach(f => (f.visible = true));
+        g.userData.growing = true;
+        return this.tween(0.7, kk => g.scale.setScalar(Math.max(0.001, s0 * kk)), ease.elastic).then(() => (g.userData.growing = false));
+      }
+      this.wiggle(g);
+    })));
+    this.updateBoard();
+  }
+  async flyGlyphFast(k, toWorld) {
+    const g = glyphSprite(k);
+    const start = this.camera.position.clone().add(this.camera.getWorldDirection(new T.Vector3()).multiplyScalar(6));
+    g.position.copy(start); g.scale.setScalar(0.1);
+    this.scene.add(g);
+    await this.tween(0.22, k2 => g.scale.setScalar(lerp(0.1, 1.8, k2)), ease.back);
+    const mid = start.clone().lerp(toWorld, 0.5).add(new T.Vector3(0, 1.5, 0));
+    await this.tween(0.5, k2 => {
+      const a = start.clone().lerp(mid, k2), b = mid.clone().lerp(toWorld, k2);
+      g.position.copy(a.lerp(b, k2)); g.scale.setScalar(lerp(1.8, 0.5, k2));
+    }, ease.inout);
+    this.scene.remove(g);
+  }
+  // はなび（おいわい）
+  fireworks(n = 1) {
+    const cols = [['💖', '✨'], ['⭐', '🌟'], ['🌸', '💫'], ['🎀', '✨']];
+    for (let i = 0; i < n * 3; i++) {
+      setTimeout(() => {
+        const p = new T.Vector3(rand(-this.R * 0.7, this.R * 0.7), rand(3, 6), rand(-this.R * 0.6, 0));
+        this.burst(p, cols[i % cols.length], 16, 4.5);
+      }, i * 220);
+    }
+  }
+  // あしたの 字の かげ（そらに ふわふわ）
+  setTomorrow(k) {
+    if (this.tomorrow && this.tomorrow.userData.k === k) return;
+    if (this.tomorrow) { this.scene.remove(this.tomorrow); this.tomorrow = null; }
+    if (!k) return;
+    const D = window.KANJI_DATA.DATA[k];
+    const e = D.e.startsWith('#') ? '🎈' : [...D.e][0];
+    const tex = canvasTex('sil' + k, 256, 300, (g) => {
+      g.font = `190px ${EMOJI_FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(e, 128, 118);
+      g.globalCompositeOperation = 'source-in';
+      g.fillStyle = '#b39ddb'; g.fillRect(0, 0, 256, 256);
+      g.globalCompositeOperation = 'source-over';
+      g.fillStyle = 'rgba(255,255,255,.92)'; g.beginPath(); g.roundRect ? g.roundRect(58, 236, 140, 56, 28) : g.rect(58, 236, 140, 56); g.fill();
+      g.fillStyle = '#8a63d9'; g.font = '900 34px "Hiragino Maru Gothic ProN",sans-serif'; g.fillText('あした', 128, 265);
+      g.font = '900 80px sans-serif'; g.fillStyle = '#fff'; g.fillText('？', 128, 118);
+    });
+    const sp = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, opacity: 0.85, depthWrite: false }));
+    sp.scale.set(1.9, 2.2, 1);
+    sp.userData.k = k;
+    this.tomorrow = sp;
+    this.scene.add(sp);
   }
 
   /* ---------- じゅもん ---------- */

@@ -50,7 +50,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 .uni .face{width:64px;height:58px;flex:none;border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 30% 30%,#fff,#fff4f7 60%,#ffe3ec);position:relative;animation:floaty 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 6px rgba(150,60,130,.2))}
 .uni .face:before{content:"";position:absolute;left:17px;top:22px;width:8px;height:11px;border-radius:50%;background:#3a2a3a;box-shadow:22px 0 0 #3a2a3a}
 .uni .face:after{content:"";position:absolute;left:8px;top:34px;width:12px;height:7px;border-radius:50%;background:#ff9fb8;box-shadow:36px 0 0 #ff9fb8}
-.say{background:#fff;border-radius:24px;padding:10px 18px;font-size:22px;font-weight:900;box-shadow:0 5px 0 rgba(200,90,150,.12),0 10px 20px rgba(160,60,120,.12);position:relative;margin-bottom:22px;line-height:1.4;text-wrap:balance;max-width:min(400px,calc(var(--vw) * 0.4))}
+.say{background:#fff;border-radius:24px;padding:10px 18px;font-size:22px;font-weight:900;box-shadow:0 5px 0 rgba(200,90,150,.12),0 10px 20px rgba(160,60,120,.12);position:relative;margin-bottom:22px;line-height:1.4;text-wrap:balance;white-space:pre-line;max-width:min(400px,calc(var(--vw) * 0.4))}
 .say:after{content:"";position:absolute;left:-12px;bottom:14px;border:10px solid transparent;border-right-color:#fff;border-left:0}
 
 /* タイトル */
@@ -211,6 +211,79 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 /* iPad よこ（1024×768）を もとに、画面ぜんたいを 拡大・縮小する */
 :root{--s:1;--vw:100vw;--vh:100vh}
 .screen,#modal{inset:auto;left:0;top:0;width:var(--vw);height:var(--vh);transform:scale(var(--s));transform-origin:0 0}
+
+/* しまの ラベルつき ボタン */
+.lbtn{background:rgba(255,255,255,.94);border-radius:22px;width:84px;height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:32px;box-shadow:0 5px 0 #f0bcd8,0 10px 18px rgba(200,60,130,.12);position:relative;line-height:1}
+.lbtn small{font-size:14px;font-weight:900;margin-top:5px;color:var(--ink)}
+.lbtn:active{transform:translateY(3px);box-shadow:0 2px 0 #f0bcd8}
+.lbtn .dot{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:#ff5a9e;border:3px solid #fff;animation:breath 1s infinite;display:none}
+.lbtn .dot.on{display:block}
+.chip{font-size:22px;pointer-events:none}
+.chip b{color:#ffb000;letter-spacing:2px;font-size:26px}
+.chip.done{background:#e8fff4;color:#2e8a66}
+.chip small{font-size:15px;display:block;text-align:center;color:#5fae8e}
+.btn.sky{background:linear-gradient(180deg,#9fd8ff,#5fb2f5);box-shadow:0 6px 0 #3f8fd6,0 12px 24px rgba(60,140,220,.25);text-shadow:0 2px 0 rgba(30,100,180,.3)}
+.btn.sky:active{box-shadow:0 2px 0 #3f8fd6}
+/* すごろく */
+.road{flex:1;display:flex;align-items:center;justify-content:center;gap:0;min-width:0}
+.road .rl{width:22px;height:5px;border-radius:3px;background:rgba(255,255,255,.75);flex:none}
+.rk{display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.7);border-radius:18px;padding:4px 10px;min-width:70px;height:62px;box-shadow:inset 0 0 0 3px rgba(255,255,255,.9);flex:none;transition:transform .2s}
+.rk b{font-size:28px;line-height:1;color:#c9a0b8}
+.rk span{font-size:15px;letter-spacing:1px;line-height:1;margin-top:3px}
+.rk span i{font-style:normal;color:#e9d6e2}
+.rk span i.on{color:#ffb000;text-shadow:0 1px 0 #d98a00}
+.rk.now{background:#fff;box-shadow:0 0 0 4px var(--pink),0 6px 14px rgba(200,60,130,.25);transform:scale(1.12)}
+.rk.now b{color:var(--deep)}
+.rk.done{background:linear-gradient(160deg,#fff,#ffe1f0);box-shadow:inset 0 0 0 3px #ffc2e2}
+.rk.done b{color:var(--deep)}
+.rk.q b,.rk.g b{font-size:26px;color:inherit}
+.rk.g{min-width:58px}
+.rk.bump{animation:bump .45s cubic-bezier(.3,1.8,.5,1)}
+@keyframes bump{40%{transform:scale(1.35)}}
+.pill.mode{font-size:16px}
+.flyer{position:fixed;z-index:40;pointer-events:none;display:flex;align-items:center;justify-content:center;line-height:1;filter:drop-shadow(0 4px 6px rgba(160,60,140,.3))}
+.flyer.card{background:#fff;border-radius:24px;color:var(--deep);font-weight:900;box-shadow:0 0 0 5px #ffc2e2}
+/* れんしゅう がめん */
+.panel{height:var(--bs);justify-content:space-between}
+.nextArea{min-height:84px;display:flex;align-items:flex-end;justify-content:center;width:100%}
+.btn.go{font-size:32px;padding:18px 46px}
+.boardIcon{position:absolute;left:-16px;top:-16px;width:76px;height:76px;border-radius:50%;background:#fff;box-shadow:0 5px 0 #f0bcd8,0 8px 16px rgba(200,60,130,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;color:var(--deep);z-index:4;line-height:1}
+.boardIcon small{font-size:11px;font-weight:900;margin-top:2px}
+.boardIcon[hidden]{display:none}
+.boardIcon:active{transform:translateY(3px)}
+.hana{position:absolute;inset:6%;width:88%;height:88%;pointer-events:none;opacity:0;z-index:3}
+.hana path{fill:none;stroke:#ff4f8f;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.hana .sp{stroke-width:3.2}.hana .pt{stroke-width:3}
+.hana.on{opacity:.85}
+.hana.on .sp{animation:draw .55s ease-out forwards}
+.hana.on .pt{animation:draw .45s .45s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.dekita{position:absolute;left:50%;top:50%;translate:-50% -50%;font-size:calc(var(--bs) * .2);font-weight:900;color:#fff;-webkit-text-stroke:3px #ff6fb3;text-shadow:0 6px 0 #ff9fd0,0 10px 24px rgba(200,60,130,.4);white-space:nowrap;pointer-events:none;opacity:0;z-index:5}
+.dekita.on{animation:dekita 1.6s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes dekita{0%{opacity:0;scale:.2;rotate:-12deg}25%{opacity:1;scale:1.15;rotate:4deg}40%{scale:1;rotate:0}85%{opacity:1}100%{opacity:0;scale:1.05}}
+/* おさらい（みずいろ） */
+#lesson.review:before,#quiz.review:before{background:radial-gradient(circle at 15% 12%,rgba(255,255,255,.9) 0 2px,transparent 3px),linear-gradient(180deg,#cfe6ff 0%,#dcecff 45%,#dff9f2 100%)}
+#lesson.review .rk.now{box-shadow:0 0 0 4px #5fb2f5,0 6px 14px rgba(60,140,220,.25)}
+#lesson.review .board{box-shadow:0 8px 0 #bcdcf5,0 18px 36px rgba(60,120,200,.18)}
+#qcount{font-size:18px}
+/* おいわい */
+#celebrate{position:fixed;inset:0;z-index:35;display:none;align-items:center;justify-content:center;overflow:hidden}
+#celebrate.on{display:flex}
+.crays{position:absolute;left:50%;top:50%;width:200vmax;height:200vmax;margin:-100vmax 0 0 -100vmax;background:repeating-conic-gradient(rgba(255,255,255,.55) 0 7deg,rgba(255,220,240,.0) 7deg 18deg);animation:rays 2.6s linear,fadein .3s;border-radius:50%}
+#celebrate.big .crays{background:repeating-conic-gradient(rgba(255,255,255,.6) 0 6deg,rgba(255,236,150,.25) 6deg 12deg,rgba(255,200,235,.0) 12deg 18deg)}
+@keyframes rays{to{rotate:60deg}}
+@keyframes fadein{from{opacity:0}}
+.cconf{position:absolute;left:50%;top:50%}
+.cconf i{position:absolute;width:14px;height:20px;border-radius:3px;animation:conf 1.8s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes conf{0%{transform:translate(0,0) rotate(0) scale(.4);opacity:1}70%{opacity:1}100%{transform:translate(var(--x),calc(var(--y) + 30vh)) rotate(var(--r)) scale(1);opacity:0}}
+.cbox{position:relative;text-align:center;animation:cbox .55s cubic-bezier(.3,1.7,.5,1)}
+@keyframes cbox{0%{scale:.1;rotate:-10deg;opacity:0}100%{scale:1;rotate:0;opacity:1}}
+.cbox h2{margin:0;font-size:clamp(44px,8vmin,84px);line-height:1.15;color:#fff;-webkit-text-stroke:3px #ff6fb3;text-shadow:0 5px 0 #ff9fd0,0 10px 0 #c77dff,0 18px 30px rgba(160,60,140,.35);letter-spacing:.04em}
+.cstars{font-size:clamp(40px,7vmin,70px);animation:spinin .8s cubic-bezier(.3,1.6,.5,1)}
+@keyframes spinin{0%{scale:0;rotate:-180deg}100%{scale:1;rotate:0}}
+.cks{display:flex;gap:16px;justify-content:center;margin-top:16px}
+.cks b{width:clamp(70px,12vmin,110px);height:clamp(70px,12vmin,110px);border-radius:26px;background:#fff;color:var(--deep);font-size:clamp(46px,8vmin,74px);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px #ffd84a,0 8px 0 #f3c3dd;animation:pop .5s cubic-bezier(.3,1.8,.5,1) both}
+.cgot{display:inline-block;margin-top:14px;background:#fff;border-radius:999px;padding:8px 20px;font-size:24px;font-weight:900;box-shadow:0 5px 0 #f3c3dd;animation:pop .5s .6s both}
 </style>
 </head>
 <body>
@@ -233,14 +306,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
   <div class="topbar">
     <div class="pill count2 pe" id="countPill">🌸 かんじ <b id="hudCount">0</b> / 80</div>
     <div class="grow"></div>
-    <button class="ibtn" id="calBtn" aria-label="カレンダー">📅</button>
-    <button class="ibtn" id="dressBtn" aria-label="きせかえ">👗<i class="dot" id="dressDot"></i></button>
-    <button class="ibtn" id="spellBtn" aria-label="じゅもん">🪄</button>
-    <button class="ibtn" id="zukanBtn" aria-label="ずかん">📖</button>
-    <button class="ibtn" id="setBtn" aria-label="せってい">⚙️</button>
+    <button class="lbtn" id="dressBtn">👗<small>きせかえ</small><i class="dot" id="dressDot"></i></button>
+    <button class="lbtn" id="spellBtn">🪄<small>じゅもん</small></button>
+    <button class="lbtn" id="zukanBtn">📖<small>ずかん</small></button>
   </div>
   <div class="hudBottom">
     <div class="cap pe" id="cap" hidden></div>
+    <div class="pill chip" id="todayChip"></div>
     <button class="btn" id="todayBtn">✨ きょうの まほう</button>
     <button class="btn" id="bottomBtn" hidden>つぎへ ▶</button>
   </div>
@@ -261,9 +333,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 <section class="screen solid" id="lesson">
   <div class="topbar">
     <button class="ibtn" id="lessonHome" aria-label="もどる">🏝️</button>
-    <div class="steps" id="steps"></div>
-    <div class="grow"></div>
-    <div class="pill" id="lessonLabel"></div>
+    <div class="road" id="road"></div>
+    <div class="pill mode" id="lessonMode"></div>
   </div>
   <div class="stage">
     <div class="board" id="board">
@@ -271,15 +342,14 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
       <div class="pic" id="pic"></div>
       <div class="flash" id="flash"></div>
       <button class="wand" id="wand" aria-label="まほう">🪄</button>
+      <button class="boardIcon" id="replayBtn" hidden>▶<small>かきじゅん</small></button>
+      <svg class="hana" id="hana" viewBox="0 0 100 100"><path class="sp" pathLength="1" d="M51.4,46.3 L51.9,46.3 L52.3,46.3 L52.7,46.4 L53.1,46.5 L53.5,46.7 L54.0,47.0 L54.4,47.2 L54.7,47.6 L55.1,47.9 L55.4,48.4 L55.7,48.8 L56.0,49.3 L56.2,49.9 L56.3,50.4 L56.4,51.0 L56.5,51.7 L56.4,52.3 L56.4,52.9 L56.2,53.6 L56.0,54.2 L55.7,54.9 L55.4,55.5 L54.9,56.1 L54.5,56.6 L53.9,57.2 L53.3,57.6 L52.7,58.1 L52.0,58.4 L51.2,58.7 L50.4,59.0 L49.6,59.2 L48.8,59.3 L47.9,59.3 L47.0,59.2 L46.1,59.0 L45.2,58.8 L44.4,58.5 L43.5,58.0 L42.7,57.5 L41.9,57.0 L41.2,56.3 L40.5,55.6 L39.9,54.7 L39.3,53.9 L38.9,52.9 L38.5,51.9 L38.2,50.9 L38.0,49.8 L37.9,48.7 L37.9,47.6 L38.0,46.5 L38.2,45.3 L38.5,44.2 L39.0,43.1 L39.5,42.0 L40.2,41.0 L40.9,40.0 L41.7,39.1 L42.7,38.3 L43.7,37.5 L44.8,36.8 L46.0,36.2 L47.2,35.8 L48.5,35.4 L49.8,35.2 L51.2,35.0 L52.5,35.0 L53.9,35.2 L55.3,35.4 L56.7,35.8 L58.0,36.3 L59.3,37.0 L60.6,37.8 L61.8,38.7 L62.9,39.7 L63.9,40.8 L64.8,42.0 L65.6,43.3 L66.3,44.7 L66.9,46.2 L67.3,47.7 L67.7,49.3 L67.8,50.9 L67.8,52.5 L67.7,54.2 L67.4,55.8 L66.9,57.4 L66.4,59.0 L65.6,60.5 L64.7,62.0 L63.7,63.4 L62.5,64.7 L61.2,65.9 L59.8,67.0 L58.3,68.0 L56.7,68.8 L55.0,69.5 L53.2,70.1 L51.4,70.5 L49.6,70.7 L47.7,70.7 L45.8,70.6 L43.9,70.3 L42.0,69.8 L40.2,69.1 L38.4,68.3 L36.7,67.3 L35.0,66.1 L33.5,64.8 L32.1,63.4 L30.8,61.8 L29.7,60.1 L28.7,58.2 L27.9,56.3 L27.2,54.3 L26.8,52.3 L26.5,50.1 L26.4,48.0 L26.5,45.8 L26.8,43.7 L27.4,41.6 L28.1,39.5 L29.0,37.4 L30.1,35.5 L31.3,33.6 L32.8,31.9 L34.4,30.3 L36.1,28.8 L38.0,27.5 L40.1,26.3 L42.2,25.4 L44.4,24.6 L46.7,24.0 L49.1,23.7 L51.5,23.5 L53.9,23.6 L56.3,23.9 L58.7,24.4 L61.1,25.2 L63.4,26.2 L65.6,27.3 L67.7,28.7 L69.6,30.3 L71.5,32.0 L73.1,33.9 L74.6,36.0 L76.0,38.2 L77.1,40.6 L78.0,43.0 L78.7,45.6 L79.1,48.2 L79.3,50.8 L79.3,53.5 L79.0,56.2 L78.5,58.8 L77.7,61.5 L76.7,64.0 L75.5,66.5 L74.0,68.8 L72.3,71.0 L70.5,73.1 L68.4,75.0 L66.1,76.7 L63.7,78.2 L61.2,79.5 L58.5,80.5 L55.7,81.3 L52.9,81.9 L50.0,82.2 L47.0,82.2 L44.1,82.0 L41.2,81.5 L38.3,80.7 L35.5,79.6 L32.8,78.4 L30.2,76.8 L27.7,75.0 L25.4,73.0 L23.3,70.8 L21.4,68.4"/><path class="pt" pathLength="1" d="M88.0,50.0 A9,9 0 0 1 79.1,74.4 A9,9 0 0 1 56.6,87.4 A9,9 0 0 1 31.0,82.9 A9,9 0 0 1 14.3,63.0 A9,9 0 0 1 14.3,37.0 A9,9 0 0 1 31.0,17.1 A9,9 0 0 1 56.6,12.6 A9,9 0 0 1 79.1,25.6 A9,9 0 0 1 88.0,50.0"/></svg>
+      <div class="dekita" id="dekita">できた！</div>
     </div>
     <div class="panel">
       <div class="uni"><div class="face"></div><div class="say" id="lessonSay"></div></div>
       <div class="yomi" id="yomi"></div>
-      <div class="btnrow">
-        <button class="btn white small" id="replayBtn" hidden>▶ かきじゅん</button>
-        <button class="btn" id="nextBtn" hidden>つぎへ ▶</button>
-        <button class="btn lav" id="againBtn" hidden>もう いっかい</button>
-      </div>
+      <div class="nextArea"><button class="btn go" id="nextBtn" hidden>つぎへ ▶</button></div>
     </div>
   </div>
 </section>
@@ -288,11 +358,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 <section class="screen solid" id="quiz">
   <div class="topbar">
     <button class="ibtn" id="quizHome" aria-label="もどる">🏝️</button>
-    <div class="steps" id="qsteps"></div>
-    <div class="grow"></div>
-    <div class="pill">よみ クイズ</div>
+    <div class="road" id="qroad"></div>
+    <div class="pill mode" id="quizMode"></div>
   </div>
   <div class="stage">
+    <div class="pill" id="qcount"></div>
     <div class="qhead" id="qhead"></div>
     <div class="qq" id="qq"></div>
     <div class="choices" id="choices"></div>
@@ -305,11 +375,14 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
     <button class="ibtn" id="zukanHome" aria-label="もどる">🏝️</button>
     <div class="logo">📖 かんじ ずかん</div>
     <div class="grow"></div>
+    <button class="btn white small" id="calBtn">📅 カレンダー</button>
     <div class="pill" id="zukanCount"></div>
+    <button class="ibtn" id="setBtn" aria-label="せってい">⚙️</button>
   </div>
   <div class="list" id="zlist"></div>
 </section>
 
+<div id="celebrate"></div>
 <div id="modal"><div class="mbox" id="mbox"></div></div>
 <div id="fx"></div>
 

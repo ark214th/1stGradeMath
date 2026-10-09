@@ -162,6 +162,8 @@ const Board = {
     this.models = this.paths.map(d => el('path', { d }, this.layers.model));
   },
   showModel(on) { this.layers.model.style.opacity = on ? 1 : 0; },
+  // なぞる かいすうが ふえるほど おてほんを うすく
+  setGuide(level) { this.layers.model.style.opacity = [1, 0.5, 0.26][level] ?? 1; },
   clearDone() { this.layers.done.innerHTML = ''; this.done = 0; },
   clearAnim() { this.layers.anim.innerHTML = ''; },
   addDone(i) { el('path', { d: this.paths[i] }, this.layers.done); },
@@ -202,24 +204,26 @@ const Board = {
   },
   clearHint() { this.layers.hint.innerHTML = ''; },
   // つぎの画の「ここから」
-  startDot(i, strong) {
+  startDot(i, strong, num = true) {
     this.clearHint();
     const [x, y] = Core.flatten(this.paths[i])[0];
     const g = el('g', {}, this.layers.hint);
     const c = el('circle', { cx: x, cy: y, r: strong ? 6 : 4.6, fill: '#4fd1a8', opacity: .9 }, g);
     c.innerHTML = `<animate attributeName="r" values="${strong ? '5;8;5' : '4;6;4'}" dur="1.1s" repeatCount="indefinite"/>`;
-    this.number(i, '#ff6fb3');
+    if (num || strong) this.number(i, '#ff6fb3');
   },
 };
 
 /* ================= なぞり ================= */
 const Trace = {
   active: false, idx: 0, miss: 0, pts: null, line: null, onDone: null,
-  start(onDone) {
-    this.active = true; this.idx = 0; this.miss = 0; this.onDone = onDone;
+  // hint: { dot: みどりの まるを だす, num: 書き順の ばんごうを だす }
+  start(onDone, hint = { dot: true, num: true }) {
+    this.active = true; this.idx = 0; this.miss = 0; this.onDone = onDone; this.hint = hint;
     Board.clearDone(); Board.clearAnim(); Board.layers.user.innerHTML = '';
-    Board.startDot(0);
+    this.showHint();
   },
+  showHint() { if (this.hint.dot) Board.startDot(this.idx, false, this.hint.num); else Board.clearHint(); },
   stop() { this.active = false; this.pts = null; },
   toLocal(e) {
     const r = $('#board').getBoundingClientRect();
@@ -289,7 +293,7 @@ const Trace = {
     if (this.idx >= Board.paths.length) {
       this.active = false; Board.clearHint();
       this.onDone && this.onDone();
-    } else Board.startDot(this.idx);
+    } else this.showHint();
   },
 };
 const boardEl = $('#board');
@@ -304,25 +308,61 @@ const Say = {
   lesson(t, voice) { $('#lessonSay').textContent = t; if (voice) Voice.say(t); },
 };
 
-/* ================= レッスン ================= */
-let L = null; // { list, i, mode: 'today'|'one', token }
-function stepsHTML(n, now, doneUpTo) {
-  return Array.from({ length: n }, (_, i) => `<i class="${i < doneUpTo ? 'on' : i === now ? 'now' : ''}"></i>`).join('');
-}
+/* ================= レッスン =================
+ * きょうの まほう：3もじ × 3かい なぞる → ことば クイズ → 島で ごほうび
+ * おさらい：おぼえた 字を 1かいずつ（あたらしい 字は でない）
+ * 島へは さいごに 1かい だけ もどる
+ */
+let L = null; // { list, i, mode: 'today'|'review'|'one', rep, events, phase }
 function cancelToken() { if (L && L.token) L.token.cancel = true; L.token = { cancel: false }; return L.token; }
+const repsOf = k => (L.mode === 'today' ? 3 : L.mode === 'review' ? 1 : S.kanji[k] && S.kanji[k].traced && !L.newOne ? 1 : 3);
 
 function startLesson(list, mode) {
   if (typeof dropBottomBtn === 'function') dropBottomBtn();
-  L = { list, i: 0, mode, token: { cancel: false }, ev: null };
+  L = { list, i: 0, mode, rep: 0, token: { cancel: false }, events: [], phase: 'kanji', shown: false, newOne: mode === 'one' && !(S.kanji[list[0]] && S.kanji[list[0]].traced) };
+  for (const id of ['#lesson', '#quiz']) $(id).classList.toggle('review', mode === 'review');
+  const label = mode === 'today' ? '✨ きょうの まほう' : mode === 'review' ? '📘 おさらい' : '✏️ れんしゅう';
+  $('#lessonMode').textContent = label; $('#quizMode').textContent = label;
   show('lesson');
   meet();
 }
 
-function setButtons({ replay = false, next = null, again = null } = {}) {
-  const rb = $('#replayBtn'), nb = $('#nextBtn'), ab = $('#againBtn');
+// うえの すごろく：もじごとの ほし ＋ クイズ ＋ ごほうび
+function renderRoad() {
+  const items = L.list.map((k, i) => {
+    const reps = repsOf(k), got = i < L.i ? reps : i === L.i && L.phase === 'kanji' ? L.rep : 0;
+    const shown = i < L.i || (i === L.i && L.shown);
+    const st = i < L.i ? 'done' : i === L.i && L.phase === 'kanji' ? 'now' : '';
+    return `<div class="rk ${st}" data-i="${i}"><b>${shown ? k : '？'}</b><span>${'<i class="on">★</i>'.repeat(got)}${'<i>★</i>'.repeat(reps - got)}</span></div>`;
+  });
+  if (L.mode === 'today') items.push(`<div class="rk q ${L.phase === 'quiz' ? 'now' : ''}"><b>💬</b><span>クイズ</span></div>`);
+  items.push(`<div class="rk g"><b>${L.mode === 'today' ? '🎁' : '🏝️'}</b></div>`);
+  const html = items.join('<i class="rl"></i>');
+  $('#road').innerHTML = html; $('#qroad').innerHTML = html;
+}
+const roadSlot = i => document.querySelector(`#${L.phase === 'quiz' ? 'q' : ''}road .rk[data-i="${i}"]`);
+
+// ものを とばす（ほし・字の カード）
+function flyTo(text, from, toEl, { size = 54, cls = 'flyer', ms = 650 } = {}) {
+  if (!toEl) return Promise.resolve();
+  const r = toEl.getBoundingClientRect();
+  const d = document.createElement('div');
+  d.className = cls; d.textContent = text;
+  d.style.left = from[0] - size / 2 + 'px'; d.style.top = from[1] - size / 2 + 'px'; d.style.fontSize = size * 0.8 + 'px'; d.style.width = d.style.height = size + 'px';
+  $('#fx').appendChild(d);
+  const dx = r.left + r.width / 2 - from[0], dy = r.top + r.height / 2 - from[1];
+  const a = d.animate([
+    { transform: 'translate(0,0) scale(1.3)', opacity: 1 },
+    { transform: `translate(${dx * 0.4}px,${dy * 0.4 - 80}px) scale(1.1)`, opacity: 1, offset: 0.45 },
+    { transform: `translate(${dx}px,${dy}px) scale(.45)`, opacity: 0.9 },
+  ], { duration: ms, easing: 'cubic-bezier(.4,0,.3,1)' });
+  return a.finished.then(() => { d.remove(); toEl.classList.remove('bump'); void toEl.offsetWidth; toEl.classList.add('bump'); });
+}
+
+function setButtons({ replay = false, next = null } = {}) {
+  const rb = $('#replayBtn'), nb = $('#nextBtn');
   rb.hidden = !replay;
-  nb.hidden = !next; nb.onclick = next ? () => { AC.tap(); next(); } : null;
-  ab.hidden = !again; ab.onclick = again ? () => { AC.tap(); again(); } : null;
+  nb.hidden = !next; nb.onclick = next ? () => { AC.tap(); nb.hidden = true; next(); } : null;
 }
 
 function renderPic(e) {
@@ -343,19 +383,28 @@ async function meet() {
   const k = L.list[L.i];
   const token = cancelToken();
   Trace.stop();
-  L.ev = null;
-  $('#steps').innerHTML = stepsHTML(L.list.length, L.i, L.i);
-  $('#lessonLabel').textContent = L.mode === 'today' ? `${L.i + 1} / ${L.list.length}` : 'れんしゅう';
+  L.rep = 0; L.shown = false; L.phase = 'kanji';
+  renderRoad();
   Board.setup(k);
   Board.showModel(false);
   renderPic(DATA[k].e);
   $('#yomi').innerHTML = '';
-  $('#wand').hidden = false;
   setButtons();
-  const isNew = !(S.kanji[k] && S.kanji[k].traced);
-  Say.lesson(isNew ? 'ステッキを タッチしてね！' : 'また あったね！');
   show('lesson');
-  Voice.say(isNew ? 'まほうの ステッキを タッチしてね' : 'また あったね');
+  const isNew = !(S.kanji[k] && S.kanji[k].traced);
+  const head = L.list.length > 1 ? `${L.i + 1}もじめ！\n` : '';
+  if (L.mode === 'review' && !isNew) {
+    // おさらいは すぐに 字へ
+    $('#wand').hidden = true;
+    Say.lesson(`${head}おぼえてるかな？`);
+    Voice.say(`${head.trim()} おぼえてるかな？`);
+    await sleep(700);
+    if (!token.cancel) transform(k, token);
+    return;
+  }
+  $('#wand').hidden = false;
+  Say.lesson(`${head}ステッキを タッチしてね`);
+  Voice.say(`${head.trim()} まほうの ステッキを タッチしてね`);
   $('#wand').onclick = () => transform(k, token);
 }
 
@@ -371,8 +420,8 @@ async function transform(k, token) {
   Board.showModel(true);
   for (let i = 0; i < Board.paths.length; i++) { await Board.drawStroke(i, 200); if (token.cancel) return; }
   AC.sparkle();
-  const e = DATA[k];
-  const first = e.words[0];
+  L.shown = true; renderRoad();
+  const first = DATA[k].words[0];
   Say.lesson(`「${first.r}」の かんじ だよ！`);
   showWords(k);
   await Voice.say(first.r);
@@ -395,63 +444,117 @@ function showWords(k) {
 async function order(k) {
   const token = cancelToken();
   setButtons();
-  $('#nextBtn').textContent = 'つぎへ ▶';
   Board.clearAnim(); Board.clearDone(); Board.clearHint();
+  Board.setGuide(0);
   Say.lesson('かきじゅんを みてね');
   Voice.say('かきじゅんを みてね');
   await Board.playOrder(token);
   if (token.cancel) return;
   await sleep(400);
   Board.clearAnim(); Board.clearHint();
-  trace(k, token);
+  startRep(k, token);
 }
 
-function trace(k, token) {
-  Say.lesson('みどりの まるから なぞってね');
-  Voice.say('みどりの まるから なぞってね');
+// 1かい ぶんの なぞり
+function startRep(k, token) {
+  const reps = repsOf(k), r = L.rep;
+  Board.clearDone(); Board.clearAnim(); Board.layers.user.innerHTML = '';
+  Board.setGuide(reps === 1 ? 0 : r);
+  const msg = reps === 1 ? 'みどりの まるから なぞってね'
+    : r === 0 ? '1かいめ！\nみどりの まるから なぞってね'
+    : r === reps - 1 ? 'さいごの 1かい！' : `${r + 1}かいめ！\nうすい おてほんを なぞってね`;
+  Say.lesson(msg); Voice.say(msg.replace('\n', ' '));
   setButtons({ replay: true });
   $('#replayBtn').onclick = async () => {
     AC.tap();
     Trace.stop();
     const t = cancelToken();
     setButtons();
-    Board.clearDone();
-    Board.clearAnim();
+    Board.clearDone(); Board.clearAnim(); Board.setGuide(0);
     await Board.playOrder(t);
     if (t.cancel) return;
     await sleep(300);
     Board.clearAnim(); Board.clearHint();
-    trace(k, t);
+    startRep(k, t);
   };
-  Trace.start(() => traced(k, token));
+  // 1かいめは ばんごう つき、2かいめは みどりの まる だけ、3かいめは なにも なし（まちがえたら でる）
+  Trace.start(() => repDone(k, token), { dot: reps === 1 || r < 2, num: reps === 1 || r === 0 });
 }
 
-async function traced(k, token) {
-  const before = Core.stars(S.kanji[k]);
-  const ev = learn(k);
-  // おなじ字を もう いっかい なぞったときは まとめる（はじめて の しるしは のこす）
-  if (L.ev && L.ev.k === k) { ev.first = ev.first || L.ev.first; ev.got = L.ev.got.concat(ev.got); ev.grow = Math.max(ev.grow, L.ev.grow); }
-  L.ev = ev;
-  AC.fanfare();
+async function repDone(k, token) {
+  setButtons();
+  L.rep++;
+  const reps = repsOf(k);
+  const last = L.rep >= reps;
+  hanamaru();
+  AC.sparkle();
   const [cx, cy] = centerOf($('#board'));
-  sparks(cx, cy, 22);
-  const msg = ['はなまる！', 'じょうず！', 'すてき！', 'きらきら！'][Math.floor(Math.random() * 4)];
-  Say.lesson(ev.lv > before && before > 0 ? `${msg} ほしが ふえたよ ⭐` : `${msg} しまへ とどけよう！`);
-  Voice.say(msg);
-  setButtons({ replay: false, next: () => afterTrace(), again: () => { Board.clearDone(); Board.layers.user.innerHTML = ''; trace(k, cancelToken()); } });
-  $('#nextBtn').textContent = 'しまへ ▶';
+  sparks(cx, cy, last ? 26 : 14);
+  const praise = ['はなまる！', 'じょうず！', 'すてき！', 'きらきら！', 'できたね！'][Math.floor(Math.random() * 5)];
+  if (!last) {
+    Say.lesson(praise); Voice.say(praise);
+    await flyTo('⭐', [cx, cy], roadSlot(L.i), { size: 60 });
+    renderRoad();
+    await sleep(700);
+    if (token.cancel) return;
+    hanamaru(false);
+    startRep(k, token);
+    return;
+  }
+  // 1もじ おわり
+  const ev = learn(k);
+  L.events.push(ev);
+  AC.fanfare();
+  const w = DATA[k].words[0];
+  $('#dekita').classList.remove('on'); void $('#dekita').offsetWidth; $('#dekita').classList.add('on');
+  Say.lesson(`「${w.r}」 できた！`);
+  Voice.say(`${w.r}、できた！`);
+  await flyTo('⭐', [cx, cy], roadSlot(L.i), { size: 60 });
+  renderRoad();
+  await sleep(250);
+  await flyTo(k, [cx, cy], roadSlot(L.i), { size: 120, cls: 'flyer card', ms: 800 });
+  await sleep(500);
+  if (token.cancel) return;
+  hanamaru(false); $('#dekita').classList.remove('on');
+  L.i++;
+  if (L.i < L.list.length) meet();
+  else if (L.mode === 'today') startQuiz(L.list);
+  else finishSession();
+}
+
+// はなまる（板の うえに くるっと）
+function hanamaru(on = true) {
+  const h = $('#hana');
+  h.classList.remove('on');
+  if (on) { void h.getBoundingClientRect(); h.classList.add('on'); }
+}
+
+// やめるときは かくにん
+function confirmExit() {
+  AC.tap();
+  openModal(`<h2>しまに もどる？</h2><div style="font-weight:900;font-size:20px">ここまで かいた じは のこるよ</div>
+    <div class="setrow"><button class="btn lav" id="exNo">つづける</button><button class="btn white" id="exYes">もどる</button></div>`);
+  $('#exNo').onclick = () => { AC.tap(); closeModal(); };
+  $('#exYes').onclick = () => {
+    AC.tap(); closeModal();
+    Trace.stop(); cancelToken(); Voice.stop();
+    hanamaru(false); $('#dekita').classList.remove('on');
+    if (L && L.events.length) islandSync();
+    goHome();
+  };
 }
 
 /* ================= よみクイズ ================= */
 let Q = null;
 function startQuiz(list) {
   Q = { qs: Core.makeQuiz(list, DATA), i: 0 };
+  L.phase = 'quiz'; renderRoad();
   show('quiz');
   askQ();
 }
 async function askQ() {
   const q = Q.qs[Q.i];
-  $('#qsteps').innerHTML = stepsHTML(Q.qs.length, Q.i, Q.i);
+  $('#qcount').textContent = `${Q.i + 1} / ${Q.qs.length}`;
   const head = $('#qhead'), ch = $('#choices');
   ch.innerHTML = '';
   let locked = false;
@@ -480,7 +583,7 @@ async function askQ() {
         await Voice.say(q.w.r);
         await sleep(500);
         Q.i++;
-        if (Q.i < Q.qs.length) askQ(); else finishToday();
+        if (Q.i < Q.qs.length) askQ(); else finishSession();
       } else {
         b.classList.add('no');
         AC.boing();
@@ -545,22 +648,27 @@ function bottomBtn(text) {
 function dropBottomBtn() { const b = $('#bottomBtn'); b.hidden = true; b.onclick = null; }
 function hud(on) {
   // on: ふだんの ボタン を だす / off: えんしゅつちゅう
-  document.querySelectorAll('#island .topbar .ibtn').forEach(b => (b.style.visibility = on ? '' : 'hidden'));
+  document.querySelectorAll('#island .topbar .lbtn').forEach(b => (b.style.visibility = on ? '' : 'hidden'));
+  $('#todayChip').hidden = !on;
   // 「つぎの かんじ ▶」を まっている あいだは「きょうの まほう」を ださない
   $('#todayBtn').hidden = !on || !$('#bottomBtn').hidden;
   if (on) refreshHud();
 }
 function refreshHud() {
   $('#hudCount').textContent = metCount();
-  const day = today();
-  const done = !!(S.today && S.today.day === day && S.today.done);
+  const done = todayDone();
   const tb = $('#todayBtn');
-  tb.textContent = done ? 'もっと れんしゅう ✨' : '✨ きょうの まほう';
-  tb.className = 'btn' + (done ? ' lav' : ' pulse');
+  tb.textContent = done ? '📘 おさらい' : '✨ きょうの まほう';
+  tb.className = 'btn' + (done ? ' sky' : ' pulse');
+  $('#todayChip').innerHTML = done ? '✔ きょうの まほう できた！ <small>あたらしい かんじは あした</small>' : `きょうの まほう <b>${(S.today && S.today.day === today() ? S.today.list : todayList()).map(() => '☆').join('')}</b>`;
+  $('#todayChip').className = 'pill chip' + (done ? ' done' : '');
+  world.setTomorrow(done ? tomorrowKanji() : null);
   $('#spellBtn').style.display = ORDER.some(k => Rw.roleOf(k) === 'spell' && S.kanji[k] && S.kanji[k].traced) ? '' : 'none';
   $('#dressDot').classList.toggle('on', S.r.owned.some(id => !Rw.START_OWNED.includes(id) && !S.r.seen.includes(id)));
 }
 
+// あしたの はじめての 字（ぜんぶ おぼえたら なし）
+function tomorrowKanji() { return ORDER.find(k => !(S.kanji[k] && S.kanji[k].traced)) || null; }
 function goHome() {
   Trace.stop(); if (L) cancelToken(); Voice.stop();
   closeModal();
@@ -570,100 +678,93 @@ function goHome() {
   world.zoomOut();
 }
 
-/* ---------- 字が 島に とどく ---------- */
-async function afterTrace() {
-  const ev = L.ev;
-  Voice.stop();
-  show('island'); hud(false); hideCaption();
-  await playEvent(ev);
-  if (L.mode === 'today') {
-    // えんしゅつが おわったら きせかえ なども つかえるように ボタンを もどす
-    const next = bottomBtn(L.i + 1 < L.list.length ? 'つぎの かんじ ▶' : 'よみ クイズ ▶');
-    hud(true);
-    await next;
-    hideCaption();
-    if (L.i + 1 < L.list.length) { L.i++; meet(); } else startQuiz(L.list);
-  } else {
-    await sleep(1200);
-    hideCaption();
-    await world.zoomOut();
-    hud(true);
-  }
-}
-
-async function playEvent(ev) {
-  const k = ev.k, w = word0(k);
-  $('#hudCount').textContent = metCount();
-  if (Rw.roleOf(k) === 'spell') {
-    caption(kcap(k, `「${w.r}」の まほう！`));
-    Voice.say(w.r);
-    await world.spell(k);
-  } else if (ev.first) {
-    caption(kcap(k, `「${w.r}」が でてきた！`));
-    Voice.say(`${w.r}が でてきた！`);
-    await world.reveal(k, ev.lv);
-  } else {
-    caption(kcap(k, ev.lvUp ? 'ほしが ふえたよ ⭐' : 'きらきら！'));
-    Voice.say(ev.lvUp ? 'ほしが ふえたよ' : 'きらきら！');
-    await world.levelUp(k, ev.lv);
-  }
-  for (const id of ev.got) {
-    const o = Rw.outfitById(id);
-    AC.fanfare();
-    if (o.slot === 'color') { S.r.outfit.color = id; world.setOutfit(S.r.outfit); }
-    else { S.r.outfit[o.slot] = id; world.setOutfit(S.r.outfit); }
-    save();
-    world.poke();
-    caption(`<span class="ck">${o.icon}</span><span>${o.name} が ふえたよ！<small>きせかえで かえられるよ</small></span>`);
-    await Voice.say(`やったー！ ${o.name} が ふえたよ`);
-    await sleep(800);
-  }
-  if (ev.grow) {
-    caption('<span class="ck">🏝️</span><span>しまが ひろがった！</span>');
-    AC.magic();
-    Voice.say('しまが ひろがったよ！');
-    await world.growIsland(ev.grow);
-    await sleep(500);
-  }
-}
-
-/* ---------- きょうの まほう ---------- */
+/* ---------- きょうの まほう／おさらい ---------- */
 function todayList() {
   const day = today();
   if (!S.today || S.today.day !== day) { S.today = { day, list: Core.pickToday(S, ORDER, day, Rw.newLeftToday(S.r, day)), done: false }; save(); }
   return S.today.list;
 }
-$('#todayBtn').onclick = () => {
+const todayDone = () => !!(S.today && S.today.day === today() && S.today.done);
+// おさらい：おぼえた 字 だけから（あたらしい 字は でない）
+function reviewList() {
+  const met = ORDER.filter(k => S.kanji[k] && S.kanji[k].traced > 0);
+  const day = today();
+  return met.sort((a, b) => ((S.kanji[a].last === day) - (S.kanji[b].last === day)) || (S.kanji[a].traced - S.kanji[b].traced) || (S.kanji[a].last < S.kanji[b].last ? -1 : 1)).slice(0, 3);
+}
+$('#todayBtn').onclick = async () => {
   AC.tap();
-  let list = todayList();
-  if (S.today.done) {
-    // もっと れんしゅう：あたらしい字は 1日の 上限まで、あとは おさらい
-    const day = today();
-    list = Core.pickToday(S, ORDER, day, Rw.newLeftToday(S.r, day));
-  }
-  startLesson(list, 'today');
+  if (!todayDone()) { startLesson(todayList(), 'today'); return; }
+  caption('<span class="ck">📘</span><span>おぼえた かんじの おさらい<small>あたらしい かんじは あした！</small></span>', 2600);
+  await Voice.say('おぼえた かんじの おさらい だよ。 あたらしい かんじは あしたね');
+  startLesson(reviewList(), 'review');
 };
 
-async function finishToday() {
-  const day = today();
-  show('island'); hud(false);
-  world.setMode('island');
-  const firstSet = !(S.today && S.today.day === day && S.today.done);
-  if (S.today && S.today.day === day) S.today.done = true;
-  if (firstSet && S.lastDay !== day) { S.days++; S.lastDay = day; }
-  save();
-  if (!S.r.stamps[day]) {
-    const k = L.list.find(x => S.kanji[x] && S.kanji[x].traced === 1 && S.kanji[x].last === day) || L.list[0];
-    Rw.stamp(S.r, day, k); save();
-    Voice.say('きょうの スタンプ！');
-    await showCalendar(day, true);
+// ぜんぶ おわったら 島へ：字が いっせいに とんで → はでに おいわい → スタンプ → プレゼント
+async function finishSession() {
+  const mode = L.mode, evs = L.events, day = today();
+  Voice.stop();
+  show('island'); hud(false); hideCaption(); world.setMode('island');
+  world.setTomorrow(null);
+  $('#hudCount').textContent = metCount();
+  // もらえた きせかえは すぐ きせる
+  const got = evs.flatMap(e => e.got);
+  for (const id of got) { const o = Rw.outfitById(id); S.r.outfit[o.slot] = id; }
+  if (got.length) world.setOutfit(S.r.outfit);
+  if (mode === 'today' && S.today && S.today.day === day) {
+    S.today.done = true;
+    if (S.lastDay !== day) { S.days++; S.lastDay = day; }
   }
-  const gift = Rw.claimGift(S.r, day);
   save();
-  if (gift) await giftFlow(gift);
-  caption('<span class="ck">🌙</span><span>きょうの まほう できた！<small>また あした あそぼうね</small></span>', 4000);
-  Voice.say('きょうの まほう、できたね！ また あした あそぼうね');
+  await world.arrive(evs);
+  await celebrate(mode, evs.map(e => e.k), got);
+  const grow = Math.max(0, ...evs.map(e => e.grow));
+  if (grow) {
+    caption('<span class="ck">🏝️</span><span>しまが ひろがった！</span>');
+    AC.magic(); Voice.say('しまが ひろがったよ！');
+    await world.growIsland(grow);
+    hideCaption();
+  }
+  if (mode === 'today') {
+    if (!S.r.stamps[day]) {
+      const k = L.list.find(x => S.kanji[x] && S.kanji[x].traced === 1 && S.kanji[x].last === day) || L.list[0];
+      Rw.stamp(S.r, day, k); save();
+      Voice.say('きょうの スタンプ！');
+      await showCalendar(day, true);
+    }
+    const gift = Rw.claimGift(S.r, day);
+    save();
+    if (gift) await giftFlow(gift);
+  }
   hud(true);
+  if (mode === 'today') Voice.say('また あした あそぼうね');
+}
+
+// はでな おいわい（2びょう くらい。タッチで とばせる）
+function celebrate(mode, ks, got) {
+  return new Promise(res => {
+    const big = mode === 'today';
+    const c = $('#celebrate');
+    const title = big ? 'きょうの まほう<br>ぜんぶ できた！' : mode === 'review' ? 'おさらい<br>できた！' : 'できた！';
+    const cols = ['#ff6fb3', '#ffd84a', '#7fd0f5', '#9ee493', '#c77dff', '#ffb36b', '#ffffff'];
+    let conf = '';
+    for (let i = 0; i < (big ? 70 : 36); i++) {
+      const a = Math.random() * Math.PI * 2, r = 30 + Math.random() * 55;
+      conf += `<i style="--x:${Math.cos(a) * r}vmax;--y:${Math.sin(a) * r - 10}vmax;--r:${Math.random() * 900 - 450}deg;background:${cols[i % cols.length]};animation-delay:${Math.random() * .15}s;${i % 3 ? '' : 'border-radius:50%;'}"></i>`;
+    }
+    const chips = got.map(id => { const o = Rw.outfitById(id); return `<div class="cgot">${o.icon} ${o.name} が ふえたよ！</div>`; }).join('');
+    c.innerHTML = `<div class="crays"></div><div class="cconf">${conf}</div>
+      <div class="cbox"><div class="cstars">⭐ ⭐ ⭐</div><h2>${title}</h2>
+      <div class="cks">${ks.map((k, i) => `<b style="animation-delay:${0.25 + i * 0.12}s">${k}</b>`).join('')}</div>${chips}</div>`;
+    c.className = 'on' + (big ? ' big' : '');
+    AC.fanfare(); setTimeout(() => AC.sparkle(), 350); if (big) setTimeout(() => AC.fanfare(), 700);
+    Voice.say(big ? 'やったー！ きょうの まほう、ぜんぶ できたね！' : 'できたね！');
+    world.poke(); setTimeout(() => world.poke(), 600);
+    world.fireworks(big ? 3 : 1);
+    let done = false;
+    const end = () => { if (done) return; done = true; c.className = ''; c.innerHTML = ''; res(); };
+    setTimeout(() => (c.onclick = end), 500);
+    setTimeout(end, big ? 2600 + got.length * 700 : 1700);
+  });
 }
 
 async function giftFlow(gift) {
@@ -814,6 +915,7 @@ world.onTapKanji = k => {
   caption(kcap(k, w.r, w.w !== k ? w.w : ''), 2600);
   Voice.say(w.r);
 };
+world.onTapTomorrow = () => { AC.tap(); caption('<span class="ck">🌙</span><span>あしたの おたのしみ！</span>', 2200); Voice.say('あしたの おたのしみ！'); };
 world.onTapPunyu = () => {
   if (screen === 'island' && $('#todayBtn').offsetParent) Voice.say(['ぷにゅ！', 'えへへ', 'あそぼう！', 'かんじ かこう！'][Math.floor(Math.random() * 4)]);
 };
@@ -849,7 +951,7 @@ function buildZukan() {
 }
 function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1600); }
 $('#zukanBtn').onclick = () => { AC.tap(); buildZukan(); show('zukan'); };
-$('#lessonHome').onclick = $('#quizHome').onclick = () => { AC.tap(); dropBottomBtn(); goHome(); };
+$('#lessonHome').onclick = $('#quizHome').onclick = confirmExit;
 $('#zukanHome').onclick = () => { AC.tap(); goHome(); };
 
 /* ================= はじめ ================= */
