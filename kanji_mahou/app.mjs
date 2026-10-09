@@ -118,12 +118,17 @@ function show(id) {
   layout();
 }
 function layout() {
-  const W = innerWidth, H = innerHeight;
-  const top = H <= 520 ? 50 : 64;
+  // iPad よこ（1024×768）を きじゅんに して、UI ぜんたいを おなじ わりあいで 拡大・縮小する
+  const rw = innerWidth, rh = innerHeight;
+  const s = Math.max(0.6, Math.min(1.6, rw / 1024, rh / 768));
+  const W = rw / s, H = rh / s;
+  const root = document.documentElement.style;
+  root.setProperty('--s', s); root.setProperty('--vw', W + 'px'); root.setProperty('--vh', H + 'px');
+  const top = 64;
   let bs;
   if (W >= H) bs = Math.min(H - top - 40, W * 0.5);
   else bs = Math.min(W - 40, (H - top) * 0.5);
-  document.documentElement.style.setProperty('--bs', Math.max(200, Math.floor(bs)) + 'px');
+  root.setProperty('--bs', Math.max(200, Math.floor(bs)) + 'px');
 }
 addEventListener('resize', layout);
 

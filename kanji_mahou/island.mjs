@@ -639,7 +639,7 @@ export class Island {
   }
   applyLevel(k, g) {
     const lv = this.levels[k] || 1;
-    const s = SKY.includes(k) ? 1 : [0.85, 0.85, 1, 1.12][lv] || 1;
+    const s = SKY.includes(k) ? g.userData.skyScale || 1 : [0.85, 0.85, 1, 1.12][lv] || 1;
     g.userData.size = s;
     if (!g.userData.growing) g.scale.setScalar(s);
     if (lv >= 3 && !g.userData.kira) {
@@ -717,8 +717,10 @@ export class Island {
   }
   placeSky() {
     const R = this.R;
-    const P = { 日: [-R * 1.05, 5.8, -R * 1.0], 月: [R * 1.1, 6.0, -R * 1.0], 雨: [-R * 0.55, 5.6, -R * 0.4], 天: [0, 9.5, -R * 1.4], 空: [0, 0, -R * 1.25], 夕: [0, 4.2, -R * 1.6], 千: [0, 11, -R * 2] };
-    for (const [k, g] of this.objs) if (P[k]) g.position.set(...P[k]);
+    // 島の すぐ うえ に（とおくに おくと 画面が ひろがって 島が ちいさく 見える）
+    const P = { 日: [-R * 0.7, 2.6 + R * 0.1, -R * 0.62], 月: [R * 0.72, 2.8 + R * 0.1, -R * 0.62], 雨: [-R * 0.42, 3.6, -R * 0.3], 天: [0, 4.6 + R * 0.2, -R * 0.9], 空: [0, 0, -R * 0.95], 夕: [0, 2.6 + R * 0.1, -R * 1.05], 千: [0, 6 + R * 0.25, -R * 1.3] };
+    const S = { 日: 0.6, 月: 0.65, 雨: 0.8, 空: (R * 0.6 + 1) / 7.4, 天: R / 9, 千: R / 10 };
+    for (const [k, g] of this.objs) if (P[k]) { g.position.set(...P[k]); g.userData.skyScale = g.userData.size = S[k] || 1; if (!g.userData.growing) g.scale.setScalar(g.userData.size); }
   }
   setSkyStars(n) {
     while (this.skyStars.children.length < n) {
@@ -738,6 +740,9 @@ export class Island {
   // dress: きせかえの ときは ぷにゅを アップ（がめんの みぎ がわ）
   setMode(mode) {
     this.mode = mode;
+    // きせかえの ときは ぷにゅ だけに する（まわりの ものが カメラの まえに こないように）
+    for (const g of this.objs.values()) g.visible = mode !== 'dress';
+    this.skyStars.visible = mode !== 'dress';
     if (mode === 'dress') { this.pu.busy = true; this.faceCam = true; }
     else if (mode === 'island') { this.pu.busy = false; this.faceCam = false; }
   }
@@ -757,12 +762,19 @@ export class Island {
     const w = this.canvas.clientWidth || innerWidth, h = this.canvas.clientHeight || innerHeight;
     const aspect = w / h;
     const R = this.R;
-    let dist = (6 + R * 2.05) / Math.min(1, aspect / 1.25);
+    // たて・よこの どちらでも 島が おさまる きょり（iPad よこでは たてで きまる）
+    const tv = Math.tan((this.camera.fov * Math.PI) / 360), th = tv * aspect;
+    let dist = Math.max((R * 0.5 + 2.4) / tv, (R * 1.08) / th);
     let lookY = 0.9, height = dist * 0.42, x = 0;
     if (this.mode === 'dress') {
       const p = new T.Vector3(); this.punyu.getWorldPosition(p);
-      const look = p.clone().add(new T.Vector3(aspect > 1 ? -0.95 : 0, 0.15, 0));
-      const pos = look.clone().add(new T.Vector3(0, 0.75, 3.6 / Math.min(1, aspect / 1.2)));
+      // きせかえの パネル（がめんの ひだり はんぶん）の みぎに ぷにゅが くるように
+      const d = 3.6 / Math.min(1, aspect / 1.2);
+      const hw = d * Math.tan((this.camera.fov * Math.PI) / 360) * aspect;
+      // たてもちでは パネルが うえ、ぷにゅは した
+      const hv = hw / aspect;
+      const look = p.clone().add(aspect > 1 ? new T.Vector3(-0.48 * hw, 0.15, 0) : new T.Vector3(0, 0.15 + 0.5 * hv, 0));
+      const pos = look.clone().add(new T.Vector3(0, 0.75, d));
       this.camera.position.lerp(pos, Math.min(1, dt * 4));
       this.camLook.lerp(look, Math.min(1, dt * 4));
       this.camera.lookAt(this.camLook);
