@@ -312,6 +312,7 @@ function stepsHTML(n, now, doneUpTo) {
 function cancelToken() { if (L && L.token) L.token.cancel = true; L.token = { cancel: false }; return L.token; }
 
 function startLesson(list, mode) {
+  if (typeof dropBottomBtn === 'function') dropBottomBtn();
   L = { list, i: 0, mode, token: { cancel: false }, ev: null };
   show('lesson');
   meet();
@@ -540,10 +541,13 @@ function bottomBtn(text) {
   b.textContent = text; b.hidden = false;
   return new Promise(res => { b.onclick = () => { AC.tap(); b.hidden = true; b.onclick = null; res(); }; });
 }
+// とちゅうで やめたときは「つぎの かんじ ▶」を けす
+function dropBottomBtn() { const b = $('#bottomBtn'); b.hidden = true; b.onclick = null; }
 function hud(on) {
   // on: ふだんの ボタン を だす / off: えんしゅつちゅう
   document.querySelectorAll('#island .topbar .ibtn').forEach(b => (b.style.visibility = on ? '' : 'hidden'));
-  $('#todayBtn').hidden = !on;
+  // 「つぎの かんじ ▶」を まっている あいだは「きょうの まほう」を ださない
+  $('#todayBtn').hidden = !on || !$('#bottomBtn').hidden;
   if (on) refreshHud();
 }
 function refreshHud() {
@@ -573,8 +577,12 @@ async function afterTrace() {
   show('island'); hud(false); hideCaption();
   await playEvent(ev);
   if (L.mode === 'today') {
-    if (L.i + 1 < L.list.length) { await bottomBtn('つぎの かんじ ▶'); hideCaption(); L.i++; meet(); }
-    else { await bottomBtn('よみ クイズ ▶'); hideCaption(); startQuiz(L.list); }
+    // えんしゅつが おわったら きせかえ なども つかえるように ボタンを もどす
+    const next = bottomBtn(L.i + 1 < L.list.length ? 'つぎの かんじ ▶' : 'よみ クイズ ▶');
+    hud(true);
+    await next;
+    hideCaption();
+    if (L.i + 1 < L.list.length) { L.i++; meet(); } else startQuiz(L.list);
   } else {
     await sleep(1200);
     hideCaption();
@@ -841,7 +849,8 @@ function buildZukan() {
 }
 function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1600); }
 $('#zukanBtn').onclick = () => { AC.tap(); buildZukan(); show('zukan'); };
-$('#lessonHome').onclick = $('#quizHome').onclick = $('#zukanHome').onclick = () => { AC.tap(); goHome(); };
+$('#lessonHome').onclick = $('#quizHome').onclick = () => { AC.tap(); dropBottomBtn(); goHome(); };
+$('#zukanHome').onclick = () => { AC.tap(); goHome(); };
 
 /* ================= はじめ ================= */
 islandSync();
