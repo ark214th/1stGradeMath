@@ -130,7 +130,13 @@ function layout() {
   else bs = Math.min(W - 40, (H - top) * 0.5);
   root.setProperty('--bs', Math.max(200, Math.floor(bs)) + 'px');
 }
-addEventListener('resize', layout);
+// 画面を まわしたときは すこし あとにも やりなおす（iPad Safari は 大きさが きまるのが おそい）
+function relayout() { layout(); setTimeout(layout, 250); setTimeout(layout, 700); }
+addEventListener('resize', relayout);
+addEventListener('orientationchange', relayout);
+if (window.visualViewport) visualViewport.addEventListener('resize', relayout);
+let lastVP = '';
+setInterval(() => { const v = innerWidth + 'x' + innerHeight; if (v !== lastVP) { lastVP = v; layout(); } }, 400);
 
 const hl = (w, k) => w.split(k).map(t => t.replace(/[&<>]/g, '')).join('<em>' + k + '</em>');
 

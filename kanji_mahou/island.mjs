@@ -874,6 +874,7 @@ export class Island {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h; this.camera.updateProjectionMatrix();
     this.needResize = false;
+    this.lastSize = w + 'x' + h;
   }
 
   /* ---------- tween ---------- */
@@ -887,7 +888,9 @@ export class Island {
     const now = performance.now();
     const dt = Math.min(0.05, (now - this.last) / 1000); this.last = now;
     if (this.paused) return;
-    if (this.needResize) this.resize();
+    // iPad を まわしたとき resize が はやく きすぎて 古い 大きさの ままに なることが あるので、まいフレーム たしかめる
+    const cw = this.canvas.clientWidth || innerWidth, ch = this.canvas.clientHeight || innerHeight;
+    if (this.needResize || this.lastSize !== cw + 'x' + ch) this.resize();
     this.time += dt;
     const t = this.time;
     for (let i = this.tweens.length - 1; i >= 0; i--) {
