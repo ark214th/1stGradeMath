@@ -216,6 +216,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 .lbtn{background:rgba(255,255,255,.94);border-radius:22px;width:84px;height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:32px;box-shadow:0 5px 0 #f0bcd8,0 10px 18px rgba(200,60,130,.12);position:relative;line-height:1}
 .lbtn small{font-size:14px;font-weight:900;margin-top:5px;color:var(--ink)}
 .lbtn:active{transform:translateY(3px);box-shadow:0 2px 0 #f0bcd8}
+a.lbtn{text-decoration:none;color:inherit}
+.toTop{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top))}
 .lbtn .dot{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:#ff5a9e;border:3px solid #fff;animation:breath 1s infinite;display:none}
 .lbtn .dot.on{display:block}
 .chip{font-size:22px;pointer-events:none}
@@ -291,6 +293,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 
 <!-- タイトル -->
 <section class="screen on hud" id="title">
+  <a class="lbtn toTop pe" href="../index.html" aria-label="トップへ もどる">🏠<small>トップ</small></a>
   <div style="flex:1"></div>
   <div style="text-align:center">
     <h1>ゆめかわ<br>かんじの しま</h1>
@@ -304,6 +307,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 <!-- しま（ホーム） -->
 <section class="screen hud" id="island">
   <div class="topbar">
+    <a class="lbtn pe" href="../index.html" aria-label="トップへ もどる">🏠<small>トップ</small></a>
     <div class="pill count2 pe" id="countPill">🌸 かんじ <b id="hudCount">0</b> / 80</div>
     <div class="grow"></div>
     <button class="lbtn" id="dressBtn">👗<small>きせかえ</small><i class="dot" id="dressDot"></i></button>

@@ -50,6 +50,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .ibtn{border:0;background:rgba(255,255,255,.92);border-radius:24px;width:78px;height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:34px;box-shadow:0 5px 0 #f0bcd8,0 10px 20px rgba(200,60,130,.15);position:relative}
 .ibtn small{font-size:13px;font-weight:900;margin-top:2px}
 .ibtn:active{transform:translateY(3px);box-shadow:0 2px 0 #f0bcd8}
+a.ibtn{text-decoration:none;color:inherit}
+.toTop{position:absolute;left:max(16px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top))}
 .dot{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;background:#ff5a9e;border:3px solid #fff;animation:beat 1s infinite}
 @keyframes beat{50%{scale:1.2}}
 
@@ -172,7 +174,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 <canvas id="c"></canvas>
 <div id="labels"></div>
 <div id="ui">
-  <div class="layer on" id="L-splash"><div id="splash" style="height:100%">
+  <div class="layer on" id="L-splash"><a class="ibtn pe toTop" href="../index.html" aria-label="トップへ もどる">🏠<small>トップ</small></a><div id="splash" style="height:100%">
     <div class="title"><h1>ゆめかわ<br>かずうさガーデン</h1><p>かずの うさぎたちと なかよくなろう</p></div>
     <div style="display:flex;flex-direction:column;align-items:center">
       <button class="btn pe" id="startBtn">▶ はじめる</button>
@@ -184,6 +186,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div id="gTop">
       <div><div class="logo">🌸 かずうさガーデン</div><div id="friends"></div></div>
       <div class="gbtns pe">
+        <a class="ibtn" href="../index.html" aria-label="トップへ もどる">🏠<small>トップ</small></a>
         <button class="ibtn" id="calBtn">📒<small>シール</small></button>
         <button class="ibtn" id="dressBtn">🎀<small>きせかえ</small></button>
         <button class="ibtn" id="parentBtn">⚙️<small>おうち</small><span class="ring"></span></button>
