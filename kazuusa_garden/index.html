@@ -89,6 +89,8 @@ a.ibtn{text-decoration:none;color:inherit}
 #instr{font-size:26px;font-weight:900;background:#fff;border-radius:26px;padding:10px 24px;box-shadow:0 5px 0 rgba(200,90,150,.14);min-height:54px;display:flex;align-items:center;gap:8px;transition:opacity .2s}
 #instr:empty{opacity:0}
 #choices{display:flex;gap:22px;min-height:170px;align-items:flex-end}
+#choices.think .choice:not(.wrong){opacity:.45;filter:saturate(.4);transition:opacity .3s}
+#choices .choice{transition:opacity .3s}
 .choice{border:0;width:170px;height:170px;border-radius:36px;background:#fff;box-shadow:0 8px 0 var(--c),0 14px 26px rgba(160,60,120,.18);display:flex;align-items:center;justify-content:center;gap:10px;position:relative;animation:lpop .45s cubic-bezier(.3,1.6,.5,1) backwards;border:5px solid var(--c)}
 .choice:active{transform:translateY(5px);box-shadow:0 3px 0 var(--c)}
 .choice .cn{font-size:84px;font-weight:900;color:var(--ink);line-height:1}
@@ -310,6 +312,7 @@ const AC = {
   sparkle() { const t = this.now(); [1319, 1568, 1760, 2093, 2637, 3136].forEach((f, i) => this.note(f, t + i * .055, .35, { vol: .11 })); },
   fanfare() { const t = this.now(); [[523, 0], [659, .11], [784, .22], [1047, .33]].forEach(([f, d]) => { this.note(f, t + d, .5, { type: 'triangle', vol: .26 }); this.note(f / 2, t + d, .4, { vol: .1 }); }); this.note(1319, t + .45, .9, { vol: .13 }); this.note(1568, t + .45, .9, { vol: .1 }); },
   boing() { const t = this.now(); this.note(300, t, .4, { vol: .25, slide: .6 }); this.note(240, t + .12, .35, { type: 'triangle', vol: .12, slide: .7 }); },
+  sad() { const t = this.now(); [[392, 0], [370, .28], [330, .56]].forEach(([f, d], i) => this.note(f, t + d, i === 2 ? .7 : .3, { type: 'triangle', vol: .2, slide: i === 2 ? .85 : .97 })); },
   whoosh() { const t = this.now(); this.note(300, t, .35, { vol: .12, slide: 3 }); },
   shake() { const t = this.now(); [0, .07, .14].forEach(d => this.note(200 + Math.random() * 80, t + d, .08, { type: 'square', vol: .05 })); },
   magic() { const t = this.now(); for (let i = 0; i < 10; i++) this.note(700 + i * 140, t + i * .04, .25, { vol: .07 }); },
@@ -405,12 +408,15 @@ const GEO = {
   ear: new THREE.CapsuleGeometry(.14, .46, 6, 14),
   earIn: new THREE.CapsuleGeometry(.075, .34, 6, 12),
   tail: new THREE.SphereGeometry(.17, 16, 12),
+  brow: new THREE.CapsuleGeometry(.018, .1, 4, 8),
+  tear: new THREE.SphereGeometry(.045, 12, 10),
   plane: new THREE.PlaneGeometry(1, 1),
   sph: new THREE.SphereGeometry(1, 20, 14),
   sphLo: new THREE.SphereGeometry(1, 12, 8),
 };
 const MAT = {
   eye: new THREE.MeshBasicMaterial({ color: 0x3b1f3f }),
+  tear: new THREE.MeshBasicMaterial({ color: 0x8fd8ff, transparent: true, opacity: .9 }),
   white: new THREE.MeshBasicMaterial({ color: 0xffffff }),
   cheek: new THREE.MeshBasicMaterial({ color: 0xff78ad, transparent: true, opacity: .55 }),
   mouth: new THREE.MeshBasicMaterial({ color: 0x7a2f55 }),
@@ -475,7 +481,7 @@ class Bunny {
     this.makeHead(); this.body.add(this.head);
     this.tail = new THREE.Mesh(GEO.tail, MAT.tail); this.tail.position.set(0, .45, -.52); this.body.add(this.tail);
     this.shadow = new THREE.Mesh(GEO.plane, MAT.shadow.clone()); this.shadow.rotation.x = -Math.PI / 2; this.shadow.position.y = .02; this.root.add(this.shadow);
-    this.t = rand(0, 10); this.blinkT = rand(1, 4); this.sq = 0; this.hopY = 0; this.busy = false; this.labelOn = !!label;
+    this.t = rand(0, 10); this.blinkT = rand(1, 4); this.sq = 0; this.hopY = 0; this.busy = false; this.sad = false; this.droop = 0; this.labelOn = !!label;
     this.label = label ? makeLabel(n, label) : null;
     this.layout(false); this.personality();
     this.setAcc(S.outfits[n]);
@@ -488,7 +494,7 @@ class Bunny {
   makeHead() {
     const h = this.head = new THREE.Group(); h.userData.headOf = this;
     const f = new THREE.Group(); f.position.z = .475; h.add(f);
-    this.eyes = []; this.happyEyes = [];
+    this.eyes = []; this.happyEyes = []; this.brows = []; this.mouths = [];
     for (const s of [-1, 1]) {
       const e = new THREE.Group(); e.position.set(s * .19, .06, 0);
       const ball = new THREE.Mesh(GEO.eye, MAT.eye); ball.scale.set(1, 1.18, .42); e.add(ball);
@@ -497,7 +503,8 @@ class Bunny {
       f.add(e); this.eyes.push(e);
       const hp = new THREE.Mesh(GEO.happy, MAT.eye); hp.position.set(s * .19, .02, .01); hp.visible = false; f.add(hp); this.happyEyes.push(hp);
       const ck = new THREE.Mesh(GEO.cheek, MAT.cheek); ck.position.set(s * .31, -.085, .006); ck.scale.y = .75; f.add(ck);
-      const mo = new THREE.Mesh(GEO.mouth, MAT.mouth); mo.rotation.z = Math.PI; mo.position.set(s * .042, -.075, .012); f.add(mo);
+      const mo = new THREE.Mesh(GEO.mouth, MAT.mouth); mo.rotation.z = Math.PI; mo.position.set(s * .042, -.075, .012); f.add(mo); this.mouths.push(mo);
+      const br = new THREE.Mesh(GEO.brow, MAT.eye); br.position.set(s * .19, .23, .01); br.rotation.z = Math.PI / 2 - s * .4; br.visible = false; f.add(br); this.brows.push(br);
     }
     this.ears = [];
     for (const s of [-1, 1]) {
@@ -506,6 +513,7 @@ class Bunny {
       const ei = new THREE.Mesh(GEO.earIn, this.n === 1 || this.n === 8 ? MAT.earInW : MAT.earIn); ei.position.set(0, .36, .06); ei.scale.z = .32; p.add(ei);
       h.add(p); this.ears.push(p);
     }
+    this.tear = new THREE.Mesh(GEO.tear, MAT.tear); this.tear.scale.set(1, 1.4, .6); this.tear.visible = false; f.add(this.tear);
     this.acc = new THREE.Group(); h.add(this.acc);
   }
   personality() { // 耳のかたちで こせい
@@ -534,11 +542,14 @@ class Bunny {
     this.t += dt; this.blinkT -= dt;
     let es = 1;
     if (this.blinkT < 0) { const b = -this.blinkT; es = b < .1 ? 1 - b / .1 * .9 : b < .2 ? .1 + (b - .1) / .1 * .9 : 1; if (b > .2) this.blinkT = rand(2, 5); }
-    for (const e of this.eyes) e.scale.y = es;
+    this.droop += ((this.sad ? 1 : 0) - this.droop) * Math.min(1, dt * 6);
+    for (const e of this.eyes) e.scale.y = es * (1 - this.droop * .4);
+    if (this.sad) { const k = (this.t * .9) % 1; this.tear.visible = true; this.tear.position.set(-.21, -.02 - k * .35, .02); this.tear.material.opacity = 1 - k * k; }
     const br = Math.sin(this.t * 2.6) * .016;
-    this.body.scale.set(1 + this.sq * .55, (1 + br) * (1 - this.sq), 1 + this.sq * .55);
+    const sq = this.sq + this.droop * .05;
+    this.body.scale.set(1 + sq * .55, (1 + br * (1 - this.droop)) * (1 - sq), 1 + sq * .55);
     this.body.position.y = this.hopY;
-    this.ears.forEach((p, i) => { p.rotation.z = p.userData.base + Math.sin(this.t * 3 + i * 1.7) * .05 + (i ? -1 : 1) * this.sq * .8; p.rotation.x = p.userData.bx + Math.sin(this.t * 2.2 + i) * .03; });
+    this.ears.forEach((p, i) => { p.rotation.z = p.userData.base + Math.sin(this.t * 3 + i * 1.7) * .05 * (1 - this.droop) + (i ? -1 : 1) * (this.sq * .8 + this.droop * 1.1); p.rotation.x = p.userData.bx + Math.sin(this.t * 2.2 + i) * .03; });
     const ss = 1 / (1 + this.hopY * .35); this.shadow.material.opacity = ss;
     if (this.label) {
       if (!this.labelOn || !shown(this.root)) this.label.style.opacity = 0;
@@ -550,7 +561,12 @@ class Bunny {
       }
     }
   }
-  setHappy(on) { this.eyes.forEach(e => e.visible = !on); this.happyEyes.forEach(e => e.visible = on); }
+  setHappy(on) { if (on) this.setSad(false); this.eyes.forEach(e => e.visible = !on); this.happyEyes.forEach(e => e.visible = on); }
+  setSad(on) { // しょんぼり かお
+    this.sad = on; if (on) this.setHappy(false);
+    this.brows.forEach(b => b.visible = on); this.tear.visible = false;
+    this.mouths.forEach((m, i) => { m.rotation.z = on ? 0 : Math.PI; m.position.set(on ? (i ? .03 : -.03) : (i ? .042 : -.042), on ? -.1 : -.075, .012); });
+  }
   async hop({ to = null, h = .75, dur = .45, sq = .16 } = {}) {
     const r = this.root.position, from = r.clone();
     if (to) { const dx = to.x - from.x, dz = to.z - from.z; if (Math.hypot(dx, dz) > .05) this.turn(Math.atan2(dx, dz)); }
@@ -1064,7 +1080,7 @@ function setEq(a, b, ans) {
     (ans ? `<span class="ans" style="color:${INK[ans]}">${ans}</span>` : '<span class="q">？</span>');
 }
 const instr = t => $('#instr').innerHTML = t || '';
-function renderProg() { const n = P.qs.length; $('#prog').innerHTML = P.qs.map((_, i) => i < P.idx ? '💖' : i === P.idx ? '<span class="cur">🤍</span>' : '🤍').join(''); }
+function renderProg() { $('#prog').innerHTML = P.qs.map((_, i) => i < P.idx ? (P.log[i] && !P.log[i].firstTry ? '💔' : '💖') : i === P.idx ? '<span class="cur">🤍</span>' : '🤍').join(''); }
 
 function tapCube(bunny, cube) {
   const t = P.tap; if (!t) return;
@@ -1143,8 +1159,25 @@ async function question([a, b], tok) {
   const opts = shuffle([sum, ...shuffle(cands.slice(0, 2).concat(shuffle(cands.slice(2)))).slice(0, 2)]);
   const pic = st <= 2;
   let firstTry = true, hinted = false, lock = false; const t0 = performance.now();
-  const box = $('#choices'); box.innerHTML = '';
+  const box = $('#choices'); box.innerHTML = ''; box.classList.remove('think');
   let resolveAns; const answered = new Promise(r => resolveAns = r);
+  let misses = 0;
+  const recount = async () => { // まちがえたら じぶんで タッチして かぞえる
+    box.classList.add('think');
+    A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
+    instr('👆 ブロックを タッチして かぞえなおそう');
+    await Voice.say(misses > 1 ? 'もういちど、 ひとつずつ かぞえてね' : 'じぶんで かぞえて みよう'); guard(tok);
+    await tapCount(A, 1); guard(tok);
+    await tapCount(B, a + 1); guard(tok);
+    A.setSad(false); B.setSad(false);
+    instr('いくつ だったかな？'); Voice.say('いくつ だったかな？');
+    await thinkLock(.8); guard(tok);
+  };
+  // かんがえタイム：すぐには おせない
+  const thinkLock = async sec => {
+    lock = true; box.classList.add('think'); await wait(sec); guard(tok);
+    box.classList.remove('think'); lock = false; P.enabledAt = performance.now();
+  };
   const demo = async () => { // いっしょに かぞえる
     lock = true; $('#hintBtn').style.display = 'none';
     await openBoxes(); guard(tok);
@@ -1159,9 +1192,14 @@ async function question([a, b], tok) {
     bt.onclick = () => run(async () => {
       if (lock || bt.classList.contains('wrong')) return;
       if (v === correct) { lock = true; bt.classList.add('right'); resolveAns(); return; }
-      firstTry = false; bt.classList.add('wrong'); AC.boing(); lock = true;
-      await Voice.say(pick(['おしい！', 'ざんねん！', 'あれれ？']) + ' いっしょに かぞえて みよう'); guard(tok);
-      await demo();
+      // まちがい：うさぎが しょんぼり → じぶんで かぞえなおす
+      const hasty = performance.now() - P.enabledAt < 2500;
+      firstTry = false; bt.classList.add('wrong'); AC.sad(); lock = true; misses++;
+      $('#hintBtn').style.display = 'none';
+      await openBoxes(); guard(tok);
+      A.setSad(true); B.setSad(true);
+      await Voice.say(hasty ? 'えーん… ちゃんと みて かんがえてね' : pick(['えーん、ちがうよ…', 'しょんぼり… ちがったみたい', 'うーん、ざんねん…']), { pitch: 1.1, rate: .9 }); guard(tok);
+      await recount();
     });
     box.appendChild(bt);
   });
@@ -1173,6 +1211,7 @@ async function question([a, b], tok) {
       await demo();
     });
   }
+  run(() => thinkLock(st >= 3 ? 1.8 : .8));
   await answered; guard(tok);
   const time = performance.now() - t0;
   $('#hintBtn').style.display = 'none';
@@ -1206,11 +1245,14 @@ async function sessionEnd(tok) {
   const row = [...new Set(sums)].sort((x, y) => x - y).slice(0, 5);
   const bs = row.map((n, i) => { const b = new Bunny(n); b.root.position.x = (i - (row.length - 1) / 2) * 2.4; stageDyn.add(b.root); b.dropIn(i * .15); return b; });
   fitStage(row.length * 2.4 + 2, 7.4, 3, 110, 150);
-  bigMsg('🎉 おさんぽ クリア！ 🎉');
+  const good = P.log.filter(l => l.firstTry).length, perfect = good === P.log.length;
+  bigMsg(perfect ? '🌟 パーフェクト！ 🌟<br><span style="font-size:22px">キラキラぼしを もらったよ（おにわの おそらに ひかるよ）</span>'
+    : `🎉 おさんぽ クリア！ 🎉<br><span style="font-size:24px">${P.log.map(l => l.firstTry ? '💖' : '💔').join('')}</span><br><span style="font-size:20px">ぜんぶ 💖 だと キラキラぼしが もらえるよ</span>`);
+  if (perfect) { S.stars++; save(); }
   AC.fanfare(); await wait(.8); guard(tok);
   bs.forEach((b, i) => { b.setHappy(true); wait(i * .1).then(() => b.hop({ h: 1.2 })); });
   burst(new THREE.Vector3(0, 4, 1), { n: 30, emojis: ['💖', '✨', '⭐', '🌸', '🎀', '🍓'], speed: 6 });
-  await Voice.say('よく がんばったね！'); guard(tok);
+  await Voice.say(perfect ? 'パーフェクト！ キラキラぼしを もらったよ！' : 'よく がんばったね！ つぎは ぜんぶ ハートに しようね'); guard(tok);
   S.sessions++; save();
   const today = dayKey();
   if (S.lastGift !== today) {
