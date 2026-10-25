@@ -26,6 +26,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .nlabel.s{font-size:21px;border-width:3px;box-shadow:0 3px 0 rgba(160,60,120,.12)}
 .nlabel.rainbow{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#ff8fa3,#ffb36b,#ffe066,#9ee493,#7fd0f5,#a39bff,#e79bff) border-box}
 .nlabel.pearl{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#ffb8dc,#d4c2ff,#b5eaff,#ffe9b0,#ffb8dc) border-box}
+.nlabel.teen{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#ffc2e2 0 45%,#d4c2ff 50%,var(--c) 55%) border-box}
 .nlabel.pop{animation:lpop .6s cubic-bezier(.3,1.6,.5,1)}
 @keyframes lpop{0%{scale:.3}100%{scale:1}}
 .anchor{position:absolute;left:0;top:0;will-change:transform}
@@ -67,7 +68,7 @@ a.ibtn{text-decoration:none;color:inherit}
 /* garden */
 #gTop{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));gap:10px}
 .logo{font-size:24px;font-weight:900;color:#c24d8f;background:rgba(255,255,255,.9);padding:10px 20px;border-radius:999px;box-shadow:0 4px 0 rgba(200,90,150,.15)}
-#friends{display:flex;gap:5px;margin-top:10px;background:rgba(255,255,255,.75);padding:7px 10px;border-radius:999px;width:max-content}
+#friends{display:grid;grid-template-columns:repeat(10,30px);gap:5px;margin-top:10px;background:rgba(255,255,255,.75);padding:7px 10px;border-radius:999px;width:max-content}
 #friends span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;background:#eee;color:#bbb;border:3px solid #fff}
 #friends span.m{background:var(--c);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 .gbtns{display:flex;gap:12px}
@@ -84,6 +85,7 @@ a.ibtn{text-decoration:none;color:inherit}
 #eq{background:rgba(255,255,255,.94);border-radius:999px;padding:4px 34px;font-size:64px;font-weight:900;display:flex;align-items:center;gap:14px;box-shadow:0 6px 0 rgba(200,90,150,.15),0 12px 26px rgba(200,90,150,.18);min-height:96px}
 #eq .op{color:#e57fb6;font-size:52px}
 #eq .q{display:inline-grid;place-items:center;width:78px;height:78px;border-radius:22px;background:#ffeef7;border:4px dashed #ff9fcf;color:#ff7ab8;animation:beat 1.2s infinite}
+#eq .mid{background:#fff0f7;border-radius:20px;padding:0 12px;box-shadow:inset 0 0 0 4px #ffc2e0}
 #eq .ans{animation:lpop .6s cubic-bezier(.3,1.6,.5,1)}
 #pBottom{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;padding:0 12px max(18px,env(safe-area-inset-bottom));gap:12px}
 #instr{font-size:26px;font-weight:900;background:#fff;border-radius:26px;padding:10px 24px;box-shadow:0 5px 0 rgba(200,90,150,.14);min-height:54px;display:flex;align-items:center;gap:8px;transition:opacity .2s}
@@ -95,6 +97,7 @@ a.ibtn{text-decoration:none;color:inherit}
 .choice:active{transform:translateY(5px);box-shadow:0 3px 0 var(--c)}
 .choice .cn{font-size:84px;font-weight:900;color:var(--ink);line-height:1}
 .choice.pic .cn{font-size:62px}
+.choice.teen.pic .cn{font-size:46px}.choice.teen .mb{gap:2px}.choice.teen .mb .col{gap:2px}.choice.teen .mb i{width:12px;height:12px;border-radius:4px}
 .choice.wrong{opacity:.35;filter:grayscale(.6);animation:shake .45s}
 .choice.right{animation:lpop .5s;box-shadow:0 0 0 8px #fff,0 0 0 14px var(--c)}
 @keyframes shake{20%,60%{translate:-10px 0}40%,80%{translate:10px 0}}
@@ -108,10 +111,10 @@ a.ibtn{text-decoration:none;color:inherit}
 #dBack{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top));width:64px;height:64px;font-size:30px}
 #dPanel{position:absolute;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(920px,calc(100% - 24px));background:rgba(255,255,255,.93);border-radius:34px;padding:14px 16px;box-shadow:0 10px 30px rgba(160,60,120,.2)}
 #dTabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
-#dTabs button{width:54px;height:54px;border-radius:50%;border:4px solid #fff;background:var(--c);color:#fff;font-size:24px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 3px 0 rgba(0,0,0,.1)}
+#dTabs button{width:46px;height:46px;font-size:20px!important;border-radius:50%;border:4px solid #fff;background:var(--c);color:#fff;font-size:24px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 3px 0 rgba(0,0,0,.1)}
 #dTabs button.sel{outline:5px solid #ff6fb3;transform:scale(1.1)}
-#dItems{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-#dItems button{border:0;background:#fff4fa;border-radius:22px;width:92px;height:92px;font-size:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 0 #f5c9e0}
+#dItems{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-height:min(186px,30vh);overflow-y:auto;padding:4px;-webkit-overflow-scrolling:touch}
+#dItems button{border:0;background:#fff4fa;border-radius:20px;width:82px;height:82px;font-size:36px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 0 #f5c9e0}
 #dItems button small{font-size:11px;font-weight:900;margin-top:2px;line-height:1.1;text-align:center}
 #dItems button.sel{background:#ffd7eb;outline:4px solid #ff8fc6}
 .empty{font-weight:900;padding:18px;text-align:center;font-size:20px}
@@ -275,15 +278,18 @@ catch (e) { S = DEF(); }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 
 /* ================= かずの キャラクター設定 ================= */
-const YOMI = ['ぜろ', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう', 'じゅう'];
+const YOMI = ['ぜろ', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう', 'じゅう', 'じゅういち', 'じゅうに', 'じゅうさん', 'じゅうよん', 'じゅうご', 'じゅうろく', 'じゅうなな', 'じゅうはち', 'じゅうきゅう', 'にじゅう'];
+const KOSU = ['', 'いっこ', 'にこ', 'さんこ', 'よんこ', 'ごこ', 'ろっこ', 'ななこ', 'はっこ', 'きゅうこ', 'じゅっこ'];
 const KO = ['', 'ひとつ', 'ふたつ', 'みっつ', 'よっつ', 'いつつ', 'むっつ', 'ななつ', 'やっつ', 'ここのつ', 'とお'];
 const MAIN = { 1: '#ff86c0', 2: '#ffa48f', 3: '#ffd45e', 4: '#86dea0', 5: '#72cdf0', 6: '#b29bff', 7: '#ff8fa3', 8: '#f28fe0', 9: '#8ea8ff', 10: '#ffd9ee' };
 const INK = { 1: '#e0428f', 2: '#e2603f', 3: '#c98d00', 4: '#2f9e57', 5: '#1d8fc0', 6: '#7a5ce0', 7: '#e0508a', 8: '#c24aae', 9: '#4a66db', 10: '#d0579a' };
 const RAINBOW = ['#ff8fa3', '#ffb36b', '#ffe066', '#9ee493', '#7fd0f5', '#a39bff', '#e79bff'];
 const PEARL = ['#ffd9ee', '#e9dcff', '#d6f1ff', '#fff0cf', '#dcfbe8'];
-const cubeColor = (n, i) => n === 7 ? RAINBOW[i % 7] : n === 10 ? PEARL[i % 5] : MAIN[n];
-const earColor = n => n === 7 ? '#ffb3c8' : n === 10 ? '#fff3fa' : MAIN[n];
-const cssColor = n => n === 7 ? 'linear-gradient(135deg,#ff8fa3,#ffe066,#7fd0f5,#e79bff)' : n === 10 ? 'linear-gradient(135deg,#ffc2e2,#d9c7ff,#bfeeff)' : MAIN[n];
+// 11〜20 は「10の パールブロック ＋ のこりの いろ」
+for (let n = 11; n <= 20; n++) { MAIN[n] = MAIN[n - 10]; INK[n] = INK[n - 10]; }
+const cubeColor = (n, i) => n > 10 ? (i < 10 ? PEARL[i % 5] : cubeColor(n - 10, i - 10)) : n === 7 ? RAINBOW[i % 7] : n === 10 ? PEARL[i % 5] : MAIN[n];
+const earColor = n => n > 10 ? earColor(n - 10) : n === 7 ? '#ffb3c8' : n === 10 ? '#fff3fa' : MAIN[n];
+const cssColor = n => n === 20 ? cssColor(10) : n > 10 ? `linear-gradient(135deg,#ffd9ee 0 48%,${n === 17 ? '#ffe066' : MAIN[n]} 52%)` : n === 7 ? 'linear-gradient(135deg,#ff8fa3,#ffe066,#7fd0f5,#e79bff)' : n === 10 ? 'linear-gradient(135deg,#ffc2e2,#d9c7ff,#bfeeff)' : MAIN[n];
 
 /* ================= おと ================= */
 const AC = {
@@ -388,11 +394,11 @@ const shadowTex = canvasTex(128, 128, (g) => { const r = g.createRadialGradient(
 const emojiCache = {};
 const emojiMat = e => emojiCache[e] ||= new THREE.SpriteMaterial({ map: canvasTex(128, 128, g => { g.font = '100px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 64, 72); }), transparent: true, depthWrite: false });
 const badgeCache = {};
-const badgeMat = n => badgeCache[n] ||= new THREE.SpriteMaterial({
+const badgeMat = (n, out) => badgeCache[n + (out ? 'o' : '')] ||= new THREE.SpriteMaterial({
   map: canvasTex(128, 128, g => {
     g.fillStyle = '#fff'; g.beginPath(); g.arc(64, 64, 56, 0, Math.PI * 2); g.fill();
-    g.lineWidth = 10; g.strokeStyle = '#ff6fb3'; g.stroke();
-    g.fillStyle = '#e8438f'; g.font = `900 ${n >= 10 ? 58 : 76}px "Hiragino Maru Gothic ProN","Arial Rounded MT Bold",sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 64, 70);
+    g.lineWidth = 10; g.strokeStyle = out ? '#7fb8ff' : '#ff6fb3'; g.stroke();
+    g.fillStyle = out ? '#3f7fe0' : '#e8438f'; g.font = `900 ${n >= 10 ? 58 : 76}px "Hiragino Maru Gothic ProN","Arial Rounded MT Bold",sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 64, 70);
   }), depthTest: false, transparent: true,
 });
 
@@ -429,7 +435,7 @@ const slot = i => new THREE.Vector3(Math.floor(i / 5), (i % 5) + .5, 0);
 function makeLabel(n, size = 'm') { const el = document.createElement('div'); el.className = 'nlabel ' + size; setLabelN(el, n); $('#labels').appendChild(el); return el; }
 function setLabelN(el, n, pop) {
   el.textContent = n; el.style.setProperty('--c', MAIN[n]); el.style.setProperty('--ink', INK[n]);
-  el.classList.toggle('rainbow', n === 7); el.classList.toggle('pearl', n === 10);
+  el.classList.toggle('rainbow', n === 7); el.classList.toggle('pearl', n === 10 || n === 20); el.classList.toggle('teen', n > 10 && n < 20);
   if (pop) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 }
 function shown(o) { while (o) { if (!o.visible) return false; if (o === scene) return true; o = o.parent; } return false; }
@@ -521,16 +527,16 @@ class Bunny {
     l.userData.base = .14; r.userData.base = -.14; l.userData.bx = 0; r.userData.bx = 0;
     if (n % 3 === 2) r.userData.base = -.95;
     if (n % 4 === 3) { l.userData.base = .3; r.userData.base = -.3; }
-    if (n === 10) { l.userData.bx = -.15; r.userData.bx = -.15; }
+    if (n === 10 || n === 20) { l.userData.bx = -.15; r.userData.bx = -.15; }
   }
-  setAcc(id) {
-    this.acc.clear(); this.accId = id || null; this.accTall = (id && ACC_TALL[id]) || 0;
-    if (id && ACC[id]) this.acc.add(ACC[id]());
+  setAcc(o) {
+    this.acc.clear(); this.accId = normOutfit(o); this.accTall = 0;
+    for (const id of Object.values(this.accId)) if (ACC[id]) { this.acc.add(ACC[id]()); this.accTall = Math.max(this.accTall, ACC_TALL[id] || 0); }
   }
-  get width() { return this.n > 5 ? 2 : 1; }
+  get width() { return Math.ceil(this.n / 5); }
   get tall() { return Math.min(this.n, 5); }
   layout(anim = true, dur = .45) {
-    const hp = slot(this.tall - 1), bx = this.n > 5 ? -.5 : 0, sw = this.width * 1.25 + .2;
+    const hp = slot(this.tall - 1), bx = -(this.width - 1) / 2, sw = this.width * 1.25 + .2;
     if (!anim) { this.head.position.copy(hp); this.body.position.x = bx; this.shadow.scale.set(sw, 1.5, 1); return Promise.resolve(); }
     const h0 = this.head.position.clone(), b0 = this.body.position.x, s0 = this.shadow.scale.x;
     return tween(dur, k => {
@@ -586,13 +592,16 @@ class Bunny {
     AC.pop(.8); burst(this.root.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, .2, .5)), { n: 6, emojis: ['✨', '💫'], speed: 3, up: 1, size: .4 });
     await tween(.22, k => this.sq = .22 * Math.sin(k * Math.PI)); this.sq = 0;
   }
-  showBadge(i, num) {
+  showBadge(i, num, out) {
     const c = this.cubes[i]; if (!c) return;
     if (c.userData.badge) c.remove(c.userData.badge);
-    const sp = new THREE.Sprite(badgeMat(num)); sp.renderOrder = 20; c.add(sp); c.userData.badge = sp;
+    const sp = new THREE.Sprite(badgeMat(num, out)); sp.renderOrder = 20; c.add(sp); c.userData.badge = sp;
     this.placeBadge(i); tween(.3, k => sp.scale.setScalar(.48 * ease.back(k)), ease.lin);
   }
-  placeBadge(i) { const c = this.cubes[i], b = c && c.userData.badge; if (b) b.position.set(Math.floor(i / 5) === 0 ? -.66 : .66, 0, .3); }
+  placeBadge(i) {
+    const c = this.cubes[i], b = c && c.userData.badge; if (!b) return; const col = Math.floor(i / 5);
+    if (col === 0) b.position.set(-.66, 0, .3); else if (col === this.width - 1) b.position.set(.66, 0, .3); else b.position.set(0, 0, .56);
+  }
   clearBadges() { this.cubes.forEach(c => { if (c.userData.badge) { c.remove(c.userData.badge); c.userData.badge = null; } }); }
   glow(i, on = true) {
     const c = this.cubes[i]; if (!c) return; c.userData.glow = on;
@@ -607,11 +616,16 @@ class Bunny {
   async countAll({ from = 1, voice = true, gap = .45, tok } = {}) {
     for (let i = 0; i < this.n; i++) { await this.countOne(i, from + i, { voice, gap }); if (tok !== undefined) guard(tok); }
   }
-  async countFive({ tok, voice = true } = {}) { // 5のかたまり → のこりを かぞえる
+  async countFive({ tok, voice = true } = {}) { // 5や10の かたまり → のこりを かぞえる
     if (this.n <= 5) return this.countAll({ tok, voice });
-    for (let i = 0; i < 5; i++) { this.showBadge(i, i + 1); this.glow(i); this.popCube(i); }
-    AC.sparkle(); await Promise.all([voice ? Voice.say('ご！') : null, wait(.7)]); if (tok !== undefined) guard(tok);
-    for (let i = 5; i < this.n; i++) { await this.countOne(i, i + 1, { voice }); if (tok !== undefined) guard(tok); }
+    const g = this.n > 10 ? 10 : 5;
+    for (let i = 0; i < g; i++) { this.showBadge(i, i + 1); this.glow(i); this.popCube(i); }
+    AC.sparkle(); await Promise.all([voice ? Voice.say(g === 10 ? 'じゅう！' : 'ご！') : null, wait(.7)]); if (tok !== undefined) guard(tok);
+    for (let i = g; i < this.n; i++) { await this.countOne(i, i + 1, { voice }); if (tok !== undefined) guard(tok); }
+  }
+  ghost(i, on) { // ひきざんで「おでかけ」する ブロック
+    const c = this.cubes[i]; if (!c) return; c.userData.ghost = on;
+    c.material.transparent = on; c.material.opacity = on ? .28 : 1; c.material.depthWrite = !on; c.material.needsUpdate = true;
   }
   async recolor(dur = .5) {
     const from = this.cubes.map(c => c.material.color.clone()), to = this.cubes.map((c, i) => new THREE.Color(cubeColor(this.n, i)));
@@ -729,7 +743,25 @@ const ACC = {
   cherry: () => { const g = new THREE.Group(); g.add(M3(GEO.sph, '#ff5b7a', -.07, 0, 0, { s: .075 })); g.add(M3(GEO.sph, '#ff5b7a', .07, -.02, 0, { s: .075 })); g.add(M3(new THREE.CylinderGeometry(.01, .01, .2, 6), '#5cc26c', -.03, .1, 0, { rz: .4 })); g.add(M3(new THREE.CylinderGeometry(.01, .01, .2, 6), '#5cc26c', .05, .09, 0, { rz: -.3 })); g.add(M3(GEO.sph, '#7fd67f', .02, .2, 0, { s: [.07, .03, .04] })); g.position.set(.34, .4, .38); g.scale.setScalar(1.3); return g; },
   tiara: () => { const g = new THREE.Group(), m = toon('#efe6ff'); g.add(M3(new THREE.TorusGeometry(.26, .025, 8, 28, Math.PI), m, 0, 0, 0)); g.add(M3(STAR, '#fff27a', 0, .3, .02, { s: .22 })); g.add(M3(GEO.sph, '#7fd6ff', -.17, .2, .02, { s: .045 })); g.add(M3(GEO.sph, '#ff8fc6', .17, .2, .02, { s: .045 })); g.position.set(0, .47, .18); g.scale.set(1, .8, 1); return g; },
 };
-const ACC_TALL = { crown: .25, unicorn: .3, hat: .5, angel: .55, tiara: .2 };
+Object.assign(ACC, {
+  bigbow: () => { const g = bow('#b99cff', 1.7); g.position.set(0, .56, .02); return g; },
+  headphones: () => { const g = new THREE.Group(); g.add(M3(new THREE.TorusGeometry(.54, .045, 8, 32, Math.PI), '#ffffff', 0, 0, 0)); for (const s of [-1, 1]) { g.add(M3(new THREE.CylinderGeometry(.18, .18, .13, 22), '#ff8fc6', s * .54, -.02, 0, { rz: Math.PI / 2 })); g.add(M3(HEART, '#ffffff', s * .61, -.02, 0, { s: [.12, .12, .1], ry: s * Math.PI / 2 })); } return g; },
+  berryhat: () => { const g = new THREE.Group(); g.add(M3(new THREE.ConeGeometry(.3, .48, 22), '#ff5b7a', 0, .72, 0)); for (let i = 0; i < 7; i++) { const a = i * 2.2, y = .58 + (i % 3) * .1, r = .26 - (i % 3) * .07; g.add(M3(GEO.sph, '#fff6c9', Math.sin(a) * r, y, Math.cos(a) * r, { s: .025 })); } for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; g.add(M3(new THREE.ConeGeometry(.06, .2, 6), '#5cc26c', Math.sin(a) * .1, .98, Math.cos(a) * .1, { rx: Math.cos(a) * .9, rz: -Math.sin(a) * .9 })); } return g; },
+  flowercrown: () => { const g = new THREE.Group(), cs = ['#ff9fcf', '#ffe066', '#b8a4ff', '#ffffff', '#8fdcff', '#ffb36b', '#ff9fcf']; cs.forEach((c, i) => { const a = i / cs.length * Math.PI * 2; const f = new THREE.Group(); for (let j = 0; j < 5; j++) { const b = j / 5 * Math.PI * 2; f.add(M3(GEO.sphLo, c, Math.cos(b) * .055, 0, Math.sin(b) * .055, { s: .045 })); } f.add(M3(GEO.sphLo, '#ffd24d', 0, .02, 0, { s: .03 })); f.position.set(Math.sin(a) * .36, .5, Math.cos(a) * .36); g.add(f); }); return g; },
+  witch: () => { const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(.44, .44, .03, 28), '#9d82f5', 0, .5, 0)); const c = M3(new THREE.ConeGeometry(.25, .62, 22), '#9d82f5', .04, .82, 0, { rz: -.25 }); g.add(c); g.add(M3(new THREE.TorusGeometry(.24, .03, 8, 22), '#ff8fc6', 0, .56, 0, { rx: Math.PI / 2 })); g.add(M3(STAR, '#ffe066', .02, .8, .2, { s: .18 })); return g; },
+  beret: () => { const g = new THREE.Group(); g.add(M3(GEO.sph, '#ff8fc6', 0, .56, 0, { s: [.42, .13, .42] })); g.add(M3(GEO.sph, '#ff8fc6', 0, .7, 0, { s: .04 })); g.rotation.z = .25; return g; },
+  stars: () => { const g = new THREE.Group(), m = toon('#ffe066', { transparent: true, opacity: .9 }); for (const s of [-1, 1]) g.add(M3(STAR, m, s * .19, 0, 0, { s: [.36, .36, .25] })); g.add(M3(new THREE.CylinderGeometry(.015, .015, .12, 6), '#ffb36b', 0, .02, 0, { rz: Math.PI / 2 })); g.position.set(0, .07, .53); return g; },
+  butterfly: () => { const g = new THREE.Group(); for (const s of [-1, 1]) { g.add(M3(GEO.sph, '#c9a4ff', s * .1, .05, 0, { s: [.1, .08, .02], rz: s * .5 })); g.add(M3(GEO.sph, '#ff9fcf', s * .08, -.07, 0, { s: [.07, .06, .02], rz: -s * .5 })); } g.add(M3(GEO.sph, '#7a3563', 0, 0, .01, { s: [.02, .09, .02] })); g.position.set(-.3, .38, .45); g.rotation.z = .3; g.scale.setScalar(1.3); return g; },
+  scarf: () => { const g = new THREE.Group(); g.add(M3(new THREE.TorusGeometry(.6, .1, 10, 32), '#ff8fc6', 0, -.4, 0, { rx: Math.PI / 2 })); g.add(M3(new THREE.TorusGeometry(.6, .04, 6, 32), '#ffffff', 0, -.33, 0, { rx: Math.PI / 2 })); g.add(M3(new THREE.BoxGeometry(.18, .4, .06), '#ff8fc6', .3, -.6, .6, { rz: .15 })); return g; },
+  necklace: () => { const g = new THREE.Group(); for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2; g.add(M3(GEO.sphLo, '#fff8fb', Math.sin(a) * .62, -.42, Math.cos(a) * .62, { s: .05 })); } g.add(M3(HEART, '#ff6fb1', 0, -.52, .64, { s: [.16, .16, .1] })); return g; },
+  wand: () => { const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(.025, .025, .6, 8), '#ffffff', 0, 0, 0)); g.add(M3(STAR, toon('#ffe066', { emissive: new THREE.Color('#554400') }), 0, .36, 0, { s: .3 })); g.position.set(-.68, -.15, .25); g.rotation.z = .45; return g; },
+  heartballoon: () => { const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(.008, .008, 1.3, 4), '#ffffff', .68, .45, 0, { rz: -.2 })); g.add(M3(HEART, '#ff8fc6', .82, 1.2, 0, { s: .38 })); return g; },
+});
+const ACC_TALL = { crown: .25, unicorn: .3, hat: .5, angel: .55, tiara: .2, bigbow: .2, berryhat: .55, witch: .7, beret: .1, flowercrown: .05, heartballoon: .5 };
+const ACC_SLOT = { ribbon: 'side', flower: 'side', cherry: 'side', butterfly: 'side', glasses: 'face', stars: 'face', scarf: 'neck', necklace: 'neck', wand: 'hand', heartballoon: 'hand' };
+const slotOf = id => ACC_SLOT[id] || 'head';
+// きせかえは ばしょごとに 1つずつ（あたま・かみどめ・かお・くび・て）
+const normOutfit = o => !o ? {} : typeof o === 'string' ? { [slotOf(o)]: o } : { ...o };
 
 function cottonTree(colors = ['#ffb3d9', '#e0c8ff', '#b8f0e0']) {
   const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(.14, .2, 1.6, 10), '#fff1e6', 0, .8, 0));
@@ -800,20 +832,64 @@ const DECO = {
     return g;
   },
 };
+Object.assign(DECO, {
+  swing: () => {
+    const g = new THREE.Group();
+    for (const s of [-1, 1]) for (const z of [-1, 1]) g.add(M3(new THREE.CylinderGeometry(.06, .06, 2.45, 8), '#ffb3d9', s * 1.05, 1.15, z * .38, { rx: z * .32 }));
+    g.add(M3(new THREE.CylinderGeometry(.07, .07, 2.3, 8), '#c9a4ff', 0, 2.3, 0, { rz: Math.PI / 2 }));
+    const seat = new THREE.Group(); seat.position.y = 2.3; g.add(seat);
+    for (const s of [-1, 1]) seat.add(M3(new THREE.CylinderGeometry(.015, .015, 1.6, 4), '#ffffff', s * .35, -.8, 0));
+    seat.add(M3(new THREE.BoxGeometry(.9, .08, .4), '#ff8fc6', 0, -1.6, 0));
+    g.userData.tick = t => seat.rotation.x = Math.sin(t * 1.6) * .35; return g;
+  },
+  slide: () => {
+    const g = new THREE.Group(); g.add(M3(new THREE.BoxGeometry(.9, .1, .9), '#ffe066', -.8, 1.6, 0));
+    for (const x of [-1.2, -.4]) for (const z of [-.4, .4]) g.add(M3(new THREE.CylinderGeometry(.05, .05, 1.6, 6), '#ffffff', x, .8, z));
+    g.add(M3(new THREE.BoxGeometry(2.45, .08, .8), '#8fdcff', .6, .84, 0, { rz: -.7 }));
+    for (let i = 0; i < 4; i++) g.add(M3(new THREE.BoxGeometry(.12, .06, .8), '#ff9fcf', -1.3, .3 + i * .35, 0));
+    return g;
+  },
+  carousel: () => {
+    const g = new THREE.Group(); g.add(M3(new THREE.CylinderGeometry(1.3, 1.35, .22, 28), '#fff0f7', 0, .11, 0));
+    g.add(M3(new THREE.CylinderGeometry(.08, .08, 2.2, 8), '#ffd35c', 0, 1.2, 0)); g.add(M3(new THREE.ConeGeometry(1.5, .8, 28), '#ff9fd0', 0, 2.6, 0)); g.add(M3(GEO.sph, '#ffe066', 0, 3.05, 0, { s: .14 }));
+    const rot = new THREE.Group(); g.add(rot);
+    ['#ffffff', '#c9a4ff', '#8fdcff', '#ffe066'].forEach((c, i) => { const a = i / 4 * Math.PI * 2, x = Math.sin(a) * .9, z = Math.cos(a) * .9; rot.add(M3(new THREE.CylinderGeometry(.025, .025, 2, 6), '#ffd35c', x, 1.2, z)); const h = new THREE.Group(); h.add(M3(GEO.sph, c, 0, 0, 0, { s: [.32, .2, .16] })); h.add(M3(GEO.sph, c, .28, .16, 0, { s: .13 })); h.add(M3(new THREE.ConeGeometry(.04, .14, 6), '#ffd35c', .3, .3, 0)); h.position.set(x, .9, z); h.rotation.y = -a; h.userData.ph = i; rot.add(h); });
+    g.userData.tick = t => { rot.rotation.y = t * .6; rot.children.forEach(h => { if (h.userData.ph !== undefined) h.position.y = .9 + Math.sin(t * 2 + h.userData.ph * 1.6) * .15; }); }; return g;
+  },
+  tent: () => { const g = new THREE.Group(); g.add(M3(new THREE.ConeGeometry(1.1, 1.9, 6), '#c9a4ff', 0, .95, 0)); g.add(M3(new THREE.BoxGeometry(.5, .7, .05), '#7258d6', 0, .35, .93)); [[.5, 1.2], [-.4, .9], [.1, 1.5]].forEach(([x, y]) => g.add(M3(STAR, '#ffe066', x * .6, y, (1.9 - y) * .5, { s: .2 }))); g.add(M3(new THREE.CylinderGeometry(.015, .015, .5, 4), '#ffffff', 0, 2.1, 0)); g.add(M3(new THREE.BoxGeometry(.3, .18, .02), '#ff8fc6', .15, 2.25, 0)); return g; },
+  snowman: () => { const g = new THREE.Group(); g.add(M3(GEO.sph, '#ffffff', 0, .6, 0, { s: .62 })); g.add(M3(GEO.sph, '#ffffff', 0, 1.42, 0, { s: .42 })); for (const s of [-1, 1]) g.add(M3(GEO.sphLo, '#3b1f3f', s * .14, 1.5, .37, { s: .05 })); g.add(M3(new THREE.ConeGeometry(.06, .3, 8), '#ffa040', 0, 1.42, .5, { rx: Math.PI / 2 })); g.add(M3(new THREE.TorusGeometry(.38, .08, 8, 20), '#ff8fc6', 0, 1.1, 0, { rx: Math.PI / 2 })); g.add(M3(new THREE.CylinderGeometry(.26, .3, .35, 16), '#9d82f5', 0, 1.95, 0)); g.add(M3(new THREE.CylinderGeometry(.42, .42, .04, 20), '#9d82f5', 0, 1.78, 0)); return g; },
+  icecream: () => { const g = new THREE.Group(); g.add(M3(new THREE.BoxGeometry(1.5, .8, .8), '#fff0f7', 0, .6, 0)); for (const s of [-1, 1]) g.add(M3(new THREE.TorusGeometry(.18, .06, 8, 16), '#c9a4ff', s * .5, .18, .42)); g.add(M3(new THREE.CylinderGeometry(.03, .03, 1.6, 6), '#ffffff', .5, 1.6, 0)); g.add(M3(new THREE.ConeGeometry(1, .45, 16), '#ff9fcf', .5, 2.5, 0)); g.add(M3(new THREE.ConeGeometry(.18, .55, 12), '#f5c48a', -.3, 1.25, 0, { rx: Math.PI })); g.add(M3(GEO.sph, '#ffc2e0', -.3, 1.6, 0, { s: .22 })); g.add(M3(GEO.sph, '#bff0ff', -.3, 1.85, 0, { s: .19 })); return g; },
+  flowerbed: () => { const g = new THREE.Group(); g.add(M3(new THREE.BoxGeometry(3.2, .18, 1), '#e9d6ff', 0, .09, 0)); for (let i = 0; i < 9; i++) { const x = -1.3 + i * .33, z = (i % 2) * .3 - .15, c = ['#ff8fc6', '#ffe066', '#c9a4ff', '#ffffff', '#ff9a7a'][i % 5]; g.add(M3(new THREE.CylinderGeometry(.02, .02, .5, 4), '#5cc26c', x, .4, z)); g.add(M3(GEO.sphLo, c, x, .7, z, { s: [.11, .14, .11] })); } return g; },
+  heartarch: () => { const g = new THREE.Group(); g.add(M3(new THREE.TorusGeometry(1.4, .12, 10, 36, Math.PI), '#ff9fd0', 0, 0, 0)); for (let i = 0; i <= 8; i++) { const a = i / 8 * Math.PI; g.add(M3(GEO.sphLo, i % 2 ? '#ffffff' : '#ffe066', Math.cos(a) * 1.4, Math.sin(a) * 1.4, .1, { s: .12 })); } g.add(M3(HEART, '#ff6fb1', 0, 1.75, 0, { s: .55 })); return g; },
+  hotair: () => { const g = new THREE.Group(), b = new THREE.Group(); g.add(b); b.add(M3(GEO.sph, '#ffb3d9', 0, 1.3, 0, { s: [1, 1.15, 1] })); b.add(M3(new THREE.TorusGeometry(1, .08, 8, 28), '#ffffff', 0, 1.3, 0, { rx: Math.PI / 2 })); b.add(M3(new THREE.BoxGeometry(.5, .4, .5), '#f5c48a', 0, -.15, 0)); for (const [x, z] of [[-.22, -.22], [.22, -.22], [-.22, .22], [.22, .22]]) b.add(M3(new THREE.CylinderGeometry(.01, .01, .6, 4), '#ffffff', x, .25, z)); g.userData.tick = t => { const a = t * .08; b.position.set(Math.cos(a) * 9, 7 + Math.sin(t * .7) * .4, Math.sin(a) * 9); }; return g; },
+  moon: () => { const g = new THREE.Group(); g.add(M3(GEO.sph, '#fff1a8', 0, 0, 0, { s: 1.2 })); for (const s of [-1, 1]) { g.add(M3(GEO.happy, MAT.eye, s * .4, .15, 1.15, { s: 2.2, rz: Math.PI })); g.add(M3(GEO.cheek, MAT.cheek, s * .65, -.15, 1.05, { s: 2 })); } return g; },
+});
 const ITEMS = [
   { id: 'ribbon', type: 'acc', name: 'りぼん', icon: '🎀' }, { id: 'crown', type: 'acc', name: 'おうかん', icon: '👑' },
   { id: 'flower', type: 'acc', name: 'おはな', icon: '🌸' }, { id: 'unicorn', type: 'acc', name: 'ユニコーンの つの', icon: '🦄' },
   { id: 'glasses', type: 'acc', name: 'ハートめがね', icon: '💗' }, { id: 'hat', type: 'acc', name: 'とんがりぼうし', icon: '🎉' },
   { id: 'angel', type: 'acc', name: 'てんしの わっか', icon: '👼' }, { id: 'cherry', type: 'acc', name: 'さくらんぼ', icon: '🍒' },
   { id: 'tiara', type: 'acc', name: 'ティアラ', icon: '💎' },
+  { id: 'bigbow', type: 'acc', name: 'おおきな リボン', icon: '💜' }, { id: 'headphones', type: 'acc', name: 'ヘッドホン', icon: '🎧' },
+  { id: 'berryhat', type: 'acc', name: 'いちご ぼうし', icon: '🍓' }, { id: 'flowercrown', type: 'acc', name: 'はなかんむり', icon: '💐' },
+  { id: 'witch', type: 'acc', name: 'まじょの ぼうし', icon: '🔮' }, { id: 'beret', type: 'acc', name: 'ベレーぼう', icon: '🎨' },
+  { id: 'stars', type: 'acc', name: 'ほしの めがね', icon: '⭐' }, { id: 'butterfly', type: 'acc', name: 'ちょうちょ', icon: '🦋' },
+  { id: 'scarf', type: 'acc', name: 'マフラー', icon: '🧣' }, { id: 'necklace', type: 'acc', name: 'ネックレス', icon: '🤍' },
+  { id: 'wand', type: 'acc', name: 'まほうの ステッキ', icon: '🪄' }, { id: 'heartballoon', type: 'acc', name: 'もつ ふうせん', icon: '💕' },
   { id: 'rainbow', type: 'deco', name: 'にじ', icon: '🌈' }, { id: 'castle', type: 'deco', name: 'おしろ', icon: '🏰' },
   { id: 'cake', type: 'deco', name: 'ケーキの おうち', icon: '🎂' }, { id: 'mushroom', type: 'deco', name: 'きのこの おうち', icon: '🍄' },
   { id: 'fountain', type: 'deco', name: 'ふんすい', icon: '⛲' }, { id: 'balloons', type: 'deco', name: 'ハートの ふうせん', icon: '🎈' },
   { id: 'lollipop', type: 'deco', name: 'キャンディの き', icon: '🍭' }, { id: 'pond', type: 'deco', name: 'はすの いけ', icon: '🪷' },
   { id: 'teaset', type: 'deco', name: 'おちゃかい', icon: '☕' },
+  { id: 'swing', type: 'deco', name: 'ブランコ', icon: '🌳' }, { id: 'slide', type: 'deco', name: 'すべりだい', icon: '🛝' },
+  { id: 'carousel', type: 'deco', name: 'メリーゴーランド', icon: '🎠' }, { id: 'tent', type: 'deco', name: 'おほしさま テント', icon: '⛺' },
+  { id: 'snowman', type: 'deco', name: 'ゆきだるま', icon: '⛄' }, { id: 'icecream', type: 'deco', name: 'アイスやさん', icon: '🍦' },
+  { id: 'flowerbed', type: 'deco', name: 'おはなばたけ', icon: '🌷' }, { id: 'heartarch', type: 'deco', name: 'ハートの アーチ', icon: '💞' },
+  { id: 'hotair', type: 'deco', name: 'ききゅう', icon: '🌤️' }, { id: 'moon', type: 'deco', name: 'おつきさま', icon: '🌙' },
 ];
 const itemById = id => ITEMS.find(i => i.id === id);
-const DECO_POS = { rainbow: [0, 0, -7.2, 0], mushroom: [-4.3, 0, -5.1, .5], castle: [-6.3, 0, -1.6, 1.1], cake: [-5.8, 0, 2.9, 1.9], teaset: [-3.4, 0, 5.8, 2.6], pond: [3.4, 0, 5.8, 0], balloons: [5.9, 0, 2.9, -1.9], fountain: [6.2, 0, -1.6, 0], lollipop: [4.2, 0, -5.2, -.5] };
+const DECO_POS = { rainbow: [0, 0, -7.2, 0], mushroom: [-4.3, 0, -5.1, .5], castle: [-6.3, 0, -1.6, 1.1], cake: [-5.8, 0, 2.9, 1.9], teaset: [-3.4, 0, 5.8, 2.6], pond: [3.4, 0, 5.8, 0], balloons: [5.9, 0, 2.9, -1.9], fountain: [6.2, 0, -1.6, 0], lollipop: [4.2, 0, -5.2, -.5],
+  swing: [-6.1, 0, -4, 1], slide: [6.1, 0, -4, -1], carousel: [-7.2, 0, .6, 1.6], tent: [7.2, 0, .6, -1.6], snowman: [-5.4, 0, 4.9, 2.3], icecream: [5.4, 0, 4.9, -2.3], flowerbed: [0, 0, 7.1, 0], heartarch: [0, 0, -5.3, 0], hotair: [0, 0, 0, 0], moon: [-8.5, 9, -9, 0] };
 
 function giftBox(color = '#ff9fd0', s = 1) {
   const g = new THREE.Group();
@@ -868,12 +944,13 @@ const clouds = [];
     }
   }
   w.add(petal);
-  for (const [x, z, s, c] of [[-2.6, -7.2, 1, undefined], [2.6, -7.3, .9, ['#d9c6ff', '#ffc2e0', '#bdf0ff']], [-7.6, 1.2, .7, ['#bdf0ff', '#ffb3d9']], [7.6, 1, .7, ['#ffe9a8', '#ffb3d9', '#d9c6ff']]]) { const t = cottonTree(c); t.position.set(x, 0, z); t.scale.setScalar(s); w.add(t); }
+  for (const [x, z, s, c] of [[-2.6, -7.2, 1, undefined], [2.6, -7.3, .9, ['#d9c6ff', '#ffc2e0', '#bdf0ff']], [-7.6, 1.2, .7, ['#bdf0ff', '#ffb3d9']], [7.6, 1, .7, ['#ffe9a8', '#ffb3d9', '#d9c6ff']]]) { const t = cottonTree(c); t.position.set(x, 0, z); t.scale.setScalar(s); w.add(t); if (Math.abs(x) > 7) (garden.sideTrees ||= []).push(t); }
   for (let i = 0; i < 7; i++) { const c = cloud(rand(.8, 1.4)); c.userData = { a: i / 7 * Math.PI * 2, r: rand(12, 15), y: rand(-3.5, 1.5), sp: rand(.02, .05) }; garden.group.add(c); clouds.push(c); }
 })();
 
 function buildDecos() {
   garden.decos.clear();
+  if (garden.sideTrees) { garden.sideTrees[0].visible = !S.items.includes('carousel'); garden.sideTrees[1].visible = !S.items.includes('tent'); }
   for (const it of S.items) {
     const d = DECO[it]; if (!d) continue; const p = DECO_POS[it]; const o = d();
     o.position.set(p[0], p[1], p[2]); o.rotation.y = p[3]; garden.decos.add(o);
@@ -884,7 +961,8 @@ function buildDecos() {
 
 function renderFriends() {
   const f = $('#friends'); f.innerHTML = '';
-  for (let n = 1; n <= 10; n++) { const s = document.createElement('span'); if (S.met.includes(n)) { s.className = 'm'; s.style.setProperty('--c', MAIN[n]); if (n === 7 || n === 10) s.style.background = cssColor(n); s.textContent = n; } else s.textContent = '?'; f.appendChild(s); }
+  const top = S.unlocked > 10 || S.met.some(n => n > 10) ? 20 : 10;
+  for (let n = 1; n <= top; n++) { const s = document.createElement('span'); if (S.met.includes(n)) { s.className = 'm'; s.style.setProperty('--c', MAIN[n]); if (n === 7 || n >= 10) s.style.background = cssColor(n); s.textContent = n; } else s.textContent = '?'; f.appendChild(s); }
 }
 
 function enterGarden() {
@@ -893,7 +971,8 @@ function enterGarden() {
   const today = dayKey(); $('#giftTag').style.display = S.lastGift !== today ? '' : 'none'; $('#doneTag').style.display = S.lastGift === today ? '' : 'none';
   garden.bun.forEach(b => b.dispose()); garden.bun = [];
   garden.on = true; const gen = ++garden.gen;
-  const met = [...S.met].sort((a, b) => a - b);
+  // 11いじょうの おともだちは まいかい 4にんまで あそびにくる
+  const met = [...S.met.filter(n => n <= 10), ...shuffle(S.met.filter(n => n > 10)).slice(0, 4)].sort((a, b) => a - b);
   met.forEach((n, i) => {
     const b = new Bunny(n, { scale: .72, label: 's' }); const a = i / met.length * Math.PI * 2 + .4, r = rand(1.5, 4);
     b.root.position.set(Math.cos(a) * r, 0, Math.sin(a) * r * .8); b.root.rotation.y = -garden.world.rotation.y;
@@ -934,7 +1013,7 @@ async function gardenTap(b) {
 }
 async function gardenMerge(gen) {
   const free = garden.bun.filter(b => !b.busy && b.alive);
-  const pairs = []; for (const x of free) for (const y of free) if (x !== y && x.n + y.n <= 10) pairs.push([x, y]);
+  const pairs = []; for (const x of free) for (const y of free) if (x !== y && x.n + y.n <= 20) pairs.push([x, y]);
   if (!pairs.length) return;
   // ちかくに いる ふたりを えらぶ
   pairs.sort((p, q) => p[0].root.position.distanceTo(p[1].root.position) - q[0].root.position.distanceTo(q[1].root.position));
@@ -1031,75 +1110,273 @@ function showHand(obj) { hideHand(); const el = document.createElement('div'); e
 function hideHand() { if (handA) { unanchor(handA); handA = null; } }
 function miniBlocks(v) {
   let h = '<span class="mb">';
-  for (let c = 0; c < (v > 5 ? 2 : 1); c++) { h += '<span class="col">'; for (let i = c * 5; i < Math.min(v, c * 5 + 5); i++) h += `<i style="background:${cubeColor(v, i)}"></i>`; h += '</span>'; }
+  for (let c = 0; c < Math.ceil(v / 5); c++) { h += '<span class="col">'; for (let i = c * 5; i < Math.min(v, c * 5 + 5); i++) h += `<i style="background:${cubeColor(v, i)}"></i>`; h += '</span>'; }
   return h + '</span>';
 }
 
 /* ================= もんだい の きろく ================= */
-function allFacts(max) { const r = []; for (let a = 1; a < max; a++) for (let b = 1; a + b <= max; b++) r.push([a, b]); return r; }
-const fkey = (a, b) => a + '+' + b;
-const fact = (a, b) => S.facts[fkey(a, b)] ||= { box: 0, seen: 0, ok: 0, ng: 0, last: 0, lw: false, best: 0 };
+// もんだいの しゅるい: {t:'add',a,b} / {t:'sub',a,b} / {t:'multi',n:[a,b,c],o:['+','-']}
+const fkey = (t, a, b) => a + (t === 'sub' ? '-' : '+') + b;
+const factOf = (t, a, b) => S.facts[fkey(t, a, b)] ||= { box: 0, seen: 0, ok: 0, ng: 0, last: 0, lw: false };
 const stageOf = f => f.box <= 0 ? 1 : f.box === 1 ? 2 : f.box === 2 ? 3 : 4;
-function pickQuestions(n) {
-  const now = Date.now();
-  const pool = allFacts(S.unlocked).map(([a, b]) => {
-    const f = S.facts[fkey(a, b)], box = f ? f.box : 0;
-    let w = f && f.seen ? [6, 5, 3, 2, 1][box] : 5;
-    if (f && f.lw) w += 4; if (a + b === S.unlocked) w += 2; if (f && now - f.last < 3 * 60e3) w *= .35;
-    return { q: [a, b], w, box };
-  });
-  const out = [];
-  while (out.length < n && pool.length) {
-    let r = Math.random() * pool.reduce((s, p) => s + p.w, 0), i = 0;
-    for (; i < pool.length - 1; i++) { r -= pool[i].w; if (r <= 0) break; }
-    out.push(pool.splice(i, 1)[0]);
+const MAXN = () => Math.min(20, Math.max(5, S.unlocked));
+function addPool(max) { const r = []; for (let a = 1; a <= 10; a++) for (let b = 1; b <= 10 && a + b <= max; b++) r.push([a, b]); return r; }
+function subPool(max) { const r = []; for (let a = 2; a <= max; a++) for (let b = 1; b < a && b <= 10; b++) r.push([a, b]); return r; }
+const subOn = () => S.settings.sub === 'on' || (S.settings.sub !== 'off' && S.unlocked >= 6);
+const multiOn = () => S.settings.multi === 'on' || (S.settings.multi !== 'off' && S.unlocked >= 8);
+function weighOf(t, a, b, now) {
+  const f = S.facts[fkey(t, a, b)], box = f ? f.box : 0;
+  let w = f && f.seen ? [6, 5, 3, 2, 1][box] : 4;
+  if (f && f.lw) w += 4; if (f && now - f.last < 3 * 60e3) w *= .35;
+  return { w, box };
+}
+function wpick(pool) { let r = Math.random() * pool.reduce((s, p) => s + p.w, 0), i = 0; for (; i < pool.length - 1; i++) { r -= pool[i].w; if (r <= 0) break; } return pool.splice(i, 1)[0]; }
+function genMulti() {
+  const mx = Math.min(MAXN(), 10), ops = subOn() ? pick([['+', '+'], ['+', '-'], ['-', '+'], ['-', '-'], ['+', '-']]) : ['+', '+'];
+  for (let k = 0; k < 300; k++) {
+    const a = 1 + Math.floor(Math.random() * mx), b = 1 + Math.floor(Math.random() * 5), c = 1 + Math.floor(Math.random() * 5);
+    const r1 = ops[0] === '+' ? a + b : a - b; if (r1 < 1 || r1 > mx) continue;
+    const r2 = ops[1] === '+' ? r1 + c : r1 - c; if (r2 < 1 || r2 > mx) continue;
+    return { t: 'multi', n: [a, b, c], o: ops };
   }
-  // さいしょは とくいな もんだいで じしんを つける
-  const bi = out.reduce((bi, p, i) => p.box > out[bi].box ? i : bi, 0); out.unshift(out.splice(bi, 1)[0]);
+  return { t: 'multi', n: [1, 1, 1], o: ['+', '+'] };
+}
+function pickQuestions(n) {
+  const now = Date.now(), mx = MAXN(), useSub = subOn(), useMulti = multiOn();
+  const cats = Array.from({ length: n }, () => { const r = Math.random(); return useMulti && r < .2 ? 'multi' : useSub && r < .55 ? 'sub' : 'add'; });
+  if (useSub && n >= 3 && !cats.includes('sub')) cats[1] = 'sub';
+  if (useMulti && n >= 4 && !cats.includes('multi')) cats[n - 1] = 'multi';
+  // 3つの けいさんは 1かいに 1〜2もんまで
+  let mLeft = Math.ceil(n / 5); cats.forEach((c, i) => { if (c === 'multi' && mLeft-- <= 0) cats[i] = useSub && i % 2 ? 'sub' : 'add'; });
+  if (cats[0] === 'multi') { cats[0] = cats[n - 1]; cats[n - 1] = 'multi'; }
+  const pools = {
+    add: addPool(mx).map(([a, b]) => { const o = weighOf('add', a, b, now); if (a + b >= mx - 1) o.w += 2; return { q: { t: 'add', a, b }, ...o }; }),
+    sub: subPool(mx).map(([a, b]) => ({ q: { t: 'sub', a, b }, ...weighOf('sub', a, b, now) })),
+  };
+  const out = cats.map(c => c === 'multi' ? { q: genMulti(), box: -1 } : wpick(pools[c].length ? pools[c] : pools.add));
+  // さいしょは とくいな たしざんで じしんを つける
+  let bi = -1; out.forEach((p, i) => { if (p.q.t === 'add' && (bi < 0 || p.box > out[bi].box)) bi = i; });
+  if (bi > 0) out.unshift(out.splice(bi, 1)[0]);
   return out.map(p => p.q);
 }
-function record(a, b, { first, time, hinted, st }) {
-  const f = fact(a, b); f.seen++; f.last = Date.now();
+function record(t, a, b, { first, time, hinted, st }) {
+  const f = factOf(t, a, b); f.seen++; f.last = Date.now();
   if (first) {
     f.ok++; f.lw = false;
     if (st <= 2 || (!hinted && time < (st === 3 ? 9000 : 6000))) f.box = Math.min(4, f.box + 1);
   } else { f.ng++; f.lw = true; f.box = Math.max(0, f.box - 1); }
   S.total++; save();
 }
-function checkUnlock() {
-  if (S.unlocked >= 10) return 0;
-  const pool = allFacts(S.unlocked), good = pool.filter(([a, b]) => (S.facts[fkey(a, b)]?.box || 0) >= 2).length;
-  if (good / pool.length >= .6) { S.unlocked++; save(); return S.unlocked; }
+function checkUnlock() { // いちばん 大きい たしざんが できてきたら つぎの おともだち
+  if (S.unlocked >= 20) return 0;
+  const pool = addPool(S.unlocked), band = pool.filter(([a, b]) => a + b >= S.unlocked - 1);
+  const ok = ([a, b]) => (S.facts[fkey('add', a, b)]?.box || 0) >= 2;
+  if (band.filter(ok).length / band.length >= .6 && pool.filter(ok).length / pool.length >= .4) { S.unlocked++; save(); return S.unlocked; }
   return 0;
 }
 
 /* ================= あそぶ（もんだい） ================= */
 const P = { tap: null };
-function setEq(a, b, ans) {
-  $('#eq').innerHTML = `<span style="color:${INK[a]}">${a}</span><span class="op">＋</span><span style="color:${INK[b]}">${b}</span><span class="op">＝</span>` +
-    (ans ? `<span class="ans" style="color:${INK[ans]}">${ans}</span>` : '<span class="q">？</span>');
+const OPC = { '+': '＋', '-': '−' }, OPY = { '+': 'たす', '-': 'ひく' };
+function setEq(nums, ops, ans, mid) {
+  let h = '';
+  nums.forEach((n, i) => { if (i) h += `<span class="op">${OPC[ops[i - 1]]}</span>`; h += `<span class="${i === 0 && mid ? 'mid' : ''}" style="color:${INK[n]}">${n}</span>`; });
+  $('#eq').innerHTML = h + '<span class="op">＝</span>' + (ans != null ? `<span class="ans" style="color:${INK[ans]}">${ans}</span>` : '<span class="q">？</span>');
 }
 const instr = t => $('#instr').innerHTML = t || '';
 function renderProg() { $('#prog').innerHTML = P.qs.map((_, i) => i < P.idx ? (P.log[i] && !P.log[i].firstTry ? '💔' : '💖') : i === P.idx ? '<span class="cur">🤍</span>' : '🤍').join(''); }
 
+const range = (a, b) => Array.from({ length: Math.max(0, b - a) }, (_, i) => a + i);
 function tapCube(bunny, cube) {
   const t = P.tap; if (!t) return;
   const i = bunny.cubes.indexOf(cube);
-  if (bunny !== t.bunny) { AC.tap(); return; }
-  if (i < 0 || t.done.has(i)) { AC.tap(); return; }
-  t.done.add(i); const num = t.next++;
-  bunny.showBadge(i, num); bunny.glow(i); bunny.popCube(i); AC.count(num); Voice.say(YOMI[num], { interrupt: true, rate: 1.1 });
-  if (t.done.size >= bunny.n) { hideHand(); P.tap = null; setTimeout(t.res, 700); }
-  else { const nx = bunny.cubes.findIndex((c, k) => !t.done.has(k)); showHand(bunny.cubes[nx]); }
+  if (bunny !== t.bunny || i < 0) { AC.tap(); return; }
+  let j = i;
+  if (t.remove) j = t.idxs.find(k => !t.done.has(k)); // どこを おしても 上から じゅんに おでかけ
+  else if (!t.idxs.includes(i) || t.done.has(i)) { AC.tap(); return; }
+  t.done.add(j); const num = t.next++;
+  if (t.remove) { bunny.ghost(j, true); bunny.showBadge(j, num, true); AC.pop(1.3); }
+  else { bunny.showBadge(j, num); bunny.glow(j); AC.count(num); }
+  bunny.popCube(j); Voice.say(YOMI[num], { interrupt: true, rate: 1.1 });
+  if (t.done.size >= t.idxs.length) { hideHand(); P.tap = null; setTimeout(t.res, 700); }
+  else showHand(bunny.cubes[t.idxs.find(k => !t.done.has(k))]);
 }
-const tapCount = (bunny, start) => new Promise(res => {
-  P.tap = { bunny, next: start, done: new Set(), res };
-  showHand(bunny.cubes[0]);
-});
+const tapCount = (bunny, start, idxs = range(0, bunny.n)) => new Promise(res => { P.tap = { bunny, next: start, idxs, done: new Set(), res }; showHand(bunny.cubes[idxs[0]]); });
+const tapRemove = (bunny, k) => new Promise(res => { const idxs = range(bunny.n - k, bunny.n).reverse(); P.tap = { bunny, next: 1, idxs, done: new Set(), res, remove: true }; showHand(bunny.cubes[idxs[0]]); });
 function numBox(n) {
   const g = giftBox(MAIN[n], .8); g.traverse(o => { o.userData.gift = null; o.userData.numbox = g; });
   const el = document.createElement('div'); el.className = 'nlabel'; setLabelN(el, n); g.userData.an = anchor(el, g, new THREE.Vector3(0, 2, 0));
   return g;
+}
+function makeBoxes(list) { // うさぎを はこに かくす。あける かんすうを かえす
+  const boxes = list.map(b => { b.root.visible = false; b.labelOn = false; const bx = numBox(b.n); bx.position.copy(b.root.position); stageDyn.add(bx); bx.scale.setScalar(.01); tween(.5, k => bx.scale.setScalar(.8 * Math.max(.01, k)), ease.back); return bx; });
+  P.onBox = () => { AC.shake(); boxes.forEach(bx => tween(.3, k => bx.rotation.z = Math.sin(k * Math.PI * 4) * .12, ease.lin)); };
+  let opened = false;
+  return async () => {
+    if (opened) return; opened = true; P.onBox = null; AC.magic();
+    await Promise.all(boxes.map(async (bx, i) => { await wait(i * .15); burst(bx.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 1, .5)), { n: 12, emojis: ['✨', '🎀', '💖'] }); unanchor(bx.userData.an); await tween(.25, k => bx.scale.setScalar(.8 * (1 - k))); stageDyn.remove(bx); }));
+    await Promise.all(list.map((b, i) => { b.labelOn = true; return b.dropIn(i * .1, 4); }));
+  };
+}
+function choiceOpts(c) {
+  const near = [c - 1, c + 1].filter(v => v >= 1 && v <= 20), far = [c - 2, c + 2, c + 3].filter(v => v >= 1 && v <= 20);
+  return shuffle([c, ...shuffle(near).concat(shuffle(far)).slice(0, 2)]);
+}
+// こたえを えらぶ。まちがえたら onWrong（しょんぼり → じぶんで かぞえなおし）
+function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel }) {
+  return new Promise(resolve => {
+    const box = $('#choices'), hb = $('#hintBtn'); box.innerHTML = ''; box.classList.remove('think'); hb.style.display = 'none';
+    let lock = true, firstTry = true, hinted = false, misses = 0; const t0 = performance.now(); P.correct = correct;
+    const unlock = async sec => { // かんがえタイム：すぐには おせない
+      lock = true; box.classList.add('think'); await wait(sec); guard(tok);
+      box.classList.remove('think'); lock = false; P.enabledAt = performance.now(); if (onHint && hintLabel) { hb.textContent = hintLabel; hb.style.display = ''; }
+    };
+    choiceOpts(correct).forEach((v, i) => {
+      const bt = document.createElement('button'); bt.className = 'choice' + (pic ? ' pic' : '') + (v > 10 ? ' teen' : '');
+      bt.style.setProperty('--c', MAIN[v] === '#ffd9ee' ? '#f3b6d8' : MAIN[v]); bt.style.setProperty('--ink', INK[v]); bt.style.animationDelay = i * .08 + 's';
+      bt.innerHTML = (pic ? miniBlocks(v) : '') + `<span class="cn">${v}</span>`;
+      bt.onclick = () => run(async () => {
+        if (lock || bt.classList.contains('wrong')) return;
+        if (v === correct) { lock = true; bt.classList.add('right'); hb.style.display = 'none'; resolve({ firstTry, hinted, time: performance.now() - t0 }); return; }
+        const hasty = performance.now() - P.enabledAt < 2500;
+        firstTry = false; misses++; bt.classList.add('wrong'); AC.sad(); lock = true; box.classList.add('think'); hb.style.display = 'none';
+        await onWrong({ misses, hasty }); guard(tok);
+        await unlock(.8);
+      });
+      box.appendChild(bt);
+    });
+    if (onHint) hb.onclick = () => run(async () => {
+      if (lock) return; AC.pop(); hinted = true; lock = true; box.classList.add('think'); hb.style.display = 'none';
+      hintLabel = await onHint(); guard(tok); await unlock(.4);
+    });
+    run(() => unlock(st >= 3 ? 1.8 : .8));
+  });
+}
+async function sadReact(bs, hasty, tok) {
+  bs.forEach(b => b.setSad(true));
+  await Voice.say(hasty ? 'えーん… ちゃんと みて かんがえてね' : pick(['えーん、ちがうよ…', 'しょんぼり… ちがったみたい', 'うーん、ざんねん…']), { pitch: 1.1, rate: .9 }); guard(tok);
+}
+function placePair(A, B, gap = .8) { const xa = -(gap + A.width / 2), xb = gap + B.width / 2, cx = (xa + xb) / 2; return [xa - cx, xb - cx]; }
+const PRAISE = () => pick(['すごい！', 'やったね！', 'せいかい！', 'かんぺき！', 'じょうず！']);
+const clearSome = (A, idxs) => idxs.forEach(i => { const c = A.cubes[i]; if (c && c.userData.badge) { c.remove(c.userData.badge); c.userData.badge = null; } A.glow(i, false); });
+
+// たしざん：B が A に がったい
+async function addStep({ A, B, st, tok, multi = false, enterA = true, done }) {
+  const a = A.n, b = B.n, sum = a + b;
+  let opened = st < 4; const open = st === 4 ? makeBoxes(enterA ? [A, B] : [B]) : async () => {};
+  if (st < 4) { if (enterA) { A.dropIn(0); await wait(.25); } B.dropIn(0); }
+  await wait(.7); guard(tok);
+  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は いくつかな？`); guard(tok);
+  if (st === 1) {
+    instr('👆 ブロックを タッチして かぞえよう'); Voice.say('ブロックを タッチして かぞえてね');
+    await tapCount(A, 1); guard(tok); await tapCount(B, a + 1); guard(tok);
+    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ だった？');
+  } else if (st === 2) {
+    const [L, Sm] = a >= b ? [A, B] : [B, A];
+    L.cubes.forEach((c, i) => L.glow(i)); L.showBadge(L.n - 1, L.n); L.popCube(L.n - 1); AC.sparkle(); L.hop({ h: .5 });
+    instr(`<b style="color:${INK[L.n]};font-size:34px">${L.n}</b> の つぎから かぞえよう`);
+    await Voice.say(`${YOMI[L.n]}！ ${YOMI[L.n]}の つぎから かぞえてね`); guard(tok);
+    await tapCount(Sm, L.n + 1); guard(tok);
+    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ？');
+  } else if (!multi) instr(st === 3 ? 'いくつに なるかな？' : 'はこの なかは なにかな？ こたえを えらんでね');
+  const recount = async misses => {
+    A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
+    instr('👆 ブロックを タッチして かぞえなおそう');
+    await Voice.say(misses > 1 ? 'もういちど、 ひとつずつ かぞえてね' : 'じぶんで かぞえて みよう'); guard(tok);
+    await tapCount(A, 1); guard(tok); await tapCount(B, a + 1); guard(tok);
+    A.setSad(false); B.setSad(false); instr('いくつ だったかな？'); Voice.say('いくつ だったかな？');
+  };
+  const res = await askChoice({
+    correct: sum, pic: st <= 2, st, tok,
+    onWrong: async ({ misses, hasty }) => { if (!opened) { opened = true; await open(); guard(tok); } await sadReact([A, B], hasty, tok); await recount(misses); },
+    onHint: st >= 3 ? async () => {
+      if (!opened) { opened = true; await open(); return '💡 かぞえる'; }
+      A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
+      await A.countAll({ tok, gap: .4 }); await B.countAll({ from: a + 1, tok, gap: .4 });
+      instr('いくつ だったかな？'); return '💡 かぞえる';
+    } : null,
+    hintLabel: st === 4 ? '🎁 あけてみる' : '💡 かぞえる',
+  });
+  guard(tok);
+  // せいかい！ がったい
+  AC.fanfare(); done && done(); if (!multi) instr('');
+  await wait(.4); guard(tok);
+  $('#choices').innerHTML = '';
+  if (!opened) { opened = true; await open(); guard(tok); }
+  const counted = A.cubes.some(c => c.userData.badge) && B.cubes.some(c => c.userData.badge);
+  await Promise.all([A.hop({ h: .6 }), B.hop({ h: .6 })]); guard(tok);
+  A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
+  await A.absorb(B); guard(tok);
+  { const x0 = A.root.position.x; await tween(.5, k => A.root.position.x = x0 * (1 - k)); }
+  if (counted) A.cubes.forEach((c, i) => { A.showBadge(i, i + 1); A.glow(i); });
+  else await A.countFive({ tok });
+  A.setHappy(true);
+  burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
+  if (!multi) instr(`<span style="color:${INK[a]}">${a}</span> たす <span style="color:${INK[b]}">${b}</span> は <b style="color:${INK[sum]};font-size:36px">${sum}</b>`);
+  A.hop({ h: 1 });
+  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は ${YOMI[sum]}！ ${multi ? '' : res.firstTry ? PRAISE() : 'できたね！'}`); guard(tok);
+  record('add', a, b, { first: res.firstTry, time: res.time, hinted: res.hinted, st });
+  return res;
+}
+
+// ひきざん：A から b こが「おでかけ」する
+async function subStep({ A, b, st, tok, multi = false, enterA = true, done }) {
+  const a = A.n, r = a - b, rest = range(0, r);
+  let opened = st < 4, removed = false; const open = st === 4 ? makeBoxes([A]) : async () => {};
+  if (st < 4 && enterA) A.dropIn(0);
+  await wait(.7); guard(tok);
+  await Voice.say(`${YOMI[a]} ひく ${YOMI[b]} は いくつかな？`); guard(tok);
+  const autoRemove = async () => {
+    if (removed) return; removed = true;
+    for (let k = 0; k < b; k++) { const j = a - 1 - k; A.ghost(j, true); A.showBadge(j, k + 1, true); A.popCube(j); AC.pop(1.3); await wait(.22); }
+  };
+  if (st <= 2) {
+    instr(`👆 ブロックを <b style="font-size:32px;color:#3f7fe0">${b}</b>こ タッチして おでかけ させよう`);
+    Voice.say(`ブロックを ${KOSU[b]} タッチして、 おでかけ させてね`);
+    await tapRemove(A, b); guard(tok); removed = true;
+    if (st === 1) { instr('👆 のこりの ブロックを かぞえよう'); Voice.say('のこりを かぞえてね'); await tapCount(A, 1, rest); guard(tok); }
+    instr('のこりは いくつ？'); Voice.say('のこりは いくつ？');
+  } else if (st === 3) { await autoRemove(); guard(tok); if (!multi) instr('のこりは いくつ かな？'); }
+  else if (!multi) instr(`はこの なかから ${b}こ おでかけ。 のこりは いくつ？`);
+  const recount = async misses => {
+    if (!removed) await autoRemove(); guard(tok);
+    clearSome(A, rest);
+    instr('👆 のこりの ブロックを かぞえなおそう');
+    await Voice.say(misses > 1 ? 'もういちど、 のこりを ひとつずつ かぞえてね' : 'のこりを じぶんで かぞえて みよう'); guard(tok);
+    await tapCount(A, 1, rest); guard(tok);
+    A.setSad(false); instr('のこりは いくつ だったかな？'); Voice.say('いくつ だったかな？');
+  };
+  const res = await askChoice({
+    correct: r, pic: st <= 2, st, tok,
+    onWrong: async ({ misses, hasty }) => { if (!opened) { opened = true; await open(); guard(tok); } await sadReact([A], hasty, tok); await recount(misses); },
+    onHint: st >= 3 ? async () => {
+      if (!opened) { opened = true; await open(); guard(tok); await autoRemove(); return '💡 かぞえる'; }
+      await autoRemove(); guard(tok); clearSome(A, rest);
+      for (const i of rest) { await A.countOne(i, i + 1, { gap: .4 }); guard(tok); }
+      instr('のこりは いくつ？'); return '💡 かぞえる';
+    } : null,
+    hintLabel: st === 4 ? '🎁 あけてみる' : '💡 かぞえる',
+  });
+  guard(tok);
+  AC.fanfare(); done && done(); if (!multi) instr('');
+  await wait(.4); guard(tok);
+  $('#choices').innerHTML = '';
+  if (!opened) { opened = true; await open(); guard(tok); }
+  await autoRemove(); guard(tok);
+  const counted = rest.every(i => A.cubes[i].userData.badge);
+  const G = await A.split(r); guard(tok); // おでかけ する なかま
+  G.setHappy(true); Voice.say('ばいばーい');
+  for (let k = 0; k < 2; k++) { await G.hop({ to: { x: G.root.position.x + 2.2, z: G.root.position.z + .4 }, h: .6, dur: .4 }); guard(tok); }
+  G.labelOn = false; await tween(.3, k => G.root.scale.setScalar(Math.max(.01, 1 - k))); G.dispose();
+  { const x0 = A.root.position.x; await tween(.4, k => A.root.position.x = x0 * (1 - k)); }
+  if (!counted) { clearSome(A, rest); await A.countFive({ tok }); }
+  A.setHappy(true);
+  burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
+  if (!multi) instr(`<span style="color:${INK[a]}">${a}</span> ひく <span style="color:#3f7fe0">${b}</span> は <b style="color:${INK[r]};font-size:36px">${r}</b>`);
+  A.hop({ h: 1 });
+  await Voice.say(`${YOMI[a]} ひく ${YOMI[b]} は ${YOMI[r]}！ ${multi ? '' : res.firstTry ? PRAISE() : 'できたね！'}`); guard(tok);
+  record('sub', a, b, { first: res.firstTry, time: res.time, hinted: res.hinted, st });
+  return res;
 }
 
 async function startSession() {
@@ -1107,148 +1384,79 @@ async function startSession() {
   P.qs = pickQuestions(S.settings.qn); P.idx = 0; P.log = [];
   renderProg(); instr(''); $('#choices').innerHTML = ''; $('#hintBtn').style.display = 'none';
   await run(async () => {
-    for (; P.idx < P.qs.length; P.idx++) { renderProg(); await question(P.qs[P.idx], tok); guard(tok); }
+    for (; P.idx < P.qs.length; P.idx++) { renderProg(); await playQ(P.qs[P.idx], tok); guard(tok); }
     renderProg(); await sessionEnd(tok);
   });
 }
 
-async function question([a, b], tok) {
+async function playQ(q, tok) {
   clearStage(); instr(''); $('#choices').innerHTML = ''; $('#hintBtn').style.display = 'none';
-  const sum = a + b, f = fact(a, b), st = stageOf(f);
-  setEq(a, b);
-  const A = new Bunny(a), B = new Bunny(b);
-  const gap = .8; A.root.position.x = -(gap + A.width / 2); B.root.position.x = gap + B.width / 2;
-  const cx = (A.root.position.x + B.root.position.x) / 2; A.root.position.x -= cx; B.root.position.x -= cx;
-  stageDyn.add(A.root, B.root);
-  fitStage(A.width + B.width + gap * 2 + 3.2, 8.2, 3.4, 150, 250);
-  let boxes = null, opened = st < 4;
-  const openBoxes = async () => {
-    if (opened) return; opened = true; P.onBox = null;
-    AC.magic();
-    await Promise.all(boxes.map(async (bx, i) => { await wait(i * .15); burst(bx.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 1, .5)), { n: 12, emojis: ['✨', '🎀', '💖'] }); unanchor(bx.userData.an); await tween(.25, k => bx.scale.setScalar(.8 * (1 - k))); stageDyn.remove(bx); }));
-    A.labelOn = B.labelOn = true; await Promise.all([A.dropIn(0, 4), B.dropIn(.1, 4)]);
-  };
-  if (st === 4) {
-    A.root.visible = B.root.visible = false; A.labelOn = B.labelOn = false;
-    boxes = [numBox(a), numBox(b)]; boxes[0].position.copy(A.root.position); boxes[1].position.copy(B.root.position);
-    stageDyn.add(...boxes); boxes.forEach(bx => { const s = bx.scale.x; bx.scale.setScalar(.01); tween(.5, k => bx.scale.setScalar(s * Math.max(.01, k)), ease.back); });
-    P.onBox = () => { AC.shake(); boxes.forEach(bx => tween(.3, k => bx.rotation.z = Math.sin(k * Math.PI * 4) * .12, ease.lin)); };
-  } else { A.dropIn(0); await wait(.25); B.dropIn(0); }
-  await wait(.7); guard(tok);
-  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は いくつかな？`); guard(tok);
-
-  if (st === 1) {
-    instr('👆 ブロックを タッチして かぞえよう'); Voice.say('ブロックを タッチして かぞえてね');
-    await tapCount(A, 1); guard(tok);
-    await tapCount(B, a + 1); guard(tok);
-    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ だった？');
-  } else if (st === 2) {
-    const [L, Sm] = a >= b ? [A, B] : [B, A];
-    L.cubes.forEach((c, i) => L.glow(i)); L.showBadge(L.tall - 1, L.n); L.popCube(L.tall - 1); AC.sparkle(); L.hop({ h: .5 });
-    instr(`<b style="color:${INK[L.n]};font-size:34px">${L.n}</b> の つぎから かぞえよう`);
-    await Voice.say(`${YOMI[L.n]}！ ${YOMI[L.n]}の つぎから かぞえてね`); guard(tok);
-    await tapCount(Sm, L.n + 1); guard(tok);
-    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ？');
+  if (q.t === 'multi') return multiQ(q, tok);
+  const { t, a, b } = q, st = stageOf(factOf(t, a, b)), op = t === 'sub' ? '-' : '+', ans = t === 'sub' ? a - b : a + b;
+  setEq([a, b], [op]);
+  const A = new Bunny(a); stageDyn.add(A.root);
+  const done = () => setEq([a, b], [op], ans);
+  let res;
+  if (t === 'add') {
+    const B = new Bunny(b), [xa, xb] = placePair(A, B); A.root.position.x = xa; B.root.position.x = xb; stageDyn.add(B.root);
+    fitStage(A.width + B.width + 4.8, 8.2, 3.4, 150, 250);
+    res = await addStep({ A, B, st, tok, done });
   } else {
-    instr(st === 3 ? 'いくつに なるかな？' : 'はこの なかは なにかな？ こたえを えらんでね');
+    fitStage(A.width + 7, 8.2, 3.4, 150, 250);
+    res = await subStep({ A, b, st, tok, done });
   }
+  P.log.push({ firstTry: res.firstTry, result: ans });
+  await wait(.8); guard(tok);
+}
 
-  // こたえ
-  const correct = sum;
-  const cands = [sum - 1, sum + 1, sum - 2, sum + 2].filter(v => v >= 2 && v <= 10 && v !== sum);
-  const opts = shuffle([sum, ...shuffle(cands.slice(0, 2).concat(shuffle(cands.slice(2)))).slice(0, 2)]);
-  const pic = st <= 2;
-  let firstTry = true, hinted = false, lock = false; const t0 = performance.now();
-  const box = $('#choices'); box.innerHTML = ''; box.classList.remove('think');
-  let resolveAns; const answered = new Promise(r => resolveAns = r);
-  let misses = 0;
-  const recount = async () => { // まちがえたら じぶんで タッチして かぞえる
-    box.classList.add('think');
-    A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
-    instr('👆 ブロックを タッチして かぞえなおそう');
-    await Voice.say(misses > 1 ? 'もういちど、 ひとつずつ かぞえてね' : 'じぶんで かぞえて みよう'); guard(tok);
-    await tapCount(A, 1); guard(tok);
-    await tapCount(B, a + 1); guard(tok);
-    A.setSad(false); B.setSad(false);
-    instr('いくつ だったかな？'); Voice.say('いくつ だったかな？');
-    await thinkLock(.8); guard(tok);
+// 3つの けいさん：ひとつずつ じゅんばんに
+async function multiQ({ n: [a, b, c], o: [o1, o2] }, tok) {
+  const calc = (x, o, y) => o === '+' ? x + y : x - y, r1 = calc(a, o1, b), r2 = calc(r1, o2, c);
+  setEq([a, b, c], [o1, o2]);
+  fitStage(10, 8.2, 3.4, 150, 250);
+  const A = new Bunny(a); stageDyn.add(A.root);
+  const cap = (o, x, y) => Math.min(3, stageOf(factOf(o === '+' ? 'add' : 'sub', x, y)));
+  const step = async (o, y, enterA) => {
+    if (o === '+') {
+      const B = new Bunny(y), [xa, xb] = placePair(A, B); B.root.position.x = xb; stageDyn.add(B.root);
+      if (enterA) A.root.position.x = xa; else { const x0 = A.root.position.x; await tween(.4, k => A.root.position.x = x0 + (xa - x0) * k); }
+      return addStep({ A, B, st: cap(o, A.n, y), tok, multi: true, enterA });
+    }
+    return subStep({ A, b: y, st: cap(o, A.n, y), tok, multi: true, enterA });
   };
-  // かんがえタイム：すぐには おせない
-  const thinkLock = async sec => {
-    lock = true; box.classList.add('think'); await wait(sec); guard(tok);
-    box.classList.remove('think'); lock = false; P.enabledAt = performance.now();
-  };
-  const demo = async () => { // いっしょに かぞえる
-    lock = true; $('#hintBtn').style.display = 'none';
-    await openBoxes(); guard(tok);
-    A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
-    await A.countAll({ tok, gap: .4 }); await B.countAll({ from: a + 1, tok, gap: .4 });
-    instr('いくつ だったかな？'); lock = false;
-  };
-  opts.forEach((v, i) => {
-    const bt = document.createElement('button'); bt.className = 'choice' + (pic ? ' pic' : '');
-    bt.style.setProperty('--c', MAIN[v] === '#ffd9ee' ? '#f3b6d8' : MAIN[v]); bt.style.setProperty('--ink', INK[v]); bt.style.animationDelay = i * .08 + 's';
-    bt.innerHTML = (pic ? miniBlocks(v) : '') + `<span class="cn">${v}</span>`;
-    bt.onclick = () => run(async () => {
-      if (lock || bt.classList.contains('wrong')) return;
-      if (v === correct) { lock = true; bt.classList.add('right'); resolveAns(); return; }
-      // まちがい：うさぎが しょんぼり → じぶんで かぞえなおす
-      const hasty = performance.now() - P.enabledAt < 2500;
-      firstTry = false; bt.classList.add('wrong'); AC.sad(); lock = true; misses++;
-      $('#hintBtn').style.display = 'none';
-      await openBoxes(); guard(tok);
-      A.setSad(true); B.setSad(true);
-      await Voice.say(hasty ? 'えーん… ちゃんと みて かんがえてね' : pick(['えーん、ちがうよ…', 'しょんぼり… ちがったみたい', 'うーん、ざんねん…']), { pitch: 1.1, rate: .9 }); guard(tok);
-      await recount();
-    });
-    box.appendChild(bt);
-  });
-  if (st >= 3) {
-    const hb = $('#hintBtn'); hb.textContent = st === 4 ? '🎁 あけてみる' : '💡 かぞえる'; hb.style.display = '';
-    hb.onclick = () => run(async () => {
-      if (lock) return; AC.pop(); hinted = true;
-      if (!opened) { lock = true; await openBoxes(); guard(tok); lock = false; hb.textContent = '💡 かぞえる'; return; }
-      await demo();
-    });
-  }
-  run(() => thinkLock(st >= 3 ? 1.8 : .8));
-  await answered; guard(tok);
-  const time = performance.now() - t0;
-  $('#hintBtn').style.display = 'none';
-
-  // せいかい！ がったい
-  AC.fanfare(); setEq(a, b, sum); instr('');
-  await wait(.4); guard(tok);
-  $('#choices').innerHTML = '';
-  if (!opened) { await openBoxes(); guard(tok); }
-  const counted = A.cubes.some(c => c.userData.badge);
-  await Promise.all([A.hop({ h: .6 }), B.hop({ h: .6 })]); guard(tok);
-  if (!counted) { A.unglowAll(); B.unglowAll(); }
-  await A.absorb(B); guard(tok);
-  { const x0 = A.root.position.x; await tween(.5, k => A.root.position.x = x0 * (1 - k)); }
-  if (!counted) { await A.countFive({ tok }); }
-  A.setHappy(true);
-  burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
-  instr(`<span style="color:${INK[a]}">${a}</span> たす <span style="color:${INK[b]}">${b}</span> は <b style="color:${INK[sum]};font-size:36px">${sum}</b>`);
-  A.hop({ h: 1 });
-  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は ${YOMI[sum]}！ ${firstTry ? pick(['すごい！', 'やったね！', 'せいかい！', 'かんぺき！', 'じょうず！']) : 'できたね！'}`); guard(tok);
-  record(a, b, { first: firstTry, time, hinted, st });
-  for (const n of [a, b, sum]) if (!S.met.includes(n) && n <= S.unlocked) S.met.push(n);
-  P.log.push({ a, b, sum, firstTry });
+  instr(`まず <b style="font-size:32px">${a} ${OPC[o1]} ${b}</b> から！`);
+  await Voice.say(`${YOMI[a]} ${OPY[o1]} ${YOMI[b]} ${OPY[o2]} ${YOMI[c]}。 まず、 ${YOMI[a]} ${OPY[o1]} ${YOMI[b]} から！`); guard(tok);
+  const s1 = await step(o1, b, true); guard(tok);
+  await wait(.4); A.setHappy(false); A.clearBadges(); A.unglowAll();
+  setEq([r1, c], [o2], null, true);
+  instr(`つぎは <b style="font-size:32px">${r1} ${OPC[o2]} ${c}</b>`);
+  await Voice.say(`つぎは ${YOMI[r1]} ${OPY[o2]} ${YOMI[c]}`); guard(tok);
+  const s2 = await step(o2, c, false); guard(tok);
+  const ok = s1.firstTry && s2.firstTry;
+  setEq([a, b, c], [o1, o2], r2);
+  instr(`${a} ${OPC[o1]} ${b} ${OPC[o2]} ${c} ＝ <b style="color:${INK[r2]};font-size:36px">${r2}</b>`);
+  AC.fanfare(); A.setHappy(true); A.hop({ h: 1.1 });
+  burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 30, emojis: ['💖', '✨', '⭐', '🌈', '🎀'], speed: 6 });
+  await Voice.say(`${YOMI[a]} ${OPY[o1]} ${YOMI[b]} ${OPY[o2]} ${YOMI[c]} は ${YOMI[r2]}！ ${ok ? PRAISE() : 'できたね！'}`); guard(tok);
+  S.multiDone = (S.multiDone || 0) + 1; save();
+  P.log.push({ firstTry: ok, result: r2 });
   await wait(.8); guard(tok);
 }
 
 async function sessionEnd(tok) {
   clearStage(); showLayer('show'); bigMsg(''); mode = 'show';
-  const sums = P.log.map(l => l.sum);
   // みんなで おいわい
-  const row = [...new Set(sums)].sort((x, y) => x - y).slice(0, 5);
-  const bs = row.map((n, i) => { const b = new Bunny(n); b.root.position.x = (i - (row.length - 1) / 2) * 2.4; stageDyn.add(b.root); b.dropIn(i * .15); return b; });
-  fitStage(row.length * 2.4 + 2, 7.4, 3, 110, 150);
+  const row = [...new Set(P.log.map(l => l.result))].sort((x, y) => x - y).slice(0, 5);
+  const bs = row.map(n => new Bunny(n)), tw = bs.reduce((w, b) => w + b.width + 1.2, -1.2);
+  let x = -tw / 2; bs.forEach((b, i) => { b.root.position.x = x + b.width / 2; x += b.width + 1.2; stageDyn.add(b.root); b.dropIn(i * .15); });
+  fitStage(tw + 3, 7.4, 3, 110, 150);
   const good = P.log.filter(l => l.firstTry).length, perfect = good === P.log.length;
-  bigMsg(perfect ? '🌟 パーフェクト！ 🌟<br><span style="font-size:22px">キラキラぼしを もらったよ（おにわの おそらに ひかるよ）</span>'
-    : `🎉 おさんぽ クリア！ 🎉<br><span style="font-size:24px">${P.log.map(l => l.firstTry ? '💖' : '💔').join('')}</span><br><span style="font-size:20px">ぜんぶ 💖 だと キラキラぼしが もらえるよ</span>`);
-  if (perfect) { S.stars++; save(); }
+  // パーフェクトで ほし。ほし 3こで ボーナス プレゼント
+  let bonus = false;
+  if (perfect) { S.stars++; S.starBank = (S.starBank || 0) + 1; if (S.starBank >= 3) { S.starBank -= 3; bonus = true; } save(); }
+  const bank = S.starBank || 0, meter = '⭐'.repeat(bank) + '☆'.repeat(3 - bank);
+  bigMsg(perfect ? `🌟 パーフェクト！ 🌟<br><span style="font-size:22px">キラキラぼしを もらったよ　${bonus ? '⭐⭐⭐ ボーナス プレゼント！' : meter}</span>`
+    : `🎉 おさんぽ クリア！ 🎉<br><span style="font-size:24px">${P.log.map(l => l.firstTry ? '💖' : '💔').join('')}</span><br><span style="font-size:20px">ぜんぶ 💖 だと ほしが もらえるよ　${meter}（3こで ボーナス プレゼント）</span>`);
   AC.fanfare(); await wait(.8); guard(tok);
   bs.forEach((b, i) => { b.setHappy(true); wait(i * .1).then(() => b.hop({ h: 1.2 })); });
   burst(new THREE.Vector3(0, 4, 1), { n: 30, emojis: ['💖', '✨', '⭐', '🌸', '🎀', '🍓'], speed: 6 });
@@ -1264,6 +1472,7 @@ async function sessionEnd(tok) {
     bigMsg('きょうの シールと プレゼントは もらったよ<br>また あしたも あそぼうね 🌙');
     await bottomBtn('つぎへ ▶'); guard(tok);
   }
+  if (bonus) { await openGift(tok, true); guard(tok); }
   const nf = checkUnlock();
   if (nf) { await newFriend(nf, tok); guard(tok); }
   enterGarden();
@@ -1295,8 +1504,8 @@ function showCalendar(d, land, onClose) {
   c.querySelector('#cc').onclick = () => { AC.pop(); closeModal(); onClose && onClose(); };
 }
 
-async function openGift(tok) {
-  closeModal(); clearStage(); mode = 'show'; bigMsg('🎁 プレゼントが とどいたよ！ タッチして あけてね');
+async function openGift(tok, bonus) {
+  closeModal(); clearStage(); mode = 'show'; bigMsg(bonus ? '⭐ ボーナス プレゼント！ タッチして あけてね' : '🎁 プレゼントが とどいたよ！ タッチして あけてね');
   const g = giftBox('#ff9fd0', 1.2); stageDyn.add(g); fitStage(6, 7.5, 2.4, 170, 150);
   g.scale.setScalar(.01); await tween(.6, k => g.scale.setScalar(1.2 * Math.max(.01, k)), ease.back);
   await Voice.say('プレゼントが とどいたよ！ タッチして あけてね'); guard(tok);
@@ -1336,22 +1545,23 @@ async function openGift(tok) {
 }
 
 async function newFriend(n, tok) {
-  clearStage(); showLayer('show'); mode = 'show'; bigMsg('あれれ？ なにか おこるよ…！');
-  const A = new Bunny(5), B = new Bunny(n - 5);
-  A.root.position.x = -1.6; B.root.position.x = 1.2 + B.width / 2; stageDyn.add(A.root, B.root);
-  fitStage(7, 7.5, 3, 110, 150);
+  leaveGarden(); clearStage(); showLayer('show'); mode = 'show'; bigMsg('あれれ？ なにか おこるよ…！');
+  const g = n > 10 ? 10 : 5, m = n - g;
+  const A = new Bunny(g), B = new Bunny(m);
+  A.root.position.x = -.8 - A.width / 2; B.root.position.x = .8 + B.width / 2; stageDyn.add(A.root, B.root);
+  fitStage(A.width + B.width + 6, 7.5, 3, 110, 150);
   A.dropIn(0); B.dropIn(.3); await wait(1); guard(tok);
-  await Voice.say(`ごちゃんと ${YOMI[n - 5]}ちゃんが がったいするよ！`); guard(tok);
+  await Voice.say(`${YOMI[g]}ちゃんと ${YOMI[m]}ちゃんが がったいするよ！`); guard(tok);
   await Promise.all([A.hop({ h: .8 }), B.hop({ h: .8 })]); guard(tok);
   await A.absorb(B, { stagger: .15 }); guard(tok);
-  await tween(.5, k => A.root.position.x = -1.6 * (1 - k) - .0);
+  { const x0 = A.root.position.x; await tween(.5, k => A.root.position.x = x0 * (1 - k)); }
   AC.fanfare(); A.setHappy(true);
   burst(new THREE.Vector3(0, 3, 1), { n: 40, emojis: ['💖', '✨', '⭐', '🌸', '🎀', '🌈'], speed: 7, up: 4 });
   bigMsg(`🎊 あたらしい おともだち！ <span style="color:${INK[n]}">${n}</span>ちゃん 🎊`);
   await Voice.say(`あたらしい おともだち！ ${YOMI[n]}ちゃん だよ！`); guard(tok);
   A.setHappy(false); await A.countFive({ tok }); guard(tok);
-  bigMsg(`<span style="color:${INK[5]}">5</span> と <span style="color:${INK[n - 5]}">${n - 5}</span> で <span style="color:${INK[n]}">${n}</span>！`);
-  await Voice.say(`ご と ${YOMI[n - 5]} で ${YOMI[n]}！`); guard(tok);
+  bigMsg(`<span style="color:${INK[g]}">${g}</span> と <span style="color:${INK[m]}">${m}</span> で <span style="color:${INK[n]}">${n}</span>！`);
+  await Voice.say(`${YOMI[g]} と ${YOMI[m]} で ${YOMI[n]}！`); guard(tok);
   A.setHappy(true); A.hop({ h: 1.2 });
   if (!S.met.includes(n)) S.met.push(n); save();
   await bottomBtn('よろしくね！'); guard(tok);
@@ -1394,8 +1604,8 @@ let dressSel = 1, dressBunny = null;
 function enterDress() {
   newFlow(); leaveGarden(); mode = 'dress'; clearStage(); showLayer('dress');
   dressSel = S.met.includes(dressSel) ? dressSel : (S.met[0] || 1);
-  fitStage(4.5, 7.8, 3.1, 100, 330);
   renderDress(true);
+  fitStage(4.5, 8.4, 3.4, 100, $('#dPanel').offsetHeight + 30);
 }
 function renderDress(drop) {
   if (dressBunny) dressBunny.dispose();
@@ -1404,44 +1614,54 @@ function renderDress(drop) {
   [...S.met].sort((a, b) => a - b).forEach(n => { const b = document.createElement('button'); b.textContent = n; b.style.setProperty('--c', MAIN[n]); b.style.background = cssColor(n); if (n === dressSel) b.className = 'sel'; b.onclick = () => { AC.pop(); dressSel = n; renderDress(true); }; tabs.appendChild(b); });
   const accs = ITEMS.filter(i => i.type === 'acc' && S.items.includes(i.id)), box = $('#dItems'); box.innerHTML = '';
   if (!accs.length) { box.innerHTML = '<div class="empty">まだ かざりが ないよ。<br>あそぶと プレゼントで もらえるよ 🎁</div>'; return; }
-  const cur = S.outfits[dressSel];
-  const none = document.createElement('button'); none.innerHTML = '🚫<small>はずす</small>'; if (!cur) none.className = 'sel'; none.onclick = () => { AC.pop(); delete S.outfits[dressSel]; save(); dressBunny.setAcc(null); renderDress(false); }; box.appendChild(none);
+  const cur = normOutfit(S.outfits[dressSel]), worn = Object.values(cur);
+  const none = document.createElement('button'); none.innerHTML = '🚫<small>ぜんぶ はずす</small>'; if (!worn.length) none.className = 'sel'; none.onclick = () => { AC.pop(); delete S.outfits[dressSel]; save(); dressBunny.setAcc(null); renderDress(false); }; box.appendChild(none);
   accs.forEach(it => {
-    const b = document.createElement('button'); b.innerHTML = `${it.icon}<small>${it.name}</small>`; if (cur === it.id) b.className = 'sel';
-    b.onclick = () => { AC.sparkle(); S.outfits[dressSel] = it.id; save(); renderDress(false); dressBunny.setHappy(true); dressBunny.hop({ h: .8 }); burst(new THREE.Vector3(0, dressBunny.tall + .5, .8), { n: 12, emojis: ['✨', '💖'] }); Voice.say(pick(['かわいい！', 'にあうね！', 'すてき！'])); };
+    const b = document.createElement('button'); b.innerHTML = `${it.icon}<small>${it.name}</small>`; if (worn.includes(it.id)) b.className = 'sel';
+    b.onclick = () => {
+      const sl = slotOf(it.id);
+      if (cur[sl] === it.id) { delete cur[sl]; AC.pop(); S.outfits[dressSel] = cur; save(); renderDress(false); return; }
+      cur[sl] = it.id; AC.sparkle(); S.outfits[dressSel] = cur; save(); renderDress(false); dressBunny.setHappy(true); dressBunny.hop({ h: .8 }); burst(new THREE.Vector3(0, dressBunny.tall + .5, .8), { n: 12, emojis: ['✨', '💖'] }); Voice.say(pick(['かわいい！', 'にあうね！', 'すてき！'])); };
     box.appendChild(b);
   });
 }
 
 /* ================= おうちの人 ================= */
+let pTab = 'add';
 function parentPanel() {
-  let rows = '<tr><th></th>' + Array.from({ length: 9 }, (_, i) => `<th>+${i + 1}</th>`).join('') + '</tr>';
-  for (let a = 1; a <= 9; a++) {
-    rows += `<tr><th>${a}</th>`;
-    for (let b = 1; b <= 9; b++) {
-      if (a + b > 10) { rows += '<td class="na"></td>'; continue; }
-      const f = S.facts[fkey(a, b)]; const cls = f && f.seen ? 'b' + f.box : ''; rows += `<td class="${cls}" title="${a}+${b}">${f && f.seen ? (f.box >= 4 ? '★' : f.ok + '/' + f.seen) : ''}</td>`;
-    }
-    rows += '</tr>';
+  const cell = (t, a, b, on) => { const f = S.facts[fkey(t, a, b)]; return `<td class="${!on ? 'na' : f && f.seen ? 'b' + f.box : ''}">${on && f && f.seen ? (f.box >= 4 ? '★' : f.ok + '/' + f.seen) : ''}</td>`; };
+  const mx = Math.max(S.unlocked, 10); let rows = '';
+  if (pTab === 'add') {
+    rows = '<tr><th></th>' + range(1, 11).map(b => `<th>+${b}</th>`).join('') + '</tr>';
+    for (let a = 1; a <= 10; a++) rows += `<tr><th>${a}</th>` + range(1, 11).map(b => a + b <= mx ? cell('add', a, b, true) : '<td class="na"></td>').join('') + '</tr>';
+  } else {
+    rows = '<tr><th></th>' + range(1, 11).map(b => `<th>−${b}</th>`).join('') + '</tr>';
+    for (let a = 2; a <= mx; a++) rows += `<tr><th>${a}</th>` + range(1, 11).map(b => b < a ? cell('sub', a, b, true) : '<td class="na"></td>').join('') + '</tr>';
   }
-  const seg = (key, vals, labels) => `<div class="seg" data-k="${key}">${vals.map((v, i) => `<button data-v="${v}" class="${String(S.settings[key] ?? S[key]) === String(v) ? 'sel' : ''}">${labels[i]}</button>`).join('')}</div>`;
+  const seg = (key, vals, labels, cur) => `<div class="seg" data-k="${key}">${vals.map((v, i) => `<button data-v="${v}" class="${String(cur) === String(v) ? 'sel' : ''}">${labels[i]}</button>`).join('')}</div>`;
+  const tri = k => seg(k, ['auto', 'on', 'off'], ['じどう', 'いつも', 'なし'], S.settings[k] || 'auto');
   const c = modal(`<h2>おうちの人へ</h2>
-    <p class="small">これまで ${S.total}もん ／ ${S.sessions}かい あそびました ／ シール ${Object.keys(S.stickers).length}まい ／ いま ${S.unlocked} までの たしざん</p>
-    <table class="ptab">${rows}</table>
-    <div class="legend"><span style="background:#ffe3ee">ぜんぶ数える</span><span style="background:#ffc7de">数えたす</span><span style="background:#e3cbff">見てわかる</span><span style="background:#bfe6ff">数字だけ</span><span style="background:#b5f0cd">★すらすら</span></div>
+    <p class="small">これまで ${S.total}もん ／ ${S.sessions}かい あそびました ／ シール ${Object.keys(S.stickers).length}まい ／ 3つの計算 ${S.multiDone || 0}もん ／ いま ${S.unlocked} までの数</p>
+    <div class="seg" style="justify-content:center;margin:8px 0" id="pTabs"><button data-t="add" class="${pTab === 'add' ? 'sel' : ''}">たしざん</button><button data-t="sub" class="${pTab === 'sub' ? 'sel' : ''}">ひきざん</button></div>
+    <div style="overflow:auto;max-height:40vh"><table class="ptab">${rows}</table></div>
+    <div class="legend"><span style="background:#ffe3ee">ぜんぶ数える</span><span style="background:#ffc7de">数えたす・おでかけ</span><span style="background:#e3cbff">見てわかる</span><span style="background:#bfe6ff">数字だけ</span><span style="background:#b5f0cd">★すらすら</span></div>
     <p class="small">表の数字は「1回目で正解した回数／出題回数」。まちがえた問題や数えている問題が、多めに出題されます。</p>
-    <div class="set">こえ ${seg('voice', ['true', 'false'], ['オン', 'オフ'])}</div>
-    <div class="set">BGM ${seg('bgm', ['true', 'false'], ['オン', 'オフ'])}</div>
-    <div class="set">1回の もんだい数 ${seg('qn', [3, 5, 7], ['3', '5', '7'])}</div>
-    <div class="set">こたえの 大きさ（〜まで） ${seg('unlocked', [5, 6, 7, 8, 9, 10], ['5', '6', '7', '8', '9', '10'])}</div>
-    <p class="small">ふだんは自動で少しずつ大きな数に進みます（新しい友だちが登場）。</p>
+    <div class="set">こえ ${seg('voice', ['true', 'false'], ['オン', 'オフ'], S.settings.voice)}</div>
+    <div class="set">BGM ${seg('bgm', ['true', 'false'], ['オン', 'オフ'], S.settings.bgm)}</div>
+    <div class="set">1回の もんだい数 ${seg('qn', [3, 5, 7], ['3', '5', '7'], S.settings.qn)}</div>
+    <div class="set">ひきざん ${tri('sub')}</div>
+    <div class="set">3つの けいさん（1+2+3 など） ${tri('multi')}</div>
+    <div class="set">あつかう数（〜まで） <div class="seg"><button id="uDn">◀</button><b style="font-size:24px;min-width:44px;text-align:center">${S.unlocked}</b><button id="uUp">▶</button></div></div>
+    <p class="small">ふだんは自動で少しずつ大きな数に進みます（新しい友だちが登場）。「じどう」だと、ひきざんは6から、3つの計算は8から出題されます。</p>
     <div class="row"><button class="btn white" id="pReset" style="font-size:16px">データを けす</button><button class="btn" id="pClose">とじる</button></div>`);
-  c.querySelectorAll('.seg').forEach(sg => sg.querySelectorAll('button').forEach(b => b.onclick = () => {
+  c.querySelectorAll('#pTabs button').forEach(b => b.onclick = () => { AC.tap(); pTab = b.dataset.t; parentPanel(); });
+  c.querySelectorAll('.seg[data-k]').forEach(sg => sg.querySelectorAll('button').forEach(b => b.onclick = () => {
     const k = sg.dataset.k, v = b.dataset.v; AC.tap();
-    if (k === 'unlocked') { S.unlocked = +v; for (let n = 1; n <= S.unlocked; n++) if (!S.met.includes(n)) S.met.push(n); }
-    else S.settings[k] = k === 'qn' ? +v : v === 'true';
+    S.settings[k] = k === 'qn' ? +v : (k === 'sub' || k === 'multi') ? v : v === 'true';
     save(); AC.applyBgm(); if (!S.settings.voice) Voice.stop(); parentPanel();
   }));
+  const setU = n => { AC.tap(); S.unlocked = Math.max(5, Math.min(20, n)); for (let i = 1; i <= S.unlocked; i++) if (!S.met.includes(i)) S.met.push(i); save(); parentPanel(); };
+  c.querySelector('#uDn').onclick = () => setU(S.unlocked - 1); c.querySelector('#uUp').onclick = () => setU(S.unlocked + 1);
   c.querySelector('#pClose').onclick = () => { AC.pop(); closeModal(); enterGarden(); };
   c.querySelector('#pReset').onclick = () => { if (confirm('ほんとうに すべての きろくを けしますか？')) { S = DEF(); save(); closeModal(); location.reload(); } };
 }
@@ -1504,7 +1724,7 @@ function loop(now) {
 }
 onResize(); splashScene(); requestAnimationFrame(loop);
 window.__kzReady = true; $('#loadMsg').style.display = 'none';
-window.KZ = { P, tapCube, garden, gardenMerge, get mode() { return mode; }, S, startSession, enterGarden, intro, enterDress, openGift: () => run(() => openGift(FLOW)), newFriend: n => run(() => newFriend(n, FLOW)), save };
+window.KZ = { testQ: q => run(async () => { const tok = newFlow(); leaveGarden(); mode = 'play'; clearStage(); showLayer('play'); P.qs = [q]; P.idx = 0; P.log = []; renderProg(); await playQ(q, tok); }), pickQuestions, P, tapCube, garden, gardenMerge, get mode() { return mode; }, S, startSession, enterGarden, intro, enterDress, openGift: () => run(() => openGift(FLOW)), newFriend: n => run(() => newFriend(n, FLOW)), save };
 </script>
 </body>
 </html>
