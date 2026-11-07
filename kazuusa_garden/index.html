@@ -160,6 +160,20 @@ a.ibtn{text-decoration:none;color:inherit}
 #bigMsg div{font-size:30px;font-weight:900;background:rgba(255,255,255,.94);border-radius:28px;padding:12px 28px;box-shadow:0 6px 0 rgba(200,90,150,.14);text-align:center;animation:lpop .5s cubic-bezier(.3,1.6,.5,1)}
 #bigMsg:empty{display:none}
 #bottomBtn{position:absolute;left:0;right:0;bottom:max(30px,env(safe-area-inset-bottom));display:flex;justify-content:center}
+/* おさんぽ */
+#walkBtn{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:max(26px,env(safe-area-inset-bottom));font-size:24px;padding:12px 22px}
+#wBack{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top))}
+#wHint{position:absolute;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);font-size:20px;white-space:nowrap;transition:opacity .6s}
+#wHint.off{opacity:0}
+#stick{position:absolute;left:max(28px,env(safe-area-inset-left));bottom:max(28px,env(safe-area-inset-bottom));width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55) 0 55%,rgba(255,255,255,.35) 56%);border:4px solid rgba(255,255,255,.95);box-shadow:0 8px 22px rgba(200,60,130,.22);touch-action:none}
+#stick::before,#stick::after{content:'';position:absolute;left:50%;transform:translateX(-50%);border:12px solid transparent;opacity:.55}
+#stick::before{top:6px;border-bottom:14px solid #ff8fc6;border-top:0}
+#stick::after{bottom:6px;border-top:14px solid #ff8fc6;border-bottom:0}
+#knob{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:linear-gradient(180deg,#ffb8dc,#ff7cbc);box-shadow:0 5px 0 var(--deep),0 8px 16px rgba(200,60,130,.3);display:grid;place-items:center;font-size:34px;pointer-events:none}
+#jumpBtn{position:absolute;right:max(28px,env(safe-area-inset-right));bottom:max(36px,env(safe-area-inset-bottom));width:130px;height:130px;border-radius:50%;padding:0;font-size:28px;line-height:1.1;touch-action:none}
+#jumpBtn span{display:block;font-size:44px}
+@media (max-height:500px){#stick{width:140px;height:140px}#knob{width:64px;height:64px;margin:-32px 0 0 -32px;font-size:28px}#jumpBtn{width:108px;height:108px;font-size:22px}#jumpBtn span{font-size:36px}#wHint{font-size:16px}#walkBtn{font-size:20px;padding:10px 18px}}
+@media (max-aspect-ratio:1/1){#walkBtn{bottom:calc(max(26px,env(safe-area-inset-bottom)) + 150px)}}
 @media (max-aspect-ratio:1/1){#prog{right:auto;left:50%;transform:translateX(-50%);top:calc(max(12px,env(safe-area-inset-top)) + 112px);font-size:22px}}
 @media (max-width:700px){
   #eq{font-size:44px;padding:4px 20px;min-height:72px}#eq .q{width:56px;height:56px}
@@ -202,6 +216,14 @@ a.ibtn{text-decoration:none;color:inherit}
       <div class="pill" id="doneTag">✨ きょうの シール もらったね！ また あそべるよ</div>
       <button class="btn pe" id="playBtn">🐰 あそぶ！</button>
     </div>
+    <button class="btn mint pe" id="walkBtn">👣 おさんぽ</button>
+  </div>
+
+  <div class="layer" id="L-walk">
+    <button class="ibtn pe" id="wBack" aria-label="おにわに もどる">🏡<small>もどる</small></button>
+    <div class="pill" id="wHint">ピンクの まるで あるこう！ うさぎに タッチも できるよ</div>
+    <div id="stick" class="pe" aria-label="あるく パッド"><div id="knob">👣</div></div>
+    <button class="btn lav pe" id="jumpBtn"><span>🐰</span>ぴょん</button>
   </div>
 
   <div class="layer" id="L-play">
@@ -319,6 +341,7 @@ const AC = {
   fanfare() { const t = this.now(); [[523, 0], [659, .11], [784, .22], [1047, .33]].forEach(([f, d]) => { this.note(f, t + d, .5, { type: 'triangle', vol: .26 }); this.note(f / 2, t + d, .4, { vol: .1 }); }); this.note(1319, t + .45, .9, { vol: .13 }); this.note(1568, t + .45, .9, { vol: .1 }); },
   boing() { const t = this.now(); this.note(300, t, .4, { vol: .25, slide: .6 }); this.note(240, t + .12, .35, { type: 'triangle', vol: .12, slide: .7 }); },
   sad() { const t = this.now(); [[392, 0], [370, .28], [330, .56]].forEach(([f, d], i) => this.note(f, t + d, i === 2 ? .7 : .3, { type: 'triangle', vol: .2, slide: i === 2 ? .85 : .97 })); },
+  jump() { const t = this.now(); this.note(420, t, .22, { type: 'triangle', vol: .22, slide: 2 }); this.note(840, t + .05, .16, { vol: .06, slide: 1.8 }); },
   whoosh() { const t = this.now(); this.note(300, t, .35, { vol: .12, slide: 3 }); },
   shake() { const t = this.now(); [0, .07, .14].forEach(d => this.note(200 + Math.random() * 80, t + d, .08, { type: 'square', vol: .05 })); },
   magic() { const t = this.now(); for (let i = 0; i < 10; i++) this.note(700 + i * 140, t + i * .04, .25, { vol: .07 }); },
@@ -558,7 +581,7 @@ class Bunny {
     this.ears.forEach((p, i) => { p.rotation.z = p.userData.base + Math.sin(this.t * 3 + i * 1.7) * .05 * (1 - this.droop) + (i ? -1 : 1) * (this.sq * .8 + this.droop * 1.1); p.rotation.x = p.userData.bx + Math.sin(this.t * 2.2 + i) * .03; });
     const ss = 1 / (1 + this.hopY * .35); this.shadow.material.opacity = ss;
     if (this.label) {
-      if (!this.labelOn || !shown(this.root)) this.label.style.opacity = 0;
+      if (!this.labelOn || this.hidden || !shown(this.root)) this.label.style.opacity = 0;
       else {
         this.root.localToWorld(_v.set(0, this.hopY + (this.tall + .88) * this.body.scale.y + (this.accTall || 0), 0));
         const p = toScreen(_v);
@@ -576,12 +599,13 @@ class Bunny {
   async hop({ to = null, h = .75, dur = .45, sq = .16 } = {}) {
     const r = this.root.position, from = r.clone();
     if (to) { const dx = to.x - from.x, dz = to.z - from.z; if (Math.hypot(dx, dz) > .05) this.turn(Math.atan2(dx, dz)); }
+    this.hopping = true;
     await tween(.09, k => this.sq = sq * k, ease.out);
     await tween(dur, k => {
       this.hopY = Math.sin(k * Math.PI) * h; this.sq = sq * (1 - Math.min(1, k * 3)) - .07 * Math.sin(k * Math.PI);
       if (to) { r.x = from.x + (to.x - from.x) * k; r.z = from.z + (to.z - from.z) * k; }
     }, ease.lin);
-    this.hopY = 0;
+    this.hopY = 0; this.hopping = false;
     await tween(.16, k => this.sq = sq * .9 * Math.sin(k * Math.PI)); this.sq = 0;
   }
   turn(a, dur = .22) { const r0 = this.root.rotation.y; let d = a - r0; d = Math.atan2(Math.sin(d), Math.cos(d)); return tween(dur, k => this.root.rotation.y = r0 + d * k); }
@@ -861,7 +885,7 @@ Object.assign(DECO, {
   icecream: () => { const g = new THREE.Group(); g.add(M3(new THREE.BoxGeometry(1.5, .8, .8), '#fff0f7', 0, .6, 0)); for (const s of [-1, 1]) g.add(M3(new THREE.TorusGeometry(.18, .06, 8, 16), '#c9a4ff', s * .5, .18, .42)); g.add(M3(new THREE.CylinderGeometry(.03, .03, 1.6, 6), '#ffffff', .5, 1.6, 0)); g.add(M3(new THREE.ConeGeometry(1, .45, 16), '#ff9fcf', .5, 2.5, 0)); g.add(M3(new THREE.ConeGeometry(.18, .55, 12), '#f5c48a', -.3, 1.25, 0, { rx: Math.PI })); g.add(M3(GEO.sph, '#ffc2e0', -.3, 1.6, 0, { s: .22 })); g.add(M3(GEO.sph, '#bff0ff', -.3, 1.85, 0, { s: .19 })); return g; },
   flowerbed: () => { const g = new THREE.Group(); g.add(M3(new THREE.BoxGeometry(3.2, .18, 1), '#e9d6ff', 0, .09, 0)); for (let i = 0; i < 9; i++) { const x = -1.3 + i * .33, z = (i % 2) * .3 - .15, c = ['#ff8fc6', '#ffe066', '#c9a4ff', '#ffffff', '#ff9a7a'][i % 5]; g.add(M3(new THREE.CylinderGeometry(.02, .02, .5, 4), '#5cc26c', x, .4, z)); g.add(M3(GEO.sphLo, c, x, .7, z, { s: [.11, .14, .11] })); } return g; },
   heartarch: () => { const g = new THREE.Group(); g.add(M3(new THREE.TorusGeometry(1.4, .12, 10, 36, Math.PI), '#ff9fd0', 0, 0, 0)); for (let i = 0; i <= 8; i++) { const a = i / 8 * Math.PI; g.add(M3(GEO.sphLo, i % 2 ? '#ffffff' : '#ffe066', Math.cos(a) * 1.4, Math.sin(a) * 1.4, .1, { s: .12 })); } g.add(M3(HEART, '#ff6fb1', 0, 1.75, 0, { s: .55 })); return g; },
-  hotair: () => { const g = new THREE.Group(), b = new THREE.Group(); g.add(b); b.add(M3(GEO.sph, '#ffb3d9', 0, 1.3, 0, { s: [1, 1.15, 1] })); b.add(M3(new THREE.TorusGeometry(1, .08, 8, 28), '#ffffff', 0, 1.3, 0, { rx: Math.PI / 2 })); b.add(M3(new THREE.BoxGeometry(.5, .4, .5), '#f5c48a', 0, -.15, 0)); for (const [x, z] of [[-.22, -.22], [.22, -.22], [-.22, .22], [.22, .22]]) b.add(M3(new THREE.CylinderGeometry(.01, .01, .6, 4), '#ffffff', x, .25, z)); g.userData.tick = t => { const a = t * .08; b.position.set(Math.cos(a) * 9, 7 + Math.sin(t * .7) * .4, Math.sin(a) * 9); }; return g; },
+  hotair: () => { const g = new THREE.Group(), b = new THREE.Group(); g.add(b); b.add(M3(GEO.sph, '#ffb3d9', 0, 1.3, 0, { s: [1, 1.15, 1] })); b.add(M3(new THREE.TorusGeometry(1, .08, 8, 28), '#ffffff', 0, 1.3, 0, { rx: Math.PI / 2 })); b.add(M3(new THREE.BoxGeometry(.5, .4, .5), '#f5c48a', 0, -.15, 0)); for (const [x, z] of [[-.22, -.22], [.22, -.22], [-.22, .22], [.22, .22]]) b.add(M3(new THREE.CylinderGeometry(.01, .01, .6, 4), '#ffffff', x, .25, z)); g.userData.tick = t => { const a = t * .08; b.position.set(Math.cos(a) * 11, 7.5 + Math.sin(t * .7) * .4, Math.sin(a) * 11); }; return g; },
   moon: () => { const g = new THREE.Group(); g.add(M3(GEO.sph, '#fff1a8', 0, 0, 0, { s: 1.2 })); for (const s of [-1, 1]) { g.add(M3(GEO.happy, MAT.eye, s * .4, .15, 1.15, { s: 2.2, rz: Math.PI })); g.add(M3(GEO.cheek, MAT.cheek, s * .65, -.15, 1.05, { s: 2 })); } return g; },
 });
 const ITEMS = [
@@ -926,17 +950,19 @@ const isIn = (o, g) => { while (o) { if (o === g) return true; o = o.parent; } r
 const garden = { group: new THREE.Group(), world: new THREE.Group(), decos: new THREE.Group(), bun: [], on: false, gen: 0, rot: 0, sky: new THREE.Group() };
 scene.add(garden.group); garden.group.add(garden.world); garden.world.add(garden.decos); garden.group.add(garden.sky);
 const clouds = [];
+// しまの おおきさ（20まで ふえたので ゆったり めに）。かざりの いちも この わりあいで ひろげる
+const ISLE = 1.32, ISLE_R = 8.5 * ISLE, WALK_R = ISLE_R - 1.1;
 (() => {
-  const w = garden.world;
-  w.add(M3(new THREE.CylinderGeometry(8.5, 8.5, .6, 72), '#ffd9ec', 0, -.3, 0));
-  w.add(M3(new THREE.CylinderGeometry(6, 6, .62, 72), '#ffe6f2', 0, -.29, 0));
-  w.add(M3(new THREE.CylinderGeometry(8.55, 8.2, 1.4, 72), '#fff3e3', 0, -1.25, 0));
-  for (let i = 0; i < 46; i++) { const a = i / 46 * Math.PI * 2; w.add(M3(GEO.sphLo, i % 3 === 0 ? '#ffb3d9' : i % 3 === 1 ? '#ffc9e4' : '#e5d3ff', Math.cos(a) * 8.45, -.6, Math.sin(a) * 8.45, { s: [.42, .6, .42] })); }
-  w.add(M3(new THREE.ConeGeometry(8.2, 6, 72), '#dccbff', 0, -4.9, 0, { rx: Math.PI }));
+  const w = garden.world, R = ISLE_R, NB = 60;
+  w.add(M3(new THREE.CylinderGeometry(R, R, .6, 96), '#ffd9ec', 0, -.3, 0));
+  w.add(M3(new THREE.CylinderGeometry(6 * ISLE, 6 * ISLE, .62, 96), '#ffe6f2', 0, -.29, 0));
+  w.add(M3(new THREE.CylinderGeometry(R + .05, R - .3, 1.4, 96), '#fff3e3', 0, -1.25, 0));
+  for (let i = 0; i < NB; i++) { const a = i / NB * Math.PI * 2; w.add(M3(GEO.sphLo, i % 3 === 0 ? '#ffb3d9' : i % 3 === 1 ? '#ffc9e4' : '#e5d3ff', Math.cos(a) * (R - .05), -.6, Math.sin(a) * (R - .05), { s: [.42, .6, .42] })); }
+  w.add(M3(new THREE.ConeGeometry(R - .3, 7, 96), '#dccbff', 0, -5.4, 0, { rx: Math.PI }));
   // おはな
-  const petal = new THREE.InstancedMesh(GEO.sphLo, toon('#ffffff'), 40 * 6); let k = 0; const mtx = new THREE.Matrix4(), col = new THREE.Color();
-  for (let i = 0; i < 40; i++) {
-    const r = rand(1.5, 7.8), a = rand(0, Math.PI * 2), x = Math.cos(a) * r, z = Math.sin(a) * r, pc = pick(['#ffffff', '#fff27a', '#ffc2e0', '#cdbbff', '#bff0ff']);
+  const NF = 70, petal = new THREE.InstancedMesh(GEO.sphLo, toon('#ffffff'), NF * 6); let k = 0; const mtx = new THREE.Matrix4(), col = new THREE.Color();
+  for (let i = 0; i < NF; i++) {
+    const r = rand(1.5, R - .8), a = rand(0, Math.PI * 2), x = Math.cos(a) * r, z = Math.sin(a) * r, pc = pick(['#ffffff', '#fff27a', '#ffc2e0', '#cdbbff', '#bff0ff']);
     for (let j = 0; j < 6; j++) {
       const px = j < 5 ? x + Math.cos(j * 1.256) * .13 : x, pz = j < 5 ? z + Math.sin(j * 1.256) * .13 : z;
       mtx.compose(new THREE.Vector3(px, .03, pz), new THREE.Quaternion(), new THREE.Vector3(j < 5 ? .1 : .07, .05, j < 5 ? .1 : .07));
@@ -944,8 +970,8 @@ const clouds = [];
     }
   }
   w.add(petal);
-  for (const [x, z, s, c] of [[-2.6, -7.2, 1, undefined], [2.6, -7.3, .9, ['#d9c6ff', '#ffc2e0', '#bdf0ff']], [-7.6, 1.2, .7, ['#bdf0ff', '#ffb3d9']], [7.6, 1, .7, ['#ffe9a8', '#ffb3d9', '#d9c6ff']]]) { const t = cottonTree(c); t.position.set(x, 0, z); t.scale.setScalar(s); w.add(t); if (Math.abs(x) > 7) (garden.sideTrees ||= []).push(t); }
-  for (let i = 0; i < 7; i++) { const c = cloud(rand(.8, 1.4)); c.userData = { a: i / 7 * Math.PI * 2, r: rand(12, 15), y: rand(-3.5, 1.5), sp: rand(.02, .05) }; garden.group.add(c); clouds.push(c); }
+  for (const [x, z, s, c] of [[-2.6, -7.2, 1, undefined], [2.6, -7.3, .9, ['#d9c6ff', '#ffc2e0', '#bdf0ff']], [-7.6, 1.2, .7, ['#bdf0ff', '#ffb3d9']], [7.6, 1, .7, ['#ffe9a8', '#ffb3d9', '#d9c6ff']]]) { const t = cottonTree(c); t.position.set(x * ISLE, 0, z * ISLE); t.scale.setScalar(s); w.add(t); (garden.trees ||= []).push(t); if (Math.abs(x) > 7) (garden.sideTrees ||= []).push(t); }
+  for (let i = 0; i < 7; i++) { const c = cloud(rand(.8, 1.4)); c.userData = { a: i / 7 * Math.PI * 2, r: rand(15, 19), y: rand(-3.5, 1.5), sp: rand(.02, .05) }; garden.group.add(c); clouds.push(c); }
 })();
 
 function buildDecos() {
@@ -953,10 +979,10 @@ function buildDecos() {
   if (garden.sideTrees) { garden.sideTrees[0].visible = !S.items.includes('carousel'); garden.sideTrees[1].visible = !S.items.includes('tent'); }
   for (const it of S.items) {
     const d = DECO[it]; if (!d) continue; const p = DECO_POS[it]; const o = d();
-    o.position.set(p[0], p[1], p[2]); o.rotation.y = p[3]; garden.decos.add(o);
+    o.position.set(p[0] * ISLE, p[1], p[2] * ISLE); o.rotation.y = p[3]; garden.decos.add(o);
   }
   garden.sky.clear();
-  for (let i = 0; i < Math.min(S.stars, 40); i++) { const sp = new THREE.Sprite(emojiMat('⭐').clone()); const a = i * 2.39; sp.position.set(Math.cos(a) * rand(6, 13), rand(7, 11), Math.sin(a) * 6 - 6); sp.scale.setScalar(.7); garden.sky.add(sp); }
+  for (let i = 0; i < Math.min(S.stars, 40); i++) { const sp = new THREE.Sprite(emojiMat('⭐').clone()); const a = i * 2.39; sp.position.set(Math.cos(a) * rand(7, 16), rand(8, 12), Math.sin(a) * 7 - 7); sp.scale.setScalar(.7); garden.sky.add(sp); }
 }
 
 function renderFriends() {
@@ -974,25 +1000,26 @@ function enterGarden() {
   // 11いじょうの おともだちは まいかい 4にんまで あそびにくる
   const met = [...S.met.filter(n => n <= 10), ...shuffle(S.met.filter(n => n > 10)).slice(0, 4)].sort((a, b) => a - b);
   met.forEach((n, i) => {
-    const b = new Bunny(n, { scale: .72, label: 's' }); const a = i / met.length * Math.PI * 2 + .4, r = rand(1.5, 4);
+    const b = new Bunny(n, { scale: .72, label: 's' }); const a = i / met.length * Math.PI * 2 + .4, r = rand(2, 5.6);
     b.root.position.set(Math.cos(a) * r, 0, Math.sin(a) * r * .8); b.root.rotation.y = -garden.world.rotation.y;
     garden.world.add(b.root); garden.bun.push(b); b.dropIn(i * .12, 6); wander(b, gen);
   });
   gardenFit();
   run(async () => { await wait(rand(5, 7)); while (gen === garden.gen) { await gardenMerge(gen); await wait(rand(14, 22)); } });
 }
-function leaveGarden() { garden.on = false; garden.gen++; garden.group.visible = false; stage.visible = true; }
+function leaveGarden() { if (walk.on) stopWalk(true); garden.on = false; garden.gen++; garden.group.visible = false; stage.visible = true; }
 function gardenFit() {
   const aspect = W / H, fov = THREE.MathUtils.degToRad(camera.fov);
-  const w = aspect < 1 ? 15 : 21; const d = Math.max(18, w / 2 / (Math.tan(fov / 2) * aspect));
+  const w = aspect < 1 ? 19 : 26.5; const d = Math.max(25, w / 2 / (Math.tan(fov / 2) * aspect));
   camTo(new THREE.Vector3(0, d * .42, d), new THREE.Vector3(0, aspect < 1 ? 1.5 : .2, 0));
 }
-const faceCam = () => -garden.world.rotation.y;
+// おさんぽ ちゅうは あるいている じぶんの ほうを むく
+const faceCam = b => walk.on && b ? Math.atan2(walk.pos.x - b.root.position.x, walk.pos.z - b.root.position.z) : -garden.world.rotation.y;
 async function wander(b, gen) {
   await wait(rand(1, 3));
   while (gen === garden.gen && b.alive) {
     if (b.busy) { await wait(.4); continue; }
-    const r = Math.sqrt(Math.random()) * 4.4, a = rand(0, Math.PI * 2), tx = Math.cos(a) * r, tz = Math.sin(a) * r;
+    const r = Math.sqrt(Math.random()) * 6.2, a = rand(0, Math.PI * 2), tx = Math.cos(a) * r, tz = Math.sin(a) * r;
     const p = b.root.position, dist = Math.hypot(tx - p.x, tz - p.z), steps = Math.max(1, Math.ceil(dist / .75));
     const sx = p.x, sz = p.z;
     for (let i = 1; i <= steps; i++) {
@@ -1000,13 +1027,13 @@ async function wander(b, gen) {
       await b.hop({ to: { x: sx + (tx - sx) * i / steps, z: sz + (tz - sz) * i / steps }, h: .45, dur: .34 });
     }
     if (b.busy || gen !== garden.gen) continue;
-    await b.turn(faceCam(), .3);
+    await b.turn(faceCam(b), .3);
     await wait(rand(1.5, 4.5));
   }
 }
 async function gardenTap(b) {
   if (b.busy) return; b.busy = true;
-  await b.turn(faceCam(), .2); b.setHappy(true); await b.hop({ h: .8 });
+  await b.turn(faceCam(b), .2); b.setHappy(true); await b.hop({ h: .8 });
   await b.countAll({ gap: .32 });
   await Voice.say(`${YOMI[b.n]}ちゃん だよ！`);
   b.setHappy(false); await wait(.6); b.clearBadges(); b.unglowAll(); b.busy = false;
@@ -1015,18 +1042,21 @@ async function gardenMerge(gen) {
   const free = garden.bun.filter(b => !b.busy && b.alive);
   const pairs = []; for (const x of free) for (const y of free) if (x !== y && x.n + y.n <= 20) pairs.push([x, y]);
   if (!pairs.length) return;
-  // ちかくに いる ふたりを えらぶ
-  pairs.sort((p, q) => p[0].root.position.distanceTo(p[1].root.position) - q[0].root.position.distanceTo(q[1].root.position));
+  // ちかくに いる ふたりを えらぶ（おさんぽ ちゅうは じぶんの ちかくの ふたり）
+  const pd = walk.on ? p => p[0].root.position.distanceTo(walk.pos) + p[1].root.position.distanceTo(walk.pos) : p => p[0].root.position.distanceTo(p[1].root.position);
+  pairs.sort((p, q) => pd(p) - pd(q));
   let [A, B] = pick(pairs.slice(0, 3)); A.busy = B.busy = true;
   await wait(.5); if (gen !== garden.gen) { A.busy = B.busy = false; return; }
-  const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), faceCam());
+  let mid = A.root.position.clone().add(B.root.position).multiplyScalar(.5); mid.setLength(Math.min(mid.length(), 3));
+  if (walk.on) { mid = walk.pos.clone().addScaledVector(walkFwd(), 4.2); mid.y = 0; if (mid.length() > WALK_R - 1.5) mid.setLength(WALK_R - 1.5); }
+  const right = walk.on ? new THREE.Vector3(walk.pos.z - mid.z, 0, mid.x - walk.pos.x).normalize() : new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), faceCam());
   if (A.root.position.dot(right) > B.root.position.dot(right)) [A, B] = [B, A];
-  const mid = A.root.position.clone().add(B.root.position).multiplyScalar(.5); mid.setLength(Math.min(mid.length(), 2));
   const gap = ((A.width + B.width) * .5 + .7) * .72 * .5;
   const ta = mid.clone().addScaledVector(right, -gap), tb = mid.clone().addScaledVector(right, gap);
-  const walk = async (b, t) => { const p = b.root.position.clone(), d = p.distanceTo(t), st = Math.max(1, Math.ceil(d / 1.1)); for (let i = 1; i <= st; i++) { if (gen !== garden.gen) return; await b.hop({ to: p.clone().lerp(t, i / st), h: .5, dur: .3, sq: .1 }); } };
-  await Promise.all([walk(A, ta), walk(B, tb)]); if (gen !== garden.gen) return;
-  await Promise.all([A.turn(faceCam()), B.turn(faceCam())]);
+  const walkTo = async (b, t) => { const p = b.root.position.clone(), d = p.distanceTo(t), st = Math.max(1, Math.ceil(d / 1.1)); for (let i = 1; i <= st; i++) { if (gen !== garden.gen) return; await b.hop({ to: p.clone().lerp(t, i / st), h: .5, dur: .3, sq: .1 }); } };
+  await Promise.all([walkTo(A, ta), walkTo(B, tb)]); if (gen !== garden.gen) return;
+  const fm = walk.on ? Math.atan2(walk.pos.x - mid.x, walk.pos.z - mid.z) : faceCam();
+  await Promise.all([A.turn(fm), B.turn(fm)]);
   const a = A.n, b = B.n, s = a + b;
   const el = document.createElement('div'); el.className = 'bubble'; el.innerHTML = `<span style="color:${INK[a]}">${a}</span> と <span style="color:${INK[b]}">${b}</span> で…？`;
   el.style.fontSize = '28px'; const an = anchor(el, A.head, new THREE.Vector3(0, 1.45, 0), 'garden');
@@ -1065,13 +1095,14 @@ addEventListener('resize', onResize);
 /* ================= タップ ================= */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 let ptr = null;
-canvas.addEventListener('pointerdown', e => { ptr = { x: e.clientX, y: e.clientY, drag: false, rot: garden.rot }; });
+canvas.addEventListener('pointerdown', e => { if (ptr) return; ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, drag: false, rot: garden.rot, yaw: walk.yaw, pitch: walk.pitch }; });
 canvas.addEventListener('pointermove', e => {
-  if (!ptr) return; const dx = e.clientX - ptr.x;
+  if (!ptr || e.pointerId !== ptr.id) return; const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
   if (mode === 'garden' && (ptr.drag || Math.abs(dx) > 12)) { ptr.drag = true; garden.rot = ptr.rot + dx * .006; }
+  if (mode === 'walk' && (ptr.drag || Math.hypot(dx, dy) > 12)) { ptr.drag = true; walk.yaw = ptr.yaw - dx * .006; walk.pitch = THREE.MathUtils.clamp(ptr.pitch - dy * .004, -.7, .5); }
 });
-canvas.addEventListener('pointerup', e => { if (ptr && !ptr.drag) onTap(e.clientX, e.clientY); ptr = null; });
-canvas.addEventListener('pointercancel', () => ptr = null);
+canvas.addEventListener('pointerup', e => { if (!ptr || e.pointerId !== ptr.id) return; if (!ptr.drag) onTap(e.clientX, e.clientY); ptr = null; });
+canvas.addEventListener('pointercancel', e => { if (ptr && e.pointerId === ptr.id) ptr = null; });
 function hitInfo(o) {
   while (o) {
     if (o.userData.gift) return { gift: o.userData.gift };
@@ -1084,11 +1115,11 @@ function hitInfo(o) {
 }
 function onTap(x, y) {
   ndc.set(x / W * 2 - 1, -(y / H) * 2 + 1); ray.setFromCamera(ndc, camera);
-  const root = mode === 'garden' ? garden.world : stageDyn;
+  const inGarden = mode === 'garden' || mode === 'walk', root = inGarden ? garden.world : stageDyn;
   const hits = ray.intersectObject(root, true);
   for (const h of hits) {
     const r = hitInfo(h.object); if (!r) continue;
-    if (mode === 'garden' && r.bunny) { run(() => gardenTap(r.bunny)); return; }
+    if (inGarden && r.bunny) { run(() => gardenTap(r.bunny)); return; }
     if (r.bunny && P.tap) { tapCube(r.bunny, r.cube); return; }
     if (r.gift && P.onGift) { P.onGift(); return; }
     if (r.box && P.onBox) { P.onBox(); return; }
@@ -1096,6 +1127,145 @@ function onTap(x, y) {
     return;
   }
 }
+
+/* ================= おさんぽ（じぶん してんで あるく） ================= */
+const EYE = 2.05, WALK_FOV = 62, BASE_FOV = 36, Y_AXIS = new THREE.Vector3(0, 1, 0);
+const occRay = new THREE.Raycaster();
+const walk = { occT: 0, occI: 0, on: false, pos: new THREE.Vector3(), yaw: 0, pitch: -.12, y: 0, vy: 0, bob: 0, t0: 0, stick: { x: 0, y: 0, id: null }, keys: new Set(), cols: [], greet: new Map(), lastVoice: 0 };
+const walkFwd = (yaw = walk.yaw) => new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+// かざりの あたりはんい [よこ, おく, はんけい]（かざりの むきに あわせて まわす）
+const DECO_COL = {
+  rainbow: [[-3.45, 0, .8], [3.45, 0, .8]], mushroom: [[0, 0, 1.25]], castle: [[0, 0, 1], [-1.3, .2, .6], [1.3, .2, .6]], cake: [[0, 0, 1.35]],
+  teaset: [[0, 0, 1.05], [-1.4, .2, .4], [1.4, .2, .4]], balloons: [[0, 0, .4]], fountain: [[0, 0, 1.5]], lollipop: [[0, 0, .3], [1.2, .5, .25]],
+  swing: [[-1.05, 0, .45], [0, 0, .5], [1.05, 0, .45]], slide: [[-.8, 0, .65], [.5, 0, .6], [1.5, 0, .35]], carousel: [[0, 0, 1.4]], tent: [[0, 0, 1.05]],
+  snowman: [[0, 0, .65]], icecream: [[-.4, 0, .5], [.4, 0, .5]], flowerbed: [[-1.1, 0, .55], [0, 0, .55], [1.1, 0, .55]], heartarch: [[-1.4, 0, .22], [1.4, 0, .22]],
+};
+function buildWalkCols() {
+  const c = walk.cols = [];
+  for (const it of S.items) {
+    const p = DECO_POS[it], list = DECO_COL[it]; if (!p || !list) continue;
+    const cs = Math.cos(p[3]), sn = Math.sin(p[3]);
+    for (const [dx, dz, r] of list) c.push([p[0] * ISLE + dx * cs + dz * sn, p[2] * ISLE - dx * sn + dz * cs, r]);
+  }
+  for (const t of garden.trees || []) if (t.visible) c.push([t.position.x, t.position.z, .45 * t.scale.x]);
+}
+function pushOut(x, z, r) {
+  const dx = walk.pos.x - x, dz = walk.pos.z - z, d = Math.hypot(dx, dz);
+  if (d >= r) return;
+  if (d < 1e-4) { walk.pos.x += r; return; }
+  walk.pos.x = x + dx / d * r; walk.pos.z = z + dz / d * r;
+}
+let fovGen = 0;
+function setFov(f, dur = 1) {
+  const f0 = camera.fov, g = ++fovGen; if (Math.abs(f - f0) < .01) return;
+  if (!dur) { camera.fov = f; camera.updateProjectionMatrix(); return; }
+  tween(dur, k => { if (g !== fovGen) return; camera.fov = f0 + (f - f0) * k; camera.updateProjectionMatrix(); });
+}
+let hintTimer = 0;
+function startWalk() {
+  if (mode !== 'garden') return;
+  mode = 'walk'; walk.on = true; walk.t0 = 0; ptr = null; showLayer('walk');
+  const wr = garden.world.rotation.y; garden.rot = wr;
+  // いま みている ほうの てまえから、まんなかを むいて スタート
+  walk.pos.set(0, 0, WALK_R - 2.6).applyAxisAngle(Y_AXIS, -wr); walk.yaw = -wr; walk.pitch = -.12; walk.y = walk.vy = 0;
+  walk.stick.x = walk.stick.y = 0; walk.stick.id = null; $('#knob').style.transform = ''; walk.keys.clear();
+  buildWalkCols(); setFov(WALK_FOV, 1.1);
+  const h = $('#wHint'); h.classList.remove('off'); clearTimeout(hintTimer); hintTimer = setTimeout(() => h.classList.add('off'), 6000);
+  Voice.say('おさんぽ しよう！');
+}
+function stopWalk(quiet) {
+  walk.on = false; garden.bun.forEach(b => b.hidden = false); walk.stick.id = null; walk.stick.x = walk.stick.y = 0; walk.keys.clear(); ptr = null;
+  setFov(BASE_FOV, quiet ? 0 : .9);
+  if (quiet) return;
+  mode = 'garden'; showLayer('garden'); gardenFit();
+}
+function walkJump() {
+  if (!walk.on || walk.y > .05) return;
+  walk.vy = 6.4; AC.jump();
+  // ちかくの うさぎも いっしょに ぴょん
+  for (const b of garden.bun) {
+    if (!b.alive || b.busy || b.hopping || b.root.position.distanceTo(walk.pos) > 5.5) continue;
+    b.busy = true;
+    run(async () => { await wait(rand(.05, .3)); b.setHappy(true); await b.hop({ h: .9 }); b.setHappy(false); b.busy = false; });
+  }
+}
+async function walkGreet(b) {
+  b.busy = true; walk.greet.set(b, T0);
+  await b.turn(faceCam(b), .25); b.setHappy(true); AC.pop(); await b.hop({ h: .6 });
+  if (T0 - walk.lastVoice > 7 && walk.on) { walk.lastVoice = T0; Voice.say(pick(['やっほー！', 'こんにちは！', `${YOMI[b.n]} だよ！`, 'いっしょに あそぼ！'])); }
+  await wait(.4); b.setHappy(false); b.busy = false;
+}
+async function walkDodge(b) {
+  b.busy = true; const p = b.root.position, away = p.clone().sub(walk.pos); away.y = 0;
+  if (away.lengthSq() < 1e-4) away.set(1, 0, 0);
+  // よける むきは すすむ ほうこうの よこへ
+  const side = new THREE.Vector3(-walkFwd().z, 0, walkFwd().x); if (side.dot(away) < 0) side.negate();
+  const to = p.clone().addScaledVector(away.normalize(), .9).addScaledVector(side, 1.1); if (to.length() > WALK_R - .5) to.setLength(WALK_R - .5);
+  AC.pop(1.25); await b.hop({ to, h: .55, dur: .32 });
+  await b.turn(faceCam(b), .2); b.busy = false;
+}
+function walkUpdate(dt) {
+  walk.t0 += dt;
+  const K = walk.keys, st = walk.stick;
+  let f = Math.abs(st.y) > .12 ? -st.y : 0, t = Math.abs(st.x) > .12 ? st.x : 0;
+  if (K.has('ArrowUp') || K.has('KeyW')) f = 1; if (K.has('ArrowDown') || K.has('KeyS')) f = -1;
+  if (K.has('ArrowLeft') || K.has('KeyA')) t = -1; if (K.has('ArrowRight') || K.has('KeyD')) t = 1;
+  walk.yaw -= t * Math.abs(t) * 2.1 * dt;
+  if (f) walk.pos.addScaledVector(walkFwd(), (f > 0 ? 3.6 : 2.2) * f * dt);
+  // ぶつからない ように
+  for (const [x, z, r] of walk.cols) pushOut(x, z, r + .45);
+  for (const b of garden.bun) if (b.alive && b.root.visible) {
+    const p = b.root.position, r = .72 * (b.width * .5 + .3) + 1.05;
+    // ぶつかりそうに なったら うさぎが ぴょんと よけてくれる
+    if (!b.busy && !b.hopping && p.distanceTo(walk.pos) < r + .25) run(() => walkDodge(b));
+    pushOut(p.x, p.z, r);
+  }
+  if (walk.pos.length() > WALK_R) walk.pos.setLength(WALK_R);
+  walk.pos.y = 0;
+  // ジャンプと あるく ゆれ
+  walk.vy -= 17 * dt; walk.y = Math.max(0, walk.y + walk.vy * dt); if (walk.y === 0) walk.vy = 0;
+  walk.bob += dt * Math.abs(f) * 9;
+  const bob = walk.y > 0 ? 0 : Math.sin(walk.bob) * .07 * Math.min(1, Math.abs(f) * 1.5);
+  // ちかくに きた うさぎが あいさつ
+  for (const b of garden.bun) {
+    if (!b.alive || b.busy || b.hopping) continue;
+    const d = b.root.position.distanceTo(walk.pos);
+    if (d < 2.8 + b.width * .4 && T0 - (walk.greet.get(b) ?? -99) > 12) run(() => walkGreet(b));
+  }
+  // ものの うしろに かくれた うさぎの かずは ださない（すこしずつ しらべる）
+  walk.occT -= dt;
+  if (walk.occT <= 0 && garden.bun.length) {
+    walk.occT = .06; const b = garden.bun[walk.occI++ % garden.bun.length];
+    if (b.alive) {
+      const to = b.root.localToWorld(new THREE.Vector3(0, b.tall + .9, 0)), from = camera.position, d = from.distanceTo(to);
+      occRay.set(from, to.clone().sub(from).normalize()); occRay.far = d - .4; occRay.camera = camera;
+      b.hidden = d > 22 || occRay.intersectObject(garden.world, true).some(h => !isIn(h.object, b.root) && shown(h.object));
+    }
+  }
+  // カメラ
+  const eye = garden.world.localToWorld(new THREE.Vector3(walk.pos.x, EYE + walk.y + bob, walk.pos.z));
+  const yw = walk.yaw + garden.world.rotation.y, cp = Math.cos(walk.pitch);
+  cam.tPos.copy(eye); cam.tLook.set(eye.x - Math.sin(yw) * cp * 6, eye.y + Math.sin(walk.pitch) * 6, eye.z - Math.cos(yw) * cp * 6);
+}
+(() => {
+  const el = $('#stick'), knob = $('#knob');
+  const move = e => {
+    const r = el.getBoundingClientRect(), R = r.width / 2 - 12;
+    let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2); const l = Math.hypot(dx, dy);
+    if (l > R) { dx *= R / l; dy *= R / l; }
+    knob.style.transform = `translate(${dx}px,${dy}px)`; walk.stick.x = dx / R; walk.stick.y = dy / R;
+  };
+  const end = e => { if (e.pointerId !== walk.stick.id) return; walk.stick.id = null; walk.stick.x = walk.stick.y = 0; knob.style.transform = ''; };
+  el.addEventListener('pointerdown', e => { e.preventDefault(); if (walk.stick.id !== null) return; walk.stick.id = e.pointerId; try { el.setPointerCapture(e.pointerId); } catch (_) {} move(e); });
+  el.addEventListener('pointermove', e => { if (e.pointerId === walk.stick.id) move(e); });
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end); el.addEventListener('lostpointercapture', end);
+  $('#jumpBtn').addEventListener('pointerdown', e => { e.preventDefault(); walkJump(); });
+  $('#wBack').onclick = () => { AC.pop(); stopWalk(); };
+  $('#walkBtn').onclick = () => { AC.pop(); startWalk(); };
+  addEventListener('keydown', e => { if (mode !== 'walk') return; if (e.code === 'Space') { walkJump(); e.preventDefault(); } else walk.keys.add(e.code); });
+  addEventListener('keyup', e => walk.keys.delete(e.code));
+  addEventListener('blur', () => walk.keys.clear());
+})();
 
 /* ================= UI ヘルパー ================= */
 let mode = 'splash';
@@ -1707,7 +1877,8 @@ let last = performance.now(), T0 = 0;
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now; T0 += dt;
   updateTweens(dt);
-  const k = 1 - Math.exp(-dt * 3.5); cam.pos.lerp(cam.tPos, k); cam.look.lerp(cam.tLook, k); camera.position.copy(cam.pos); camera.lookAt(cam.look);
+  if (walk.on) walkUpdate(dt);
+  const k = 1 - Math.exp(-dt * (walk.on && walk.t0 > 1.2 ? 16 : 3.5)); cam.pos.lerp(cam.tPos, k); cam.look.lerp(cam.tLook, k); camera.position.copy(cam.pos); camera.lookAt(cam.look);
   if (garden.group.visible) {
     garden.world.rotation.y += (garden.rot - garden.world.rotation.y) * Math.min(1, dt * 6);
     garden.decos.children.forEach(d => d.userData.tick && d.userData.tick(T0));
@@ -1724,7 +1895,7 @@ function loop(now) {
 }
 onResize(); splashScene(); requestAnimationFrame(loop);
 window.__kzReady = true; $('#loadMsg').style.display = 'none';
-window.KZ = { testQ: q => run(async () => { const tok = newFlow(); leaveGarden(); mode = 'play'; clearStage(); showLayer('play'); P.qs = [q]; P.idx = 0; P.log = []; renderProg(); await playQ(q, tok); }), pickQuestions, P, tapCube, garden, gardenMerge, get mode() { return mode; }, S, startSession, enterGarden, intro, enterDress, openGift: () => run(() => openGift(FLOW)), newFriend: n => run(() => newFriend(n, FLOW)), save };
+window.KZ = { walk, startWalk, stopWalk, testQ: q => run(async () => { const tok = newFlow(); leaveGarden(); mode = 'play'; clearStage(); showLayer('play'); P.qs = [q]; P.idx = 0; P.log = []; renderProg(); await playQ(q, tok); }), pickQuestions, P, tapCube, garden, gardenMerge, get mode() { return mode; }, S, startSession, enterGarden, intro, enterDress, openGift: () => run(() => openGift(FLOW)), newFriend: n => run(() => newFriend(n, FLOW)), save };
 </script>
 </body>
 </html>
