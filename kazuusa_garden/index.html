@@ -84,6 +84,7 @@ a.ibtn{text-decoration:none;color:inherit}
 #prog .cur{display:inline-block;animation:beat 1s infinite}
 #eq{background:rgba(255,255,255,.94);border-radius:999px;padding:4px 34px;font-size:64px;font-weight:900;display:flex;align-items:center;gap:14px;box-shadow:0 6px 0 rgba(200,90,150,.15),0 12px 26px rgba(200,90,150,.18);min-height:96px}
 #eq .op{color:#e57fb6;font-size:52px}
+#eq .op.wa{font-size:40px;color:#c24d8f}
 #eq .q{display:inline-grid;place-items:center;width:78px;height:78px;border-radius:22px;background:#ffeef7;border:4px dashed #ff9fcf;color:#ff7ab8;animation:beat 1.2s infinite}
 #eq .mid{background:#fff0f7;border-radius:20px;padding:0 12px;box-shadow:inset 0 0 0 4px #ffc2e0}
 #eq .ans{animation:lpop .6s cubic-bezier(.3,1.6,.5,1)}
@@ -647,6 +648,20 @@ class Bunny {
     AC.sparkle(); await Promise.all([voice ? Voice.say(g === 10 ? 'じゅう！' : 'ご！') : null, wait(.7)]); if (tok !== undefined) guard(tok);
     for (let i = g; i < this.n; i++) { await this.countOne(i, i + 1, { voice }); if (tok !== undefined) guard(tok); }
   }
+  // 5・10 の かたまりで みせる（1こずつ かぞえない）。n は のこりの かず など、まえから n こ
+  async chunkShow({ tok, voice = true, n = this.n } = {}) {
+    this.clearBadges(); this.unglowAll();
+    const g = n >= 10 ? 10 : n >= 5 ? 5 : 0, rest = n - g, G = () => { if (tok !== undefined) guard(tok); };
+    const lit = (a, b) => { for (let i = a; i < b; i++) { this.glow(i); this.popCube(i); } };
+    if (!g || !rest) {
+      lit(0, n); this.showBadge(n - 1, n); AC.sparkle();
+      await Promise.all([voice ? Voice.say(YOMI[n]) : null, wait(.7)]); G(); return;
+    }
+    lit(0, g); this.showBadge(g - 1, g); AC.sparkle();
+    await Promise.all([voice ? Voice.say(g === 10 ? 'じゅう' : 'ご') : null, wait(.6)]); G();
+    lit(g, n); this.showBadge(n - 1, n); AC.count(Math.min(rest, 10));
+    await Promise.all([voice ? Voice.say(`${YOMI[g]}と ${YOMI[rest]}で ${YOMI[n]}`) : null, wait(.8)]); G();
+  }
   ghost(i, on) { // ひきざんで「おでかけ」する ブロック
     const c = this.cubes[i]; if (!c) return; c.userData.ghost = on;
     c.material.transparent = on; c.material.opacity = on ? .28 : 1; c.material.depthWrite = !on; c.material.needsUpdate = true;
@@ -1034,7 +1049,7 @@ async function wander(b, gen) {
 async function gardenTap(b) {
   if (b.busy) return; b.busy = true;
   await b.turn(faceCam(b), .2); b.setHappy(true); await b.hop({ h: .8 });
-  await b.countAll({ gap: .32 });
+  await b.chunkShow();
   await Voice.say(`${YOMI[b.n]}ちゃん だよ！`);
   b.setHappy(false); await wait(.6); b.clearBadges(); b.unglowAll(); b.busy = false;
 }
@@ -1286,13 +1301,21 @@ function miniBlocks(v) {
 
 /* ================= もんだい の きろく ================= */
 // もんだいの しゅるい: {t:'add',a,b} / {t:'sub',a,b} / {t:'multi',n:[a,b,c],o:['+','-']}
-const fkey = (t, a, b) => a + (t === 'sub' ? '-' : '+') + b;
+const fkey = (t, a, b) => t === 'comp' ? `${a}=${b}+` : a + (t === 'sub' ? '-' : '+') + b;
 const factOf = (t, a, b) => S.facts[fkey(t, a, b)] ||= { box: 0, seen: 0, ok: 0, ng: 0, last: 0, lw: false };
 const stageOf = f => f.box <= 0 ? 1 : f.box === 1 ? 2 : f.box === 2 ? 3 : 4;
 const MAXN = () => Math.min(20, Math.max(5, S.unlocked));
 function addPool(max) { const r = []; for (let a = 1; a <= 10; a++) for (let b = 1; b <= 10 && a + b <= max; b++) r.push([a, b]); return r; }
 function subPool(max) { const r = []; for (let a = 2; a <= max; a++) for (let b = 1; b < a && b <= 10; b++) r.push([a, b]); return r; }
 const subOn = () => S.settings.sub === 'on' || (S.settings.sub !== 'off' && S.unlocked >= 6);
+const compOn = () => S.settings.comp !== 'off';
+// いくつと いくつ：10までの わけかた ＋「10と いくつ」（11〜）。5と10を おおめに
+function compPool(max) {
+  const r = [];
+  for (let w = 2; w <= Math.min(10, max); w++) for (let p = 1; p < w; p++) r.push([w, p]);
+  for (let w = 11; w <= max; w++) r.push([w, 10]);
+  return r;
+}
 const multiOn = () => S.settings.multi === 'on' || (S.settings.multi !== 'off' && S.unlocked >= 8);
 function weighOf(t, a, b, now) {
   const f = S.facts[fkey(t, a, b)], box = f ? f.box : 0;
@@ -1312,9 +1335,10 @@ function genMulti() {
   return { t: 'multi', n: [1, 1, 1], o: ['+', '+'] };
 }
 function pickQuestions(n) {
-  const now = Date.now(), mx = MAXN(), useSub = subOn(), useMulti = multiOn();
-  const cats = Array.from({ length: n }, () => { const r = Math.random(); return useMulti && r < .2 ? 'multi' : useSub && r < .55 ? 'sub' : 'add'; });
+  const now = Date.now(), mx = MAXN(), useSub = subOn(), useMulti = multiOn(), useComp = compOn();
+  const cats = Array.from({ length: n }, () => { const r = Math.random(); return useMulti && r < .15 ? 'multi' : useComp && r < .4 ? 'comp' : useSub && r < .65 ? 'sub' : 'add'; });
   if (useSub && n >= 3 && !cats.includes('sub')) cats[1] = 'sub';
+  if (useComp && n >= 3 && !cats.includes('comp')) cats[2] = 'comp';
   if (useMulti && n >= 4 && !cats.includes('multi')) cats[n - 1] = 'multi';
   // 3つの けいさんは 1かいに 1〜2もんまで
   let mLeft = Math.ceil(n / 5); cats.forEach((c, i) => { if (c === 'multi' && mLeft-- <= 0) cats[i] = useSub && i % 2 ? 'sub' : 'add'; });
@@ -1322,6 +1346,7 @@ function pickQuestions(n) {
   const pools = {
     add: addPool(mx).map(([a, b]) => { const o = weighOf('add', a, b, now); if (a + b >= mx - 1) o.w += 2; return { q: { t: 'add', a, b }, ...o }; }),
     sub: subPool(mx).map(([a, b]) => ({ q: { t: 'sub', a, b }, ...weighOf('sub', a, b, now) })),
+    comp: compPool(mx).map(([w, p]) => { const o = weighOf('comp', w, p, now); if (w === 10 || w === 5) o.w *= 2.5; if (w > 10) o.w *= 1.5; return { q: { t: 'comp', w, p }, ...o }; }),
   };
   const out = cats.map(c => c === 'multi' ? { q: genMulti(), box: -1 } : wpick(pools[c].length ? pools[c] : pools.add));
   // さいしょは とくいな たしざんで じしんを つける
@@ -1329,11 +1354,13 @@ function pickQuestions(n) {
   if (bi > 0) out.unshift(out.splice(bi, 1)[0]);
   return out.map(p => p.q);
 }
+// 「おぼえた」は ボタンが でてから 3〜4びょうで こたえられたとき（かぞえて いると まにあわない はやさ）
+const QUICK_MS = 3500;
 function record(t, a, b, { first, time, hinted, st }) {
   const f = factOf(t, a, b); f.seen++; f.last = Date.now();
   if (first) {
-    f.ok++; f.lw = false;
-    if (st <= 2 || (!hinted && time < (st === 3 ? 9000 : 6000))) f.box = Math.min(4, f.box + 1);
+    f.ok++; f.lw = false; if (st >= 3 && !hinted && time < QUICK_MS) f.quick = (f.quick || 0) + 1;
+    if (st <= 2 || (!hinted && time < (st === 3 ? 4000 : QUICK_MS))) f.box = Math.min(4, f.box + 1);
   } else { f.ng++; f.lw = true; f.box = Math.max(0, f.box - 1); }
   S.total++; save();
 }
@@ -1359,6 +1386,7 @@ function renderProg() { $('#prog').innerHTML = P.qs.map((_, i) => i < P.idx ? (P
 const range = (a, b) => Array.from({ length: Math.max(0, b - a) }, (_, i) => a + i);
 function tapCube(bunny, cube) {
   const t = P.tap; if (!t) return;
+  if (t.whole) { if (bunny !== t.bunny) { AC.tap(); return; } AC.pop(); hideHand(); P.tap = null; t.res(); return; }
   const i = bunny.cubes.indexOf(cube);
   if (bunny !== t.bunny || i < 0) { AC.tap(); return; }
   let j = i;
@@ -1372,6 +1400,7 @@ function tapCube(bunny, cube) {
   else showHand(bunny.cubes[t.idxs.find(k => !t.done.has(k))]);
 }
 const tapCount = (bunny, start, idxs = range(0, bunny.n)) => new Promise(res => { P.tap = { bunny, next: start, idxs, done: new Set(), res }; showHand(bunny.cubes[idxs[0]]); });
+const tapWhole = bunny => new Promise(res => { P.tap = { bunny, whole: true, res }; showHand(bunny.cubes[Math.floor((bunny.tall - 1) / 2)]); });
 const tapRemove = (bunny, k) => new Promise(res => { const idxs = range(bunny.n - k, bunny.n).reverse(); P.tap = { bunny, next: 1, idxs, done: new Set(), res, remove: true }; showHand(bunny.cubes[idxs[0]]); });
 function numBox(n) {
   const g = giftBox(MAIN[n], .8); g.traverse(o => { o.userData.gift = null; o.userData.numbox = g; });
@@ -1396,10 +1425,10 @@ function choiceOpts(c) {
 function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel }) {
   return new Promise(resolve => {
     const box = $('#choices'), hb = $('#hintBtn'); box.innerHTML = ''; box.classList.remove('think'); hb.style.display = 'none';
-    let lock = true, firstTry = true, hinted = false, misses = 0; const t0 = performance.now(); P.correct = correct;
+    let lock = true, firstTry = true, hinted = false, misses = 0, t0 = 0; P.correct = correct;
     const unlock = async sec => { // かんがえタイム：すぐには おせない
       lock = true; box.classList.add('think'); await wait(sec); guard(tok);
-      box.classList.remove('think'); lock = false; P.enabledAt = performance.now(); if (onHint && hintLabel) { hb.textContent = hintLabel; hb.style.display = ''; }
+      box.classList.remove('think'); lock = false; P.enabledAt = performance.now(); if (!t0) t0 = P.enabledAt; if (onHint && hintLabel) { hb.textContent = hintLabel; hb.style.display = ''; }
     };
     choiceOpts(correct).forEach((v, i) => {
       const bt = document.createElement('button'); bt.className = 'choice' + (pic ? ' pic' : '') + (v > 10 ? ' teen' : '');
@@ -1407,8 +1436,8 @@ function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel }) {
       bt.innerHTML = (pic ? miniBlocks(v) : '') + `<span class="cn">${v}</span>`;
       bt.onclick = () => run(async () => {
         if (lock || bt.classList.contains('wrong')) return;
-        if (v === correct) { lock = true; bt.classList.add('right'); hb.style.display = 'none'; resolve({ firstTry, hinted, time: performance.now() - t0 }); return; }
-        const hasty = performance.now() - P.enabledAt < 2500;
+        if (v === correct) { lock = true; bt.classList.add('right'); hb.style.display = 'none'; const time = performance.now() - t0; resolve({ firstTry, hinted, time, quick: st >= 3 && firstTry && !hinted && time < QUICK_MS }); return; }
+        const hasty = performance.now() - P.enabledAt < 1200;
         firstTry = false; misses++; bt.classList.add('wrong'); AC.sad(); lock = true; box.classList.add('think'); hb.style.display = 'none';
         await onWrong({ misses, hasty }); guard(tok);
         await unlock(.8);
@@ -1424,131 +1453,221 @@ function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel }) {
 }
 async function sadReact(bs, hasty, tok) {
   bs.forEach(b => b.setSad(true));
-  await Voice.say(hasty ? 'えーん… ちゃんと みて かんがえてね' : pick(['えーん、ちがうよ…', 'しょんぼり… ちがったみたい', 'うーん、ざんねん…']), { pitch: 1.1, rate: .9 }); guard(tok);
+  await Voice.say(hasty ? 'えーん… よく かんがえてね' : pick(['えーん、ちがうよ…', 'しょんぼり… ちがったみたい', 'うーん、ざんねん…']), { pitch: 1.1, rate: .9 }); guard(tok);
 }
 function placePair(A, B, gap = .8) { const xa = -(gap + A.width / 2), xb = gap + B.width / 2, cx = (xa + xb) / 2; return [xa - cx, xb - cx]; }
 const PRAISE = () => pick(['すごい！', 'やったね！', 'せいかい！', 'かんぺき！', 'じょうず！']);
 const clearSome = (A, idxs) => idxs.forEach(i => { const c = A.cubes[i]; if (c && c.userData.badge) { c.remove(c.userData.badge); c.userData.badge = null; } A.glow(i, false); });
 
+// ことばの ほめかた。3〜4びょうで こたえられたら「ぱっと」
+const praiseFor = res => res.quick ? pick(['ぱっと できたね！', 'はやい！ すごい！', 'あたまの なかで できたね！']) : res.firstTry ? PRAISE() : 'できたね！';
+function quickFx(res) { if (!res.quick) return; AC.sparkle(); burst(new THREE.Vector3(0, 5, 1), { n: 18, emojis: ['⚡', '✨', '🌟'], speed: 5 }); }
 // たしざん：B が A に がったい
 async function addStep({ A, B, st, tok, multi = false, enterA = true, done }) {
-  const a = A.n, b = B.n, sum = a + b;
-  let opened = st < 4; const open = st === 4 ? makeBoxes(enterA ? [A, B] : [B]) : async () => {};
+  const a = A.n, b = B.n, sum = a + b, cross = a < 10 && b < 10 && sum > 10;
+  const [L, Sm] = a >= b ? [A, B] : [B, A];
+  // st1・2: みえる ／ st3: ちらっと みたら はこに かくれる ／ st4: はじめから はこ
+  let opened = st < 3, open = async () => {};
+  if (st === 4) open = makeBoxes(enterA ? [A, B] : [B]);
   if (st < 4) { if (enterA) { A.dropIn(0); await wait(.25); } B.dropIn(0); }
   await wait(.7); guard(tok);
   await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は いくつかな？`); guard(tok);
-  if (st === 1) {
-    instr('👆 ブロックを タッチして かぞえよう'); Voice.say('ブロックを タッチして かぞえてね');
-    await tapCount(A, 1); guard(tok); await tapCount(B, a + 1); guard(tok);
-    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ だった？');
-  } else if (st === 2) {
-    const [L, Sm] = a >= b ? [A, B] : [B, A];
+  const dimRest = (X, k, on) => { for (let i = k; i < X.n; i++) X.ghost(i, on); }; // 10に たりる ぶん だけ めだたせる
+  const clearAll = () => { A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll(); dimRest(A, 0, false); dimRest(B, 0, false); };
+  const unsad = () => { A.setSad(false); B.setSad(false); };
+  const openUp = async () => { if (!opened) { opened = true; await open(); guard(tok); } };
+  // さくらんぼ：おおきい ほうを 10に する
+  const tenHint = async () => {
+    const need = 10 - L.n; clearAll();
+    for (let i = 0; i < L.n; i++) L.glow(i); L.showBadge(L.n - 1, L.n);
+    for (let i = 0; i < need; i++) { Sm.glow(i); Sm.popCube(i); } Sm.showBadge(need - 1, need); dimRest(Sm, need, true); AC.sparkle();
+    instr(`<b style="color:${INK[L.n]};font-size:32px">${L.n}</b> は あと <b style="color:${INK[need]};font-size:32px">${need}</b> で <b style="font-size:32px">10</b>`);
+    await Voice.say(`${YOMI[L.n]}は あと ${YOMI[need]}で じゅう`); guard(tok);
+    instr(`<b style="font-size:32px">10</b> と <b style="color:${INK[Sm.n - need]};font-size:32px">${Sm.n - need}</b> で いくつ？`);
+    await Voice.say(`じゅうと ${YOMI[Sm.n - need]}で いくつ？`); guard(tok);
+  };
+  // かたまりで みる（5・10 の まとまり）
+  const chunkHint = async () => {
+    await openUp(); if (cross) return tenHint();
+    await A.chunkShow({ tok }); await B.chunkShow({ tok });
+    instr('がったいすると いくつ？'); Voice.say('がったいすると いくつ？');
+  };
+  // おおきい ほうから つづけて かぞえる
+  const countOn = async (byTap) => {
+    await openUp(); clearAll();
     L.cubes.forEach((c, i) => L.glow(i)); L.showBadge(L.n - 1, L.n); L.popCube(L.n - 1); AC.sparkle(); L.hop({ h: .5 });
     instr(`<b style="color:${INK[L.n]};font-size:34px">${L.n}</b> の つぎから かぞえよう`);
     await Voice.say(`${YOMI[L.n]}！ ${YOMI[L.n]}の つぎから かぞえてね`); guard(tok);
-    await tapCount(Sm, L.n + 1); guard(tok);
-    instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ？');
-  } else if (!multi) instr(st === 3 ? 'いくつに なるかな？' : 'はこの なかは なにかな？ こたえを えらんでね');
-  const recount = async misses => {
-    A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
-    instr('👆 ブロックを タッチして かぞえなおそう');
-    await Voice.say(misses > 1 ? 'もういちど、 ひとつずつ かぞえてね' : 'じぶんで かぞえて みよう'); guard(tok);
-    await tapCount(A, 1); guard(tok); await tapCount(B, a + 1); guard(tok);
-    A.setSad(false); B.setSad(false); instr('いくつ だったかな？'); Voice.say('いくつ だったかな？');
+    if (byTap) await tapCount(Sm, L.n + 1); else await Sm.countAll({ from: L.n + 1, tok, gap: .4 });
+    guard(tok); instr('ぜんぶで いくつ だった？'); Voice.say('ぜんぶで いくつ？');
   };
+  if (st === 1) {
+    instr('👆 うさぎを タッチして かたまりを みよう'); Voice.say('うさぎを タッチしてね');
+    await tapWhole(A); guard(tok); await A.chunkShow({ tok });
+    await tapWhole(B); guard(tok); await B.chunkShow({ tok });
+    if (cross) await tenHint(); else { instr('ぜんぶで いくつ かな？'); Voice.say('ぜんぶで いくつ？'); }
+  } else if (st === 2) {
+    if (cross) await tenHint(); else await countOn(true);
+  } else if (st === 3) {
+    await wait(1.1); guard(tok); // ちらっと みたら かくれる
+    open = makeBoxes(enterA ? [A, B] : [B]); opened = false; await wait(.5); guard(tok);
+    if (!multi) instr('あたまの なかで がったい！ いくつに なるかな？');
+  } else if (!multi) instr('はこの なかは なにかな？ あたまの なかで かんがえてね');
+  let hints = 0;
   const res = await askChoice({
     correct: sum, pic: st <= 2, st, tok,
-    onWrong: async ({ misses, hasty }) => { if (!opened) { opened = true; await open(); guard(tok); } await sadReact([A, B], hasty, tok); await recount(misses); },
-    onHint: st >= 3 ? async () => {
-      if (!opened) { opened = true; await open(); return '💡 かぞえる'; }
-      A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
-      await A.countAll({ tok, gap: .4 }); await B.countAll({ from: a + 1, tok, gap: .4 });
-      instr('いくつ だったかな？'); return '💡 かぞえる';
-    } : null,
-    hintLabel: st === 4 ? '🎁 あけてみる' : '💡 かぞえる',
+    onWrong: async ({ misses, hasty }) => {
+      await openUp(); await sadReact([A, B], hasty, tok); unsad();
+      if (misses === 1) await chunkHint(); else if (misses === 2) await countOn(true);
+      else { clearAll(); instr('👆 ブロックを タッチして かぞえなおそう'); await Voice.say('ひとつずつ かぞえてね'); guard(tok); await tapCount(A, 1); guard(tok); await tapCount(B, a + 1); guard(tok); instr('いくつ だったかな？'); Voice.say('いくつ だったかな？'); }
+    },
+    onHint: st >= 3 ? async () => { hints++; if (hints === 1) { await chunkHint(); return '💡 かぞえる'; } await countOn(false); return '💡 かぞえる'; } : null,
+    hintLabel: '👀 みてみる',
   });
   guard(tok);
   // せいかい！ がったい
-  AC.fanfare(); done && done(); if (!multi) instr('');
+  AC.fanfare(); done && done(); if (!multi) instr(''); quickFx(res);
   await wait(.4); guard(tok);
   $('#choices').innerHTML = '';
-  if (!opened) { opened = true; await open(); guard(tok); }
-  const counted = A.cubes.some(c => c.userData.badge) && B.cubes.some(c => c.userData.badge);
+  await openUp();
   await Promise.all([A.hop({ h: .6 }), B.hop({ h: .6 })]); guard(tok);
-  A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
-  await A.absorb(B); guard(tok);
-  { const x0 = A.root.position.x; await tween(.5, k => A.root.position.x = x0 * (1 - k)); }
-  if (counted) A.cubes.forEach((c, i) => { A.showBadge(i, i + 1); A.glow(i); });
-  else await A.countFive({ tok });
-  A.setHappy(true);
-  burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
-  if (!multi) instr(`<span style="color:${INK[a]}">${a}</span> たす <span style="color:${INK[b]}">${b}</span> は <b style="color:${INK[sum]};font-size:36px">${sum}</b>`);
-  A.hop({ h: 1 });
-  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は ${YOMI[sum]}！ ${multi ? '' : res.firstTry ? PRAISE() : 'できたね！'}`); guard(tok);
+  clearAll();
+  // 10を こえる ときは おおきい ほうに がったいして「10の かたまり」を つくる
+  const [M, m] = !multi && cross && b > a ? [B, A] : [A, B];
+  if (cross) {
+    const need = 10 - M.n; for (let i = 0; i < need; i++) { m.glow(i); m.popCube(i); } dimRest(m, need, true);
+    instr(`<b style="color:${INK[M.n]};font-size:32px">${M.n}</b> と <b style="color:${INK[need]};font-size:32px">${need}</b> で <b style="font-size:32px">10</b>`);
+    await Voice.say(`${YOMI[M.n]}と ${YOMI[need]}で じゅう`); guard(tok);
+    dimRest(m, need, false);
+  }
+  await M.absorb(m); guard(tok);
+  { const x0 = M.root.position.x; await tween(.5, k => M.root.position.x = x0 * (1 - k)); }
+  await M.chunkShow({ tok, voice: true }); guard(tok);
+  M.setHappy(true);
+  burst(new THREE.Vector3(0, M.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
+  if (!multi) instr(`<span style="color:${INK[a]}">${a}</span> たす <span style="color:${INK[b]}">${b}</span> は <b style="color:${INK[sum]};font-size:36px">${sum}</b>${res.quick ? ' ⚡' : ''}`);
+  M.hop({ h: 1 });
+  await Voice.say(`${YOMI[a]} たす ${YOMI[b]} は ${YOMI[sum]}！ ${multi ? '' : praiseFor(res)}`); guard(tok);
   record('add', a, b, { first: res.firstTry, time: res.time, hinted: res.hinted, st });
   return res;
 }
-
 // ひきざん：A から b こが「おでかけ」する
 async function subStep({ A, b, st, tok, multi = false, enterA = true, done }) {
-  const a = A.n, r = a - b, rest = range(0, r);
-  let opened = st < 4, removed = false; const open = st === 4 ? makeBoxes([A]) : async () => {};
+  const a = A.n, r = a - b, rest = range(0, r), cross = a > 10 && r < 10;
+  let opened = st < 3, removed = false, open = async () => {};
+  if (st === 4) open = makeBoxes([A]);
   if (st < 4 && enterA) A.dropIn(0);
   await wait(.7); guard(tok);
   await Voice.say(`${YOMI[a]} ひく ${YOMI[b]} は いくつかな？`); guard(tok);
-  const autoRemove = async () => {
+  const openUp = async () => { if (!opened) { opened = true; await open(); guard(tok); } };
+  // うえから じゅんに おでかけ。10を こえる ときは「まず 10に して、のこりを ひく」
+  const autoRemove = async (talk) => {
     if (removed) return; removed = true;
-    for (let k = 0; k < b; k++) { const j = a - 1 - k; A.ghost(j, true); A.showBadge(j, k + 1, true); A.popCube(j); AC.pop(1.3); await wait(.22); }
+    for (let k = 0; k < b; k++) {
+      const j = a - 1 - k; A.ghost(j, true); A.showBadge(j, k + 1, true); A.popCube(j); AC.pop(1.3); await wait(.22);
+      if (talk && cross && k === a - 11) { instr(`<b style="color:${INK[a - 10]};font-size:32px">${a - 10}</b> おでかけで <b style="font-size:32px">10</b>`); await Voice.say(`${YOMI[a - 10]} おでかけで じゅう。 あと ${YOMI[b - (a - 10)]}`); guard(tok); }
+    }
   };
+  const chunkRest = async () => { await A.chunkShow({ tok, n: r }); instr('のこりは いくつ？'); };
   if (st <= 2) {
+    if (cross) { await A.chunkShow({ tok }); guard(tok); A.clearBadges(); A.unglowAll(); }
     instr(`👆 ブロックを <b style="font-size:32px;color:#3f7fe0">${b}</b>こ タッチして おでかけ させよう`);
     Voice.say(`ブロックを ${KOSU[b]} タッチして、 おでかけ させてね`);
     await tapRemove(A, b); guard(tok); removed = true;
-    if (st === 1) { instr('👆 のこりの ブロックを かぞえよう'); Voice.say('のこりを かぞえてね'); await tapCount(A, 1, rest); guard(tok); }
+    if (st === 1) { instr('のこりを かたまりで みてみよう'); await A.chunkShow({ tok, n: r }); guard(tok); }
     instr('のこりは いくつ？'); Voice.say('のこりは いくつ？');
-  } else if (st === 3) { await autoRemove(); guard(tok); if (!multi) instr('のこりは いくつ かな？'); }
-  else if (!multi) instr(`はこの なかから ${b}こ おでかけ。 のこりは いくつ？`);
-  const recount = async misses => {
-    if (!removed) await autoRemove(); guard(tok);
-    clearSome(A, rest);
+  } else if (st === 3) {
+    await wait(1.1); guard(tok);
+    open = makeBoxes([A]); opened = false; await wait(.5); guard(tok);
+    if (!multi) instr(`はこの なかから ${b}こ おでかけ。 のこりは いくつ？`);
+  } else if (!multi) instr(`はこの なかから ${b}こ おでかけ。 のこりは いくつ？`);
+  const hint1 = async () => { await openUp(); await autoRemove(true); guard(tok); await chunkRest(); };
+  const recount = async () => {
+    await openUp(); await autoRemove(); guard(tok); clearSome(A, rest);
     instr('👆 のこりの ブロックを かぞえなおそう');
-    await Voice.say(misses > 1 ? 'もういちど、 のこりを ひとつずつ かぞえてね' : 'のこりを じぶんで かぞえて みよう'); guard(tok);
+    await Voice.say('のこりを ひとつずつ かぞえてね'); guard(tok);
     await tapCount(A, 1, rest); guard(tok);
-    A.setSad(false); instr('のこりは いくつ だったかな？'); Voice.say('いくつ だったかな？');
+    instr('のこりは いくつ だったかな？'); Voice.say('いくつ だったかな？');
   };
+  let hints = 0;
   const res = await askChoice({
     correct: r, pic: st <= 2, st, tok,
-    onWrong: async ({ misses, hasty }) => { if (!opened) { opened = true; await open(); guard(tok); } await sadReact([A], hasty, tok); await recount(misses); },
+    onWrong: async ({ misses, hasty }) => { await openUp(); await sadReact([A], hasty, tok); A.setSad(false); if (misses === 1) await hint1(); else await recount(); },
     onHint: st >= 3 ? async () => {
-      if (!opened) { opened = true; await open(); guard(tok); await autoRemove(); return '💡 かぞえる'; }
-      await autoRemove(); guard(tok); clearSome(A, rest);
-      for (const i of rest) { await A.countOne(i, i + 1, { gap: .4 }); guard(tok); }
+      hints++; if (hints === 1) { await hint1(); return '💡 かぞえる'; }
+      clearSome(A, rest); for (const i of rest) { await A.countOne(i, i + 1, { gap: .4 }); guard(tok); }
       instr('のこりは いくつ？'); return '💡 かぞえる';
     } : null,
-    hintLabel: st === 4 ? '🎁 あけてみる' : '💡 かぞえる',
+    hintLabel: '👀 みてみる',
   });
   guard(tok);
-  AC.fanfare(); done && done(); if (!multi) instr('');
+  AC.fanfare(); done && done(); if (!multi) instr(''); quickFx(res);
   await wait(.4); guard(tok);
   $('#choices').innerHTML = '';
-  if (!opened) { opened = true; await open(); guard(tok); }
+  await openUp();
   await autoRemove(); guard(tok);
-  const counted = rest.every(i => A.cubes[i].userData.badge);
   const G = await A.split(r); guard(tok); // おでかけ する なかま
   G.setHappy(true); Voice.say('ばいばーい');
   for (let k = 0; k < 2; k++) { await G.hop({ to: { x: G.root.position.x + 2.2, z: G.root.position.z + .4 }, h: .6, dur: .4 }); guard(tok); }
   G.labelOn = false; await tween(.3, k => G.root.scale.setScalar(Math.max(.01, 1 - k))); G.dispose();
   { const x0 = A.root.position.x; await tween(.4, k => A.root.position.x = x0 * (1 - k)); }
-  if (!counted) { clearSome(A, rest); await A.countFive({ tok }); }
+  await A.chunkShow({ tok }); guard(tok);
   A.setHappy(true);
   burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
-  if (!multi) instr(`<span style="color:${INK[a]}">${a}</span> ひく <span style="color:#3f7fe0">${b}</span> は <b style="color:${INK[r]};font-size:36px">${r}</b>`);
+  if (!multi) instr(`<span style="color:${INK[a]}">${a}</span> ひく <span style="color:#3f7fe0">${b}</span> は <b style="color:${INK[r]};font-size:36px">${r}</b>${res.quick ? ' ⚡' : ''}`);
   A.hop({ h: 1 });
-  await Voice.say(`${YOMI[a]} ひく ${YOMI[b]} は ${YOMI[r]}！ ${multi ? '' : res.firstTry ? PRAISE() : 'できたね！'}`); guard(tok);
+  await Voice.say(`${YOMI[a]} ひく ${YOMI[b]} は ${YOMI[r]}！ ${multi ? '' : praiseFor(res)}`); guard(tok);
   record('sub', a, b, { first: res.firstTry, time: res.time, hinted: res.hinted, st });
   return res;
 }
-
+// いくつと いくつ：w は p と いくつ？（のこりは はこに かくれる）
+async function compQ({ w, p }, tok) {
+  const x = w - p, st = stageOf(factOf('comp', w, p));
+  const eqHtml = ans => `<span style="color:${INK[w]}">${w}</span><span class="op wa">は</span><span style="color:${INK[p]}">${p}</span><span class="op wa">と</span>` + (ans ? `<span class="ans" style="color:${INK[x]}">${x}</span>` : '<span class="q">？</span>');
+  $('#eq').innerHTML = eqHtml(false);
+  const A = new Bunny(w); stageDyn.add(A.root); A.root.position.x = -(Math.ceil(x / 5) + 1.8) * .5;
+  fitStage(A.width + Math.ceil(x / 5) + 4.8, 8.2, 3.4, 150, 250);
+  await A.dropIn(0); guard(tok);
+  await Voice.say(`${YOMI[w]}は ${YOMI[p]}と いくつ？`); guard(tok);
+  await A.chunkShow({ tok, voice: st <= 2 }); guard(tok);
+  A.clearBadges(); A.unglowAll();
+  const B = await A.split(p); guard(tok);
+  let opened = st === 1, open = async () => {};
+  if (st === 1) { await A.chunkShow({ tok }); await B.chunkShow({ tok }); instr(`<b style="color:${INK[w]};font-size:32px">${w}</b> は <b style="color:${INK[p]};font-size:32px">${p}</b> と いくつ？`); }
+  else {
+    if (st === 2) { await A.chunkShow({ tok, voice: false }); await wait(.9); guard(tok); }
+    open = makeBoxes([B]); await wait(.5); guard(tok);
+    instr(`はこに かくれたのは いくつ？`);
+  }
+  const openUp = async () => { if (!opened) { opened = true; await open(); guard(tok); } };
+  const res = await askChoice({
+    correct: x, pic: false, st, tok,
+    onWrong: async ({ misses, hasty }) => {
+      await openUp(); await sadReact([A, B], hasty, tok); A.setSad(false); B.setSad(false);
+      if (misses === 1) { await A.chunkShow({ tok }); await B.chunkShow({ tok }); }
+      else { B.clearBadges(); B.unglowAll(); instr('👆 かくれていた ブロックを かぞえよう'); await tapCount(B, 1); guard(tok); }
+      instr('いくつ だったかな？'); Voice.say('いくつ だったかな？');
+    },
+    onHint: st >= 2 ? async () => { await openUp(); await B.chunkShow({ tok }); return '👀 みてみる'; } : null,
+    hintLabel: '🎁 のぞいてみる',
+  });
+  guard(tok);
+  AC.fanfare(); $('#eq').innerHTML = eqHtml(true); instr(''); quickFx(res);
+  await wait(.4); guard(tok); $('#choices').innerHTML = '';
+  await openUp(); A.clearBadges(); B.clearBadges(); A.unglowAll(); B.unglowAll();
+  await Promise.all([A.hop({ h: .6 }), B.hop({ h: .6 })]); guard(tok);
+  await A.absorb(B); guard(tok);
+  { const x0 = A.root.position.x; await tween(.5, k => A.root.position.x = x0 * (1 - k)); }
+  for (let i = 0; i < p; i++) A.glow(i); A.showBadge(p - 1, p);
+  for (let i = p; i < w; i++) { A.glow(i); A.popCube(i); } A.showBadge(w - 1, w);
+  A.setHappy(true); burst(new THREE.Vector3(0, A.tall * .7, 1), { n: 22, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
+  instr(`<span style="color:${INK[w]}">${w}</span> は <span style="color:${INK[p]}">${p}</span> と <b style="color:${INK[x]};font-size:36px">${x}</b>${res.quick ? ' ⚡' : ''}`);
+  A.hop({ h: 1 });
+  await Voice.say(`${YOMI[w]}は ${YOMI[p]}と ${YOMI[x]}！ ${praiseFor(res)}`); guard(tok);
+  record('comp', w, p, { first: res.firstTry, time: res.time, hinted: res.hinted, st });
+  P.log.push({ firstTry: res.firstTry, result: w });
+  await wait(.8); guard(tok);
+}
 async function startSession() {
   const tok = newFlow(); leaveGarden(); mode = 'play'; clearStage(); showLayer('play');
   P.qs = pickQuestions(S.settings.qn); P.idx = 0; P.log = [];
@@ -1562,6 +1681,7 @@ async function startSession() {
 async function playQ(q, tok) {
   clearStage(); instr(''); $('#choices').innerHTML = ''; $('#hintBtn').style.display = 'none';
   if (q.t === 'multi') return multiQ(q, tok);
+  if (q.t === 'comp') return compQ(q, tok);
   const { t, a, b } = q, st = stageOf(factOf(t, a, b)), op = t === 'sub' ? '-' : '+', ans = t === 'sub' ? a - b : a + b;
   setEq([a, b], [op]);
   const A = new Bunny(a); stageDyn.add(A.root);
@@ -1750,7 +1870,7 @@ async function intro() {
       const b = new Bunny(n); b.root.position.x = (n - 3) * 2.3; stageDyn.add(b.root); bs.push(b);
       await b.dropIn(0); guard(tok);
       bigMsg(`<span style="color:${INK[n]};font-size:44px">${n}</span>ちゃん`);
-      await b.countAll({ tok, gap: .38 });
+      await b.chunkShow({ tok });
       b.setHappy(true); b.hop({ h: .8 });
       await Voice.say(n === 1 ? 'ぼくは いちちゃん！ ブロックが ひとつ だよ。' : `${YOMI[n]}ちゃん！ ブロックが ${KO[n]}。`); guard(tok);
       b.setHappy(false); b.clearBadges(); b.unglowAll();
@@ -1804,6 +1924,9 @@ function parentPanel() {
   if (pTab === 'add') {
     rows = '<tr><th></th>' + range(1, 11).map(b => `<th>+${b}</th>`).join('') + '</tr>';
     for (let a = 1; a <= 10; a++) rows += `<tr><th>${a}</th>` + range(1, 11).map(b => a + b <= mx ? cell('add', a, b, true) : '<td class="na"></td>').join('') + '</tr>';
+  } else if (pTab === 'comp') {
+    rows = '<tr><th></th>' + range(1, 11).map(p => `<th>${p}と</th>`).join('') + '</tr>';
+    for (let w = 2; w <= Math.max(10, S.unlocked); w++) rows += `<tr><th>${w}は</th>` + range(1, 11).map(p => (w <= 10 ? p < w : p === 10) && w <= mx ? cell('comp', w, p, true) : '<td class="na"></td>').join('') + '</tr>';
   } else {
     rows = '<tr><th></th>' + range(1, 11).map(b => `<th>−${b}</th>`).join('') + '</tr>';
     for (let a = 2; a <= mx; a++) rows += `<tr><th>${a}</th>` + range(1, 11).map(b => b < a ? cell('sub', a, b, true) : '<td class="na"></td>').join('') + '</tr>';
@@ -1812,22 +1935,23 @@ function parentPanel() {
   const tri = k => seg(k, ['auto', 'on', 'off'], ['じどう', 'いつも', 'なし'], S.settings[k] || 'auto');
   const c = modal(`<h2>おうちの人へ</h2>
     <p class="small">これまで ${S.total}もん ／ ${S.sessions}かい あそびました ／ シール ${Object.keys(S.stickers).length}まい ／ 3つの計算 ${S.multiDone || 0}もん ／ いま ${S.unlocked} までの数</p>
-    <div class="seg" style="justify-content:center;margin:8px 0" id="pTabs"><button data-t="add" class="${pTab === 'add' ? 'sel' : ''}">たしざん</button><button data-t="sub" class="${pTab === 'sub' ? 'sel' : ''}">ひきざん</button></div>
+    <div class="seg" style="justify-content:center;margin:8px 0" id="pTabs"><button data-t="add" class="${pTab === 'add' ? 'sel' : ''}">たしざん</button><button data-t="sub" class="${pTab === 'sub' ? 'sel' : ''}">ひきざん</button><button data-t="comp" class="${pTab === 'comp' ? 'sel' : ''}">いくつと いくつ</button></div>
     <div style="overflow:auto;max-height:40vh"><table class="ptab">${rows}</table></div>
-    <div class="legend"><span style="background:#ffe3ee">ぜんぶ数える</span><span style="background:#ffc7de">数えたす・おでかけ</span><span style="background:#e3cbff">見てわかる</span><span style="background:#bfe6ff">数字だけ</span><span style="background:#b5f0cd">★すらすら</span></div>
-    <p class="small">表の数字は「1回目で正解した回数／出題回数」。まちがえた問題や数えている問題が、多めに出題されます。</p>
+    <div class="legend"><span style="background:#ffe3ee">かたまりで見る</span><span style="background:#ffc7de">数えたす・10をつくる</span><span style="background:#e3cbff">ちらっと見て暗算</span><span style="background:#bfe6ff">数字だけで暗算</span><span style="background:#b5f0cd">★ぱっと言える</span></div>
+    <p class="small">表の数字は「1回目で正解した回数／出題回数」。1こずつ数えず、5・10のかたまりで見る練習をします。ボタンが出てから約3.5秒以内（ヒントなし）に答えられたときだけ次の段階へ進むので、数えて答えている問題は多めに出題されます。</p>
     <div class="set">こえ ${seg('voice', ['true', 'false'], ['オン', 'オフ'], S.settings.voice)}</div>
     <div class="set">BGM ${seg('bgm', ['true', 'false'], ['オン', 'オフ'], S.settings.bgm)}</div>
     <div class="set">1回の もんだい数 ${seg('qn', [3, 5, 7], ['3', '5', '7'], S.settings.qn)}</div>
     <div class="set">ひきざん ${tri('sub')}</div>
     <div class="set">3つの けいさん（1+2+3 など） ${tri('multi')}</div>
+    <div class="set">いくつと いくつ（7は5と？・13は10と？） ${seg('comp', ['auto', 'off'], ['あり', 'なし'], S.settings.comp || 'auto')}</div>
     <div class="set">あつかう数（〜まで） <div class="seg"><button id="uDn">◀</button><b style="font-size:24px;min-width:44px;text-align:center">${S.unlocked}</b><button id="uUp">▶</button></div></div>
     <p class="small">ふだんは自動で少しずつ大きな数に進みます（新しい友だちが登場）。「じどう」だと、ひきざんは6から、3つの計算は8から出題されます。</p>
     <div class="row"><button class="btn white" id="pReset" style="font-size:16px">データを けす</button><button class="btn" id="pClose">とじる</button></div>`);
   c.querySelectorAll('#pTabs button').forEach(b => b.onclick = () => { AC.tap(); pTab = b.dataset.t; parentPanel(); });
   c.querySelectorAll('.seg[data-k]').forEach(sg => sg.querySelectorAll('button').forEach(b => b.onclick = () => {
     const k = sg.dataset.k, v = b.dataset.v; AC.tap();
-    S.settings[k] = k === 'qn' ? +v : (k === 'sub' || k === 'multi') ? v : v === 'true';
+    S.settings[k] = k === 'qn' ? +v : (k === 'sub' || k === 'multi' || k === 'comp') ? v : v === 'true';
     save(); AC.applyBgm(); if (!S.settings.voice) Voice.stop(); parentPanel();
   }));
   const setU = n => { AC.tap(); S.unlocked = Math.max(5, Math.min(20, n)); for (let i = 1; i <= S.unlocked; i++) if (!S.met.includes(i)) S.met.push(i); save(); parentPanel(); };
