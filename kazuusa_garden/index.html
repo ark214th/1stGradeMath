@@ -162,6 +162,7 @@ a.ibtn{text-decoration:none;color:inherit}
 #bigMsg:empty{display:none}
 #bottomBtn{position:absolute;left:0;right:0;bottom:max(30px,env(safe-area-inset-bottom));display:flex;justify-content:center}
 /* おさんぽ */
+#lvTag{margin-bottom:8px;font-size:18px;color:#7a5ce0}
 #walkBtn{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:max(26px,env(safe-area-inset-bottom));font-size:24px;padding:12px 22px}
 #wBack{position:absolute;left:max(14px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top))}
 #wHint{position:absolute;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);font-size:20px;white-space:nowrap;transition:opacity .6s}
@@ -213,6 +214,7 @@ a.ibtn{text-decoration:none;color:inherit}
       </div>
     </div>
     <div id="gBottom">
+      <div class="pill" id="lvTag"></div>
       <div class="pill" id="giftTag">🎁 きょうの プレゼントが まってるよ！</div>
       <div class="pill" id="doneTag">✨ きょうの シール もらったね！ また あそべるよ</div>
       <button class="btn pe" id="playBtn">🐰 あそぶ！</button>
@@ -294,7 +296,7 @@ async function run(fn) { try { await fn(); } catch (e) { if (e !== ABORT) consol
 
 /* ================= セーブ ================= */
 const KEY = 'kazuusa_garden_v1';
-const DEF = () => ({ introDone: false, unlocked: 5, met: [], facts: {}, stickers: {}, items: [], outfits: {}, lastGift: '', stars: 0, total: 0, sessions: 0, settings: { voice: true, bgm: true, qn: 5 } });
+const DEF = () => ({ introDone: false, cur: 0, unlocked: 5, met: [], facts: {}, stickers: {}, items: [], outfits: {}, lastGift: '', stars: 0, total: 0, sessions: 0, settings: { voice: true, bgm: true, qn: 5 } });
 let S;
 try { const raw = JSON.parse(localStorage.getItem(KEY) || '{}'); S = Object.assign(DEF(), raw); S.settings = Object.assign(DEF().settings, raw.settings || {}); }
 catch (e) { S = DEF(); }
@@ -1009,6 +1011,7 @@ function renderFriends() {
 function enterGarden() {
   const tok = newFlow(); mode = 'garden'; clearStage(); stage.visible = false; garden.group.visible = true;
   showLayer('garden'); buildDecos(); renderFriends(); clearAnchors('garden');
+  $('#lvTag').textContent = `${LV_ICON[lv()]} いまの れんしゅう：${LEVELS[lv()]}`;
   const today = dayKey(); $('#giftTag').style.display = S.lastGift !== today ? '' : 'none'; $('#doneTag').style.display = S.lastGift === today ? '' : 'none';
   garden.bun.forEach(b => b.dispose()); garden.bun = [];
   garden.on = true; const gen = ++garden.gen;
@@ -1301,13 +1304,36 @@ function miniBlocks(v) {
 
 /* ================= もんだい の きろく ================= */
 // もんだいの しゅるい: {t:'add',a,b} / {t:'sub',a,b} / {t:'multi',n:[a,b,c],o:['+','-']}
-const fkey = (t, a, b) => t === 'comp' ? `${a}=${b}+` : a + (t === 'sub' ? '-' : '+') + b;
+const fkey = (t, a, b) => t === 'see' ? `see${b}:${a}` : t === 'tomo' ? `tomo${a}` : t === 'comp' ? `${a}=${b}+` : a + (t === 'sub' ? '-' : '+') + b;
 const factOf = (t, a, b) => S.facts[fkey(t, a, b)] ||= { box: 0, seen: 0, ok: 0, ng: 0, last: 0, lw: false };
 const stageOf = f => f.box <= 0 ? 1 : f.box === 1 ? 2 : f.box === 2 ? 3 : 4;
-const MAXN = () => Math.min(20, Math.max(5, S.unlocked));
+/* ---- がくしゅうの だんかい（レベル） ----
+   0 ぱっと 1〜5 → 1 ぱっと 6〜10（5と いくつ）→ 2 10の おともだち → 3 たしざん（10まで）→ 4 くりあがり（20まで） */
+const LEVELS = ['ぱっと 1〜5', 'ぱっと 6〜10', '10の おともだち', 'たしざん', 'くりあがり'];
+const LV_ICON = ['👀', '🖐️', '🤝', '➕', '🌈'];
+const lv = () => Math.max(0, Math.min(4, S.cur ?? 0));
+const levelPool = l => l === 0 ? range(1, 6).map(n => ({ t: 'see', n, cap: 5 })) : l === 1 ? range(5, 11).map(n => ({ t: 'see', n, cap: 10 })) : l === 2 ? range(1, 10).map(n => ({ t: 'tomo', n })) : [];
+const qKey = q => q.t === 'see' ? fkey('see', q.n, q.cap) : fkey('tomo', q.n, 10);
+// いまの レベルの もんだいが ほとんど「ぱっと」こたえられたら つぎの レベルへ
+function checkLevel() {
+  const l = lv(); if (l >= 3) return 0;
+  const bx = levelPool(l).map(q => S.facts[qKey(q)]?.box || 0);
+  if (bx.every(b => b >= 2) && bx.filter(b => b >= 3).length >= Math.ceil(bx.length * .7)) { S.cur = l + 1; save(); return S.cur; }
+  return 0;
+}
+function pickLevelQs(n) {
+  const l = lv(), now = Date.now(), nRev = l > 0 ? Math.round(n * 2 / 5) : 0;
+  const pool = qs => qs.map(q => { const f = S.facts[qKey(q)], box = f ? f.box : 0; let w = f && f.seen ? [6, 5, 3, 2, 1][box] : 5; if (f && f.lw) w += 4; if (f && now - f.last < 2 * 60e3) w *= .4; return { q, w, box }; });
+  const take = (qs, k) => { const out = []; let p = pool(qs); for (let i = 0; i < k; i++) { if (!p.length) p = pool(qs); out.push(wpick(p).q); } return out; };
+  const rev = l > 0 ? take(levelPool(l - 1).concat(l > 1 ? levelPool(l - 2) : []), nRev) : [];
+  const cur = take(levelPool(l), n - nRev);
+  // さいしょは おさらい（できる もんだい）から、あとは まぜる
+  return [...rev.slice(0, 1), ...shuffle([...cur, ...rev.slice(1)])];
+}
+const MAXN = () => Math.min(lv() === 3 ? 10 : 20, Math.max(5, S.unlocked));
 function addPool(max) { const r = []; for (let a = 1; a <= 10; a++) for (let b = 1; b <= 10 && a + b <= max; b++) r.push([a, b]); return r; }
 function subPool(max) { const r = []; for (let a = 2; a <= max; a++) for (let b = 1; b < a && b <= 10; b++) r.push([a, b]); return r; }
-const subOn = () => S.settings.sub === 'on' || (S.settings.sub !== 'off' && S.unlocked >= 6);
+const subOn = () => S.settings.sub === 'on' || (S.settings.sub !== 'off' && lv() >= 4);
 const compOn = () => S.settings.comp !== 'off';
 // いくつと いくつ：10までの わけかた ＋「10と いくつ」（11〜）。5と10を おおめに
 function compPool(max) {
@@ -1316,7 +1342,7 @@ function compPool(max) {
   for (let w = 11; w <= max; w++) r.push([w, 10]);
   return r;
 }
-const multiOn = () => S.settings.multi === 'on' || (S.settings.multi !== 'off' && S.unlocked >= 8);
+const multiOn = () => S.settings.multi === 'on' || (S.settings.multi !== 'off' && lv() >= 4);
 function weighOf(t, a, b, now) {
   const f = S.facts[fkey(t, a, b)], box = f ? f.box : 0;
   let w = f && f.seen ? [6, 5, 3, 2, 1][box] : 4;
@@ -1335,8 +1361,9 @@ function genMulti() {
   return { t: 'multi', n: [1, 1, 1], o: ['+', '+'] };
 }
 function pickQuestions(n) {
+  if (lv() < 3) return pickLevelQs(n);
   const now = Date.now(), mx = MAXN(), useSub = subOn(), useMulti = multiOn(), useComp = compOn();
-  const cats = Array.from({ length: n }, () => { const r = Math.random(); return useMulti && r < .15 ? 'multi' : useComp && r < .4 ? 'comp' : useSub && r < .65 ? 'sub' : 'add'; });
+  const cats = Array.from({ length: n }, () => { const r = Math.random(); return useMulti && r < .15 ? 'multi' : useComp && r < (lv() === 3 ? .3 : .4) ? 'comp' : useSub && r < .65 ? 'sub' : 'add'; });
   if (useSub && n >= 3 && !cats.includes('sub')) cats[1] = 'sub';
   if (useComp && n >= 3 && !cats.includes('comp')) cats[2] = 'comp';
   if (useMulti && n >= 4 && !cats.includes('multi')) cats[n - 1] = 'multi';
@@ -1352,7 +1379,11 @@ function pickQuestions(n) {
   // さいしょは とくいな たしざんで じしんを つける
   let bi = -1; out.forEach((p, i) => { if (p.q.t === 'add' && (bi < 0 || p.box > out[bi].box)) bi = i; });
   if (bi > 0) out.unshift(out.splice(bi, 1)[0]);
-  return out.map(p => p.q);
+  const qs = out.map(p => p.q);
+  // 10の おともだちも ときどき おさらい（まだ ぱっと いえない もの）
+  const weak = levelPool(2).filter(q => (S.facts[qKey(q)]?.box || 0) < 4);
+  if (n >= 4 && weak.length) { const i = qs.findLastIndex((q, k) => k > 0 && q.t === 'add'); if (i > 0) qs[i] = pick(weak); }
+  return qs;
 }
 // 「おぼえた」は ボタンが でてから 3〜4びょうで こたえられたとき（かぞえて いると まにあわない はやさ）
 const QUICK_MS = 3500;
@@ -1364,11 +1395,15 @@ function record(t, a, b, { first, time, hinted, st }) {
   } else { f.ng++; f.lw = true; f.box = Math.max(0, f.box - 1); }
   S.total++; save();
 }
-function checkUnlock() { // いちばん 大きい たしざんが できてきたら つぎの おともだち
-  if (S.unlocked >= 20) return 0;
-  const pool = addPool(S.unlocked), band = pool.filter(([a, b]) => a + b >= S.unlocked - 1);
+function checkUnlock() { // いちばん 大きい たしざんが できてきたら つぎの おともだち（たしざんの レベルから）
+  if (lv() < 3) return 0;
+  const top = MAXN(); if (top >= 20) return 0;
+  const pool = addPool(top), band = pool.filter(([a, b]) => a + b >= top - 1);
   const ok = ([a, b]) => (S.facts[fkey('add', a, b)]?.box || 0) >= 2;
-  if (band.filter(ok).length / band.length >= .6 && pool.filter(ok).length / pool.length >= .4) { S.unlocked++; save(); return S.unlocked; }
+  if (band.filter(ok).length / band.length >= .6 && pool.filter(ok).length / pool.length >= .4) {
+    if (lv() === 3 && top >= 10) { S.cur = 4; if (S.unlocked > 10) { save(); return 0; } } // 10まで できたら くりあがりへ
+    S.unlocked = top + 1; save(); return S.unlocked;
+  }
   return 0;
 }
 
@@ -1417,20 +1452,20 @@ function makeBoxes(list) { // うさぎを はこに かくす。あける か�
     await Promise.all(list.map((b, i) => { b.labelOn = true; return b.dropIn(i * .1, 4); }));
   };
 }
-function choiceOpts(c) {
-  const near = [c - 1, c + 1].filter(v => v >= 1 && v <= 20), far = [c - 2, c + 2, c + 3].filter(v => v >= 1 && v <= 20);
+function choiceOpts(c, max = 20) {
+  const near = [c - 1, c + 1].filter(v => v >= 1 && v <= max), far = [c - 2, c + 2, c + 3, c - 3].filter(v => v >= 1 && v <= max);
   return shuffle([c, ...shuffle(near).concat(shuffle(far)).slice(0, 2)]);
 }
 // こたえを えらぶ。まちがえたら onWrong（しょんぼり → じぶんで かぞえなおし）
-function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel }) {
+function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel, max = 20, lockSec }) {
   return new Promise(resolve => {
     const box = $('#choices'), hb = $('#hintBtn'); box.innerHTML = ''; box.classList.remove('think'); hb.style.display = 'none';
     let lock = true, firstTry = true, hinted = false, misses = 0, t0 = 0; P.correct = correct;
     const unlock = async sec => { // かんがえタイム：すぐには おせない
       lock = true; box.classList.add('think'); await wait(sec); guard(tok);
-      box.classList.remove('think'); lock = false; P.enabledAt = performance.now(); if (!t0) t0 = P.enabledAt; if (onHint && hintLabel) { hb.textContent = hintLabel; hb.style.display = ''; }
+      box.classList.remove('think'); lock = false; P.enabledAt = performance.now(); if (!t0) t0 = P.enabledAt; if (onHint && hintLabel) { hb.textContent = hintLabel; hb.style.display = 'block'; }
     };
-    choiceOpts(correct).forEach((v, i) => {
+    choiceOpts(correct, max).forEach((v, i) => {
       const bt = document.createElement('button'); bt.className = 'choice' + (pic ? ' pic' : '') + (v > 10 ? ' teen' : '');
       bt.style.setProperty('--c', MAIN[v] === '#ffd9ee' ? '#f3b6d8' : MAIN[v]); bt.style.setProperty('--ink', INK[v]); bt.style.animationDelay = i * .08 + 's';
       bt.innerHTML = (pic ? miniBlocks(v) : '') + `<span class="cn">${v}</span>`;
@@ -1448,7 +1483,7 @@ function askChoice({ correct, pic, st, tok, onWrong, onHint, hintLabel }) {
       if (lock) return; AC.pop(); hinted = true; lock = true; box.classList.add('think'); hb.style.display = 'none';
       hintLabel = await onHint(); guard(tok); await unlock(.4);
     });
-    run(() => unlock(st >= 3 ? 1.8 : .8));
+    run(() => unlock(lockSec ?? (st >= 3 ? 1.8 : .8)));
   });
 }
 async function sadReact(bs, hasty, tok) {
@@ -1668,6 +1703,128 @@ async function compQ({ w, p }, tok) {
   P.log.push({ firstTry: res.firstTry, result: w });
   await wait(.8); guard(tok);
 }
+/* ================= うさぎの おうち（5・10の わく） ================= */
+// たて5マス × 1〜2れつ。あいている マスが みえるので、かぞえなくても かたちで わかる
+const emptyMat = new THREE.MeshToonMaterial({ color: '#ffffff', gradientMap: gradTex, transparent: true, opacity: .9 });
+function makeHouse(cap = 10) {
+  const g = new THREE.Group(), cols = cap / 5, w = cols + .7, h = 5.7;
+  const cellPos = i => new THREE.Vector3(Math.floor(i / 5) - (cols - 1) / 2, (i % 5) + .5, 0);
+  g.add(M3(new RoundedBoxGeometry(w, h, .3, 3, .12), '#f7c6e4', 0, h / 2 - .35, -.62));
+  const roof = M3(new THREE.ConeGeometry((w + .5) / Math.SQRT2, 1.4, 4), '#ff9fd0', 0, h - .35 + .7, -.62, { ry: Math.PI / 4 }); roof.scale.z = .35; g.add(roof);
+  g.add(M3(HEART, '#ff6fb3', 0, h + .15, -.38, { s: .28 }));
+  for (let i = 0; i < cap; i++) { const e = new THREE.Mesh(GEO.cube, emptyMat); e.position.copy(cellPos(i)); e.position.z = -.25; e.scale.set(.86, .86, .4); g.add(e); }
+  // カーテン（うえから おりてくる）
+  const cur = new THREE.Group(); cur.position.set(0, h - .4, .62); g.add(cur);
+  const cm = M3(new RoundedBoxGeometry(w - .1, h - .5, .12, 3, .05), '#ffc2e0', 0, -(h - .5) / 2, 0); cur.add(cm);
+  for (let k = 0; k < 3; k++) cur.add(M3(HEART, '#ffffff', 0, -1 - k * 1.5, .08, { s: .3 }));
+  cur.scale.y = .001; cur.visible = false;
+  const H = { group: g, cap, cols, cubes: [], width: w, height: h + 1.2, cellPos };
+  H.fill = (n, colorOf = i => cubeColor(n, i)) => { // ぜんぶ いっしょに はいる（1こずつ に しない）
+    H.cubes.forEach(c => g.remove(c)); H.cubes = [];
+    for (let i = 0; i < n; i++) { const c = new THREE.Mesh(GEO.cube, toon(colorOf(i))); c.position.copy(cellPos(i)); c.scale.setScalar(.01); g.add(c); H.cubes.push(c); }
+    AC.pop(1.1); return tween(.35, k => H.cubes.forEach(c => c.scale.setScalar(Math.max(.01, ease.back(k)))), ease.lin);
+  };
+  H.add = (i, color) => { const c = new THREE.Mesh(GEO.cube, toon(color)); c.position.copy(cellPos(i)); g.add(c); H.cubes.push(c); return c; };
+  H.cover = async on => {
+    if (on === cur.visible && (on ? cur.scale.y > .9 : true)) return;
+    cur.visible = true; AC.whoosh(); const s0 = cur.scale.y, s1 = on ? 1 : .001;
+    await tween(.35, k => cur.scale.y = s0 + (s1 - s0) * k); if (!on) cur.visible = false;
+  };
+  H.glow = (i, on = true) => { const c = H.cubes[i]; if (c) c.material.emissive.copy(c.material.color).multiplyScalar(on ? .32 : 0); };
+  H.badges = [];
+  H.badge = (i, num) => { const c = H.cubes[i]; if (!c) return; const sp = new THREE.Sprite(badgeMat(num)); sp.renderOrder = 20; sp.position.set(Math.floor(i / 5) ? .7 : -.7, 0, .3); sp.scale.setScalar(.5); c.add(sp); H.badges.push([c, sp]); };
+  H.clear = () => { H.badges.forEach(([c, sp]) => c.remove(sp)); H.badges = []; H.cubes.forEach((c, i) => H.glow(i, false)); };
+  H.pop = i => { const c = H.cubes[i]; if (c) tween(.28, k => c.scale.setScalar(1 + Math.sin(k * Math.PI) * .22), ease.lin); };
+  // 5・10の かたまりで みせる
+  H.chunk = async (tok, n = H.cubes.length) => {
+    H.clear(); const g5 = n >= 10 ? 10 : n >= 5 ? 5 : 0, rest = n - g5;
+    const lit = (a, b) => { for (let i = a; i < b; i++) { H.glow(i); H.pop(i); } };
+    if (!g5 || !rest) { lit(0, n); H.badge(n - 1, n); AC.sparkle(); await Promise.all([Voice.say(YOMI[n]), wait(.7)]); guard(tok); return; }
+    lit(0, g5); H.badge(g5 - 1, g5); AC.sparkle(); await Promise.all([Voice.say(g5 === 10 ? 'じゅう' : 'ご'), wait(.6)]); guard(tok);
+    lit(g5, n); H.badge(n - 1, n); AC.count(rest); await Promise.all([Voice.say(`${YOMI[g5]}と ${YOMI[rest]}で ${YOMI[n]}`), wait(.8)]); guard(tok);
+  };
+  // あいている マスを ぴかぴか させる
+  H.sparkEmpty = async (tok, n) => {
+    const es = g.children.filter(o => o.material === emptyMat).slice(n);
+    AC.sparkle(); burst(g.localToWorld(cellPos(n).add(new THREE.Vector3(0, 0, .8))), { n: 10, emojis: ['✨', '⭐'], speed: 2.5, size: .45 });
+    await tween(1.2, k => es.forEach(e => { const q = .86 + Math.sin(k * Math.PI * 4) * .12; e.scale.set(q, q, .4); }), ease.lin); guard(tok);
+  };
+  return H;
+}
+const houseQuick = res => praiseFor(res);
+// ぱっと いくつ：おうちに はいった ブロックを すこしだけ みせて かくす
+async function seeQ({ n, cap }, tok) {
+  const st = stageOf(factOf('see', n, cap)), flash = [2.4, 1.8, 1.3, 1.0][st - 1];
+  $('#eq').innerHTML = '<span class="op wa">ぱっと みて</span><span class="q">？</span>';
+  const H = makeHouse(cap); stageDyn.add(H.group);
+  fitStage(H.width + 3, H.height, 3.3, 140, 240);
+  instr('ぱっと みてね！'); await Voice.say('ぱっと みてね！'); guard(tok);
+  await wait(.3); guard(tok);
+  await H.fill(n); await wait(flash); guard(tok);
+  await H.cover(true); guard(tok);
+  instr('いくつ だった？'); Voice.say('いくつ だった？');
+  const res = await askChoice({
+    correct: n, pic: false, st: Math.max(3, st), tok, max: cap, lockSec: .3,
+    onWrong: async () => { await Voice.say(pick(['ざんねん… もういちど みてみよう', 'おしい！ いっしょに みてみよう'])); guard(tok); await H.cover(false); await H.chunk(tok, n); instr('いくつ かな？'); },
+    onHint: async () => { await H.cover(false); await H.chunk(tok, n); return null; },
+    hintLabel: '👀 もういちど',
+  });
+  guard(tok);
+  AC.fanfare(); quickFx(res); $('#eq').innerHTML = `<span class="ans" style="color:${INK[n]}">${n}</span>`;
+  $('#choices').innerHTML = ''; await H.cover(false); guard(tok);
+  await H.chunk(tok, n);
+  instr(`<b style="color:${INK[n]};font-size:36px">${n}</b>${n > 5 ? `　（5 と ${n - 5}）` : ''}${res.quick ? ' ⚡' : ''}`);
+  await Voice.say(houseQuick(res)); guard(tok);
+  record('see', n, cap, { first: res.firstTry, time: res.time, hinted: res.hinted, st: Math.max(3, st) });
+  P.log.push({ firstTry: res.firstTry, result: n });
+  await wait(.6); guard(tok);
+}
+// 10の おともだち：n と いくつで 10？
+async function tomoQ({ n }, tok) {
+  const x = 10 - n, st = stageOf(factOf('tomo', n, 10));
+  const eqHtml = ans => `<span style="color:${INK[n]}">${n}</span><span class="op wa">と</span>` + (ans ? `<span class="ans" style="color:${INK[x]}">${x}</span>` : '<span class="q">？</span>') + '<span class="op wa">で</span><span style="color:#d0579a">10</span>';
+  $('#eq').innerHTML = eqHtml(false);
+  const H = makeHouse(10); stageDyn.add(H.group); H.group.position.x = -1.2;
+  fitStage(H.width + 5, H.height, 3.3, 140, 240);
+  if (st === 4) H.cover(true);
+  await Voice.say(`${YOMI[n]}の おともだちは？ ${YOMI[n]}と いくつで じゅう？`); guard(tok);
+  if (st < 4) { await H.fill(n); await wait(.4); guard(tok); }
+  if (st === 1) { instr('あいている おへやは いくつ？'); await H.sparkEmpty(tok, n); }
+  else if (st === 2) instr('あいている おへやは いくつ？');
+  else if (st === 3) { await wait(1.3); guard(tok); await H.cover(true); instr(`<b style="color:${INK[n]};font-size:32px">${n}</b> の おともだちは？`); }
+  else instr(`<b style="color:${INK[n]};font-size:32px">${n}</b> の おともだちは？`);
+  const show = async () => { if (!H.cubes.length) { await H.cover(false); await H.fill(n); } else await H.cover(false); guard(tok); await H.sparkEmpty(tok, n); };
+  const res = await askChoice({
+    correct: x, pic: false, st, tok, max: 9, lockSec: st >= 3 ? 1 : .5,
+    onWrong: async ({ misses }) => {
+      await Voice.say(pick(['ざんねん… おうちを みてみよう', 'おしい！ あいている ところを みてみよう'])); guard(tok);
+      await show();
+      if (misses >= 2) { // あいている おへやに ひとつずつ いれて みる
+        for (let i = n; i < 10; i++) { H.add(i, '#ffffff'); H.badge(i, i - n + 1); AC.count(i - n + 1); await Promise.all([Voice.say(YOMI[i - n + 1], { rate: 1.1 }), wait(.4)]); guard(tok); }
+        H.cubes.splice(n).forEach(c => H.group.remove(c)); H.clear();
+      }
+      instr('あいている おへやは いくつ？');
+    },
+    onHint: st >= 2 ? async () => { await show(); instr('あいている おへやは いくつ？'); return null; } : null,
+    hintLabel: '👀 おうちを みる',
+  });
+  guard(tok);
+  AC.fanfare(); quickFx(res); $('#eq').innerHTML = eqHtml(true); instr(''); $('#choices').innerHTML = '';
+  if (!H.cubes.length) { await H.cover(false); await H.fill(n); } else await H.cover(false);
+  guard(tok); H.clear();
+  // おともだちが やってきて あいている おへやに はいる
+  const F = new Bunny(x); F.root.position.set(H.group.position.x + H.width / 2 + 1.2 + F.width / 2, 0, 0); stageDyn.add(F.root);
+  await F.dropIn(0, 5); guard(tok); F.setHappy(true); await F.hop({ h: .7 }); guard(tok);
+  for (let i = 0; i < x; i++) { const c = H.add(n + i, cubeColor(x, i)); c.scale.setScalar(.01); tween(.3, k => c.scale.setScalar(Math.max(.01, ease.back(k))), ease.lin); AC.pop(1 + i * .1); await wait(.08); }
+  F.labelOn = false; await tween(.3, k => F.root.scale.setScalar(Math.max(.01, 1 - k))); F.dispose();
+  for (let i = 0; i < 10; i++) H.glow(i); H.badge(9, 10); AC.sparkle();
+  burst(H.group.localToWorld(new THREE.Vector3(0, 3, 1)), { n: 26, emojis: ['💖', '✨', '⭐', '🌸', '🎀'], speed: 5 });
+  instr(`<span style="color:${INK[n]}">${n}</span> と <span style="color:${INK[x]}">${x}</span> で <b style="font-size:36px;color:#d0579a">10</b>${res.quick ? ' ⚡' : ''}`);
+  await Voice.say(`${YOMI[n]}と ${YOMI[x]}で じゅう！ ${praiseFor(res)}`); guard(tok);
+  record('tomo', n, 10, { first: res.firstTry, time: res.time, hinted: res.hinted, st });
+  P.log.push({ firstTry: res.firstTry, result: x });
+  await wait(.6); guard(tok);
+}
 async function startSession() {
   const tok = newFlow(); leaveGarden(); mode = 'play'; clearStage(); showLayer('play');
   P.qs = pickQuestions(S.settings.qn); P.idx = 0; P.log = [];
@@ -1682,6 +1839,8 @@ async function playQ(q, tok) {
   clearStage(); instr(''); $('#choices').innerHTML = ''; $('#hintBtn').style.display = 'none';
   if (q.t === 'multi') return multiQ(q, tok);
   if (q.t === 'comp') return compQ(q, tok);
+  if (q.t === 'see') return seeQ(q, tok);
+  if (q.t === 'tomo') return tomoQ(q, tok);
   const { t, a, b } = q, st = stageOf(factOf(t, a, b)), op = t === 'sub' ? '-' : '+', ans = t === 'sub' ? a - b : a + b;
   setEq([a, b], [op]);
   const A = new Bunny(a); stageDyn.add(A.root);
@@ -1763,7 +1922,8 @@ async function sessionEnd(tok) {
     await bottomBtn('つぎへ ▶'); guard(tok);
   }
   if (bonus) { await openGift(tok, true); guard(tok); }
-  const nf = checkUnlock();
+  const lv0 = lv(); checkLevel(); const nf = checkUnlock();
+  if (lv() !== lv0) { await levelUp(lv(), tok); guard(tok); }
   if (nf) { await newFriend(nf, tok); guard(tok); }
   enterGarden();
 }
@@ -1834,6 +1994,18 @@ async function openGift(tok, bonus) {
   holder.userData.spin = false;
 }
 
+// レベルアップの おいわい
+async function levelUp(l, tok) {
+  clearStage(); showLayer('show'); mode = 'show';
+  const bs = S.met.filter(n => n <= 10).slice(0, 5).map((n, i, a) => { const b = new Bunny(n); b.root.position.x = (i - (a.length - 1) / 2) * 2.4; stageDyn.add(b.root); b.dropIn(i * .12); return b; });
+  fitStage(12, 7.5, 3, 140, 150);
+  bigMsg(`🎉 レベル アップ！ 🎉<br><span style="font-size:24px">つぎは ${LV_ICON[l]} 「${LEVELS[l]}」 だよ</span>`);
+  AC.fanfare(); await wait(.9); guard(tok);
+  bs.forEach((b, i) => { b.setHappy(true); wait(i * .1).then(() => b.hop({ h: 1.2 })); });
+  burst(new THREE.Vector3(0, 4, 1), { n: 34, emojis: ['🌟', '✨', '💖', '🎀', '🌈'], speed: 6 });
+  await Voice.say(`レベル アップ！ つぎは ${LEVELS[l]} だよ！`); guard(tok);
+  await bottomBtn('つぎへ ▶'); guard(tok);
+}
 async function newFriend(n, tok) {
   leaveGarden(); clearStage(); showLayer('show'); mode = 'show'; bigMsg('あれれ？ なにか おこるよ…！');
   const g = n > 10 ? 10 : 5, m = n - g;
@@ -1917,11 +2089,15 @@ function renderDress(drop) {
 }
 
 /* ================= おうちの人 ================= */
-let pTab = 'add';
+let pTab = 'lv';
 function parentPanel() {
   const cell = (t, a, b, on) => { const f = S.facts[fkey(t, a, b)]; return `<td class="${!on ? 'na' : f && f.seen ? 'b' + f.box : ''}">${on && f && f.seen ? (f.box >= 4 ? '★' : f.ok + '/' + f.seen) : ''}</td>`; };
   const mx = Math.max(S.unlocked, 10); let rows = '';
-  if (pTab === 'add') {
+  if (pTab === 'lv') {
+    const row = (label, qs) => `<tr><th style="white-space:nowrap">${label}</th>` + qs.map(q => { const f = S.facts[qKey(q)]; return `<td class="${f && f.seen ? 'b' + f.box : ''}" title="${q.n}">${f && f.seen ? (f.box >= 4 ? '★' : f.ok + '/' + f.seen) : ''}</td>`; }).join('') + '</tr>';
+    const hd = qs => '<tr><th></th>' + qs.map(q => `<th>${q.n}</th>`).join('') + '</tr>';
+    rows = hd(levelPool(0)) + row('ぱっと(5まで)', levelPool(0)) + hd(levelPool(1)) + row('ぱっと(10まで)', levelPool(1)) + hd(levelPool(2)) + row('10の おともだち', levelPool(2));
+  } else if (pTab === 'add') {
     rows = '<tr><th></th>' + range(1, 11).map(b => `<th>+${b}</th>`).join('') + '</tr>';
     for (let a = 1; a <= 10; a++) rows += `<tr><th>${a}</th>` + range(1, 11).map(b => a + b <= mx ? cell('add', a, b, true) : '<td class="na"></td>').join('') + '</tr>';
   } else if (pTab === 'comp') {
@@ -1935,7 +2111,9 @@ function parentPanel() {
   const tri = k => seg(k, ['auto', 'on', 'off'], ['じどう', 'いつも', 'なし'], S.settings[k] || 'auto');
   const c = modal(`<h2>おうちの人へ</h2>
     <p class="small">これまで ${S.total}もん ／ ${S.sessions}かい あそびました ／ シール ${Object.keys(S.stickers).length}まい ／ 3つの計算 ${S.multiDone || 0}もん ／ いま ${S.unlocked} までの数</p>
-    <div class="seg" style="justify-content:center;margin:8px 0" id="pTabs"><button data-t="add" class="${pTab === 'add' ? 'sel' : ''}">たしざん</button><button data-t="sub" class="${pTab === 'sub' ? 'sel' : ''}">ひきざん</button><button data-t="comp" class="${pTab === 'comp' ? 'sel' : ''}">いくつと いくつ</button></div>
+    <div class="set">がくしゅうの だんかい ${seg('cur', [0, 1, 2, 3, 4], LEVELS.map((t, i) => (i + 1) + ' ' + t), lv())}</div>
+    <p class="small">ふだんは自動で進みます。①〜③は「見てぱっと数がわかる」「10のおともだち」の練習で、そのあいだ たしざん・ひきざんはお休みします。④は10までのたしざんと「いくつといくつ」、ひきざんと3つの計算は⑤から（下の設定で「いつも」にすると前倒しできます）。</p>
+    <div class="seg" style="justify-content:center;margin:8px 0;flex-wrap:wrap" id="pTabs"><button data-t="lv" class="${pTab === 'lv' ? 'sel' : ''}">ぱっと・おともだち</button><button data-t="add" class="${pTab === 'add' ? 'sel' : ''}">たしざん</button><button data-t="sub" class="${pTab === 'sub' ? 'sel' : ''}">ひきざん</button><button data-t="comp" class="${pTab === 'comp' ? 'sel' : ''}">いくつと いくつ</button></div>
     <div style="overflow:auto;max-height:40vh"><table class="ptab">${rows}</table></div>
     <div class="legend"><span style="background:#ffe3ee">かたまりで見る</span><span style="background:#ffc7de">数えたす・10をつくる</span><span style="background:#e3cbff">ちらっと見て暗算</span><span style="background:#bfe6ff">数字だけで暗算</span><span style="background:#b5f0cd">★ぱっと言える</span></div>
     <p class="small">表の数字は「1回目で正解した回数／出題回数」。1こずつ数えず、5・10のかたまりで見る練習をします。ボタンが出てから約3.5秒以内（ヒントなし）に答えられたときだけ次の段階へ進むので、数えて答えている問題は多めに出題されます。</p>
@@ -1946,11 +2124,12 @@ function parentPanel() {
     <div class="set">3つの けいさん（1+2+3 など） ${tri('multi')}</div>
     <div class="set">いくつと いくつ（7は5と？・13は10と？） ${seg('comp', ['auto', 'off'], ['あり', 'なし'], S.settings.comp || 'auto')}</div>
     <div class="set">あつかう数（〜まで） <div class="seg"><button id="uDn">◀</button><b style="font-size:24px;min-width:44px;text-align:center">${S.unlocked}</b><button id="uUp">▶</button></div></div>
-    <p class="small">ふだんは自動で少しずつ大きな数に進みます（新しい友だちが登場）。「じどう」だと、ひきざんは6から、3つの計算は8から出題されます。</p>
+    <p class="small">ふだんは自動で少しずつ大きな数に進みます（新しい友だちが登場）。「じどう」だと、ひきざんと3つの計算は ⑤くりあがり から出題されます。</p>
     <div class="row"><button class="btn white" id="pReset" style="font-size:16px">データを けす</button><button class="btn" id="pClose">とじる</button></div>`);
   c.querySelectorAll('#pTabs button').forEach(b => b.onclick = () => { AC.tap(); pTab = b.dataset.t; parentPanel(); });
   c.querySelectorAll('.seg[data-k]').forEach(sg => sg.querySelectorAll('button').forEach(b => b.onclick = () => {
     const k = sg.dataset.k, v = b.dataset.v; AC.tap();
+    if (k === 'cur') { S.cur = +v; save(); parentPanel(); return; }
     S.settings[k] = k === 'qn' ? +v : (k === 'sub' || k === 'multi' || k === 'comp') ? v : v === 'true';
     save(); AC.applyBgm(); if (!S.settings.voice) Voice.stop(); parentPanel();
   }));
